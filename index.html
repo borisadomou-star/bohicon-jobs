@@ -437,4 +437,109 @@
   });
 
   // ---------- Authentification ----------
-  onAuthStateChanged(auth, async u 
+  onAuthStateChanged(auth, async u => {
+    user = u;
+    profil = null;
+    if (u && !enInscription){
+      try {
+        const s = await getDoc(doc(db, "users", u.uid));
+        profil = s.exists() ? s.data() : null;
+      } catch (e) { console.error(e); }
+    }
+    majUI();
+  });
+
+  $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
+  $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
+
+  $("btn-connexion").addEventListener("click", async () => {
+    afficherMessage("");
+    try {
+      await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
+      $("mdp").value = "";
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-inscription").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("i-");
+    if (!data) return;
+    const btn = $("btn-inscription");
+    btn.disabled = true; btn.textContent = "Création du compte…";
+    enInscription = true;
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
+      await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp() });
+      profil = data;
+      $("i-mdp").value = "";
+    } catch (e) {
+      console.error(e);
+      afficherMessage(e.code ? texteErreurAuth(e) : "Compte créé, mais le profil n'a pas pu être enregistré. Complète-le ci-dessous.");
+    }
+    enInscription = false;
+    user = auth.currentUser;
+    btn.disabled = false; btn.textContent = "S'inscrire";
+    majUI();
+  });
+
+  $("btn-profil").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("p-");
+    if (!data || !user) return;
+    try {
+      await setDoc(doc(db, "users", user.uid), { ...data, email: user.email, createdAt: serverTimestamp() }, { merge: true });
+      profil = data;
+      majUI();
+    } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
+  });
+
+  $("btn-reset").addEventListener("click", async () => {
+    const email = $("email").value.trim();
+    if (!email){ afficherMessage("Entre ton e-mail ci-dessus, puis reclique sur « Mot de passe oublié ? »."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      afficherMessage("E-mail envoyé. Vérifie ta boîte de réception (et les spams).", "info");
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-deconnexion").addEventListener("click", () => signOut(auth));
+  $("btn-deco-profil").addEventListener("click", () => signOut(auth));
+
+  // ---------- Publication ----------
+  $("publier").addEventListener("click", async () => {
+    if (!user || !profil){ afficherMessage("Connecte-toi et complète ton profil pour publier."); return; }
+    const titre = $("titre").value.trim();
+    const ville = $("ville").value;
+    const prix = Number($("prix").value);
+    const desc = $("desc").value.trim();
+
+    if (!titre || !prix || prix < 0){
+      alert("Remplis au moins le titre et le prix.");
+      return;
+    }
+
+    const btn = $("publier");
+    btn.disabled = true; btn.textContent = "Publication…";
+    try {
+      await addDoc(missionsRef, {
+        titre, ville, prix, desc,
+        tel: profil.tel,
+        auteur: nomCourt(profil),
+        uid: user.uid,
+        statut: "disponible",
+        createdAt: serverTimestamp()
+      });
+      ["titre","prix","desc"].forEach(id => $(id).value = "");
+      afficherMessage("");
+    } catch (e) {
+      console.error(e);
+      afficherMessage("La mission n'a pas pu être publiée. Réessaie.");
+    }
+    btn.disabled = false; btn.textContent = "Publier";
+  });
+
+  $("filtre").addEventListener("change", afficher);
+  $("filtre-statut").addEventListener("change", afficher);
+</script>
+</body>
+</html>
