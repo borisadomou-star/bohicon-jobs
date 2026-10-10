@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bohicon Jobs</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;background:#f4f6f8;color:#1a1a1a}
+  header{background:#0a7d3b;color:#fff;padding:20px 16px;text-align:center}
+  header h1{margin:0;font-size:1.5rem}
+  header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
+  main{max-width:640px;margin:0 auto;padding:16px}
+  .card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  h2{font-size:1.1rem;margin:0 0 10px}
+  input,select,textarea,button{width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;font-size:1rem;font-family:inherit}
+  button{background:#0a7d3b;color:#fff;border:0;font-weight:600;cursor:pointer}
+  .job h3{margin:0 0 4px;font-size:1.05rem}
+  .meta{font-size:.85rem;color:#555;margin-bottom:6px}
+  .prix{color:#0a7d3b;font-weight:700}
+  .wa{display:block;text-align:center;background:#25d366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px}
+  .vide{text-align:center;color:#777;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Bohicon Jobs</h1>
+  <p>Trouve une mission rémunérée ou publie la tienne</p>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Publier une mission</h2>
+    <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
+    <select id="ville">
+      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+    </select>
+    <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
+    <input id="tel" type="tel" placeholder="Ton numéro WhatsApp (ex : 0155000000)">
+    <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
+    <button id="publier">Publier</button>
+  </div>
+
+  <div class="card">
+    <h2>Missions disponibles</h2>
+    <select id="filtre">
+      <option value="">Toutes les villes</option>
+      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+    </select>
+  </div>
+
+  <div id="liste"></div>
+</main>
+
+<script>
+  const CLE = "bohicon_jobs";
+  let missions = [];
+  try { missions = JSON.parse(localStorage.getItem(CLE)) || []; } catch (e) {}
+
+  if (missions.length === 0) {
+    missions = [
+      {titre:"Nettoyage de cour", ville:"Bohicon", prix:3000, tel:"0100000000", desc:"Balayer et nettoyer la cour d'une maison."},
+      {titre:"Livraison de colis", ville:"Abomey", prix:2000, tel:"0100000000", desc:"Livrer un colis de Bohicon vers Abomey."}
+    ];
+  }
+
+  function sauver(){
+    try { localStorage.setItem(CLE, JSON.stringify(missions)); } catch (e) {}
+  }
+
+  function lienWhatsApp(tel, titre){
+    let n = tel.replace(/\D/g, "");
+    if (!n.startsWith("229")) n = "229" + n;
+    const msg = encodeURIComponent("Bonjour, je suis intéressé par la mission : " + titre);
+    return "https://wa.me/" + n + "?text=" + msg;
+  }
+
+  function afficher(){
+    const f = document.getElementById("filtre").value;
+    const liste = document.getElementById("liste");
+    liste.innerHTML = "";
+    const items = missions.filter(m => !f || m.ville === f);
+    if (items.length === 0){
+      liste.innerHTML = '<div class="vide">Aucune mission pour le moment.</div>';
+      return;
+    }
+    items.forEach(m => {
+      const c = document.createElement("div");
+      c.className = "card job";
+      const h = document.createElement("h3"); h.textContent = m.titre;
+      const meta = document.createElement("div"); meta.className = "meta";
+      meta.textContent = "📍 " + m.ville + " · ";
+      const p = document.createElement("span"); p.className = "prix";
+      p.textContent = Number(m.prix).toLocaleString("fr-FR") + " FCFA";
+      meta.appendChild(p);
+      const d = document.createElement("div"); d.textContent = m.desc;
+      const a = document.createElement("a");
+      a.className = "wa"; a.textContent = "Contacter sur WhatsApp";
+      a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
+      c.append(h, meta, d, a);
+      liste.appendChild(c);
+    });
+  }
+
+  document.getElementById("publier").addEventListener("click", () => {
+    const titre = document.getElementById("titre").value.trim();
+    const ville = document.getElementById("ville").value;
+    const prix = document.getElementById("prix").value;
+    const tel = document.getElementById("tel").value.trim();
+    const desc = document.getElementById("desc").value.trim();
+    if (!titre || !prix || !tel){
+      alert("Remplis au moins le titre, le prix et ton numéro WhatsApp.");
+      return;
+    }
+    missions.unshift({titre, ville, prix, tel, desc});
+    sauver();
+    ["titre","prix","tel","desc"].forEach(id => document.getElementById(id).value = "");
+    afficher();
+  });
+
+  document.getElementById("filtre").addEventListener("change", afficher);
+  afficher();
+</script>
+</body>
+</html>
