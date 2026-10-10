@@ -15,11 +15,13 @@
   h2{font-size:1.1rem;margin:0 0 10px}
   input,select,textarea,button{width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;font-size:1rem;font-family:inherit}
   button{background:#0a7d3b;color:#fff;border:0;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.6}
   .job h3{margin:0 0 4px;font-size:1.05rem}
   .meta{font-size:.85rem;color:#555;margin-bottom:6px}
   .prix{color:#0a7d3b;font-weight:700}
   .wa{display:block;text-align:center;background:#25d366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px}
   .vide{text-align:center;color:#777;padding:20px}
+  .erreur{background:#fdecea;color:#b3261e;padding:12px;border-radius:8px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -51,35 +53,50 @@
     </select>
   </div>
 
-  <div id="liste"></div>
+  <div id="erreur"></div>
+  <div id="liste"><div class="vide">Chargement…</div></div>
 </main>
 
-<script>
-  const CLE = "bohicon_jobs";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
+    authDomain: "bohicon-jobs.firebaseapp.com",
+    projectId: "bohicon-jobs",
+    storageBucket: "bohicon-jobs.firebasestorage.app",
+    messagingSenderId: "505683521455",
+    appId: "1:505683521455:web:d9bcf7a1b1143eeaf9895a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const missionsRef = collection(db, "missions");
+
   let missions = [];
-  try { missions = JSON.parse(localStorage.getItem(CLE)) || []; } catch (e) {}
+  const $ = id => document.getElementById(id);
 
-  if (missions.length === 0) {
-    missions = [
-      {titre:"Nettoyage de cour", ville:"Bohicon", prix:3000, tel:"0100000000", desc:"Balayer et nettoyer la cour d'une maison."},
-      {titre:"Livraison de colis", ville:"Abomey", prix:2000, tel:"0100000000", desc:"Livrer un colis de Bohicon vers Abomey."}
-    ];
-  }
-
-  function sauver(){
-    try { localStorage.setItem(CLE, JSON.stringify(missions)); } catch (e) {}
+  function afficherErreur(msg){
+    $("erreur").innerHTML = "";
+    if (!msg) return;
+    const e = document.createElement("div");
+    e.className = "erreur";
+    e.textContent = msg;
+    $("erreur").appendChild(e);
   }
 
   function lienWhatsApp(tel, titre){
-    let n = tel.replace(/\D/g, "");
+    let n = String(tel).replace(/\D/g, "");
     if (!n.startsWith("229")) n = "229" + n;
     const msg = encodeURIComponent("Bonjour, je suis intéressé par la mission : " + titre);
     return "https://wa.me/" + n + "?text=" + msg;
   }
 
   function afficher(){
-    const f = document.getElementById("filtre").value;
-    const liste = document.getElementById("liste");
+    const f = $("filtre").value;
+    const liste = $("liste");
     liste.innerHTML = "";
     const items = missions.filter(m => !f || m.ville === f);
     if (items.length === 0){
@@ -95,7 +112,7 @@
       const p = document.createElement("span"); p.className = "prix";
       p.textContent = Number(m.prix).toLocaleString("fr-FR") + " FCFA";
       meta.appendChild(p);
-      const d = document.createElement("div"); d.textContent = m.desc;
+      const d = document.createElement("div"); d.textContent = m.desc || "";
       const a = document.createElement("a");
       a.className = "wa"; a.textContent = "Contacter sur WhatsApp";
       a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
@@ -104,24 +121,49 @@
     });
   }
 
-  document.getElementById("publier").addEventListener("click", () => {
-    const titre = document.getElementById("titre").value.trim();
-    const ville = document.getElementById("ville").value;
-    const prix = document.getElementById("prix").value;
-    const tel = document.getElementById("tel").value.trim();
-    const desc = document.getElementById("desc").value.trim();
-    if (!titre || !prix || !tel){
+  // Écoute en temps réel : toutes les missions de tout le monde
+  const q = query(missionsRef, orderBy("createdAt", "desc"), limit(100));
+  onSnapshot(q, snap => {
+    afficherErreur("");
+    missions = snap.docs.map(d => d.data());
+    afficher();
+  }, err => {
+    console.error(err);
+    afficherErreur("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
+    $("liste").innerHTML = "";
+  });
+
+  $("publier").addEventListener("click", async () => {
+    const titre = $("titre").value.trim();
+    const ville = $("ville").value;
+    const prix = Number($("prix").value);
+    const tel = $("tel").value.trim();
+    const desc = $("desc").value.trim();
+
+    if (!titre || !prix || prix < 0 || !tel){
       alert("Remplis au moins le titre, le prix et ton numéro WhatsApp.");
       return;
     }
-    missions.unshift({titre, ville, prix, tel, desc});
-    sauver();
-    ["titre","prix","tel","desc"].forEach(id => document.getElementById(id).value = "");
-    afficher();
+    const chiffres = tel.replace(/\D/g, "");
+    if (chiffres.length < 8){
+      alert("Numéro WhatsApp invalide.");
+      return;
+    }
+
+    const btn = $("publier");
+    btn.disabled = true; btn.textContent = "Publication…";
+    try {
+      await addDoc(missionsRef, { titre, ville, prix, tel, desc, createdAt: serverTimestamp() });
+      ["titre","prix","tel","desc"].forEach(id => $(id).value = "");
+      afficherErreur("");
+    } catch (e) {
+      console.error(e);
+      afficherErreur("La mission n'a pas pu être publiée. Réessaie.");
+    }
+    btn.disabled = false; btn.textContent = "Publier";
   });
 
-  document.getElementById("filtre").addEventListener("change", afficher);
-  afficher();
+  $("filtre").addEventListener("change", afficher);
 </script>
 </body>
 </html>
