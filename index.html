@@ -41,6 +41,25 @@
   .info{background:#e8f5e9;color:#0a5d2c;padding:12px;border-radius:8px;margin-bottom:12px}
   .cache{display:none}
   .moi{font-size:.9rem;margin-bottom:10px;word-break:break-word}
+
+  /* Vitrine */
+  .hero{background:linear-gradient(135deg,#0a7d3b,#13a455);color:#fff;text-align:center;padding:28px 16px 32px}
+  .hero h2{font-size:1.4rem;margin:0 0 8px;line-height:1.25}
+  .hero p{margin:0 auto 16px;max-width:460px;opacity:.95}
+  .stats{display:flex;justify-content:center;gap:12px;margin-bottom:18px}
+  .stats div{background:rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;min-width:120px}
+  .stats b{display:block;font-size:1.5rem}
+  .stats span{font-size:.8rem;opacity:.9}
+  .cta{display:inline-block;background:#fff;color:#0a7d3b;padding:12px 22px;border-radius:24px;font-weight:700;text-decoration:none}
+  .slider{max-width:640px;margin:16px auto 0;padding:0 16px}
+  .piste{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;scrollbar-width:none}
+  .piste::-webkit-scrollbar{display:none}
+  .slide{flex:0 0 100%;scroll-snap-align:center;border-radius:14px;padding:20px;color:#fff;min-height:130px;display:flex;flex-direction:column;justify-content:center;text-decoration:none}
+  .slide h3{margin:0 0 6px;font-size:1.15rem}
+  .slide p{margin:0;font-size:.9rem;opacity:.95}
+  .points{display:flex;justify-content:center;gap:6px;margin-top:8px}
+  .points i{width:8px;height:8px;border-radius:50%;background:#c9d1d9}
+  .points i.on{background:#0a7d3b}
 </style>
 </head>
 <body>
@@ -48,6 +67,18 @@
   <h1>Bohicon Jobs</h1>
   <p>Trouve une mission rémunérée ou publie la tienne</p>
 </header>
+
+<section class="hero">
+  <h2>Des petits jobs, de vraies opportunités à Bohicon</h2>
+  <p>Publie une mission ou trouve un travail près de chez toi, en quelques minutes.</p>
+  <div class="stats">
+    <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
+    <div><b id="stat-fin">0</b><span>missions terminées</span></div>
+  </div>
+  <a href="#liste" class="cta">Voir les missions</a>
+</section>
+
+<div class="slider" id="slider"></div>
 
 <main>
   <div id="message"></div>
@@ -406,6 +437,8 @@
     const f = $("filtre").value;
     const fs = $("filtre-statut").value;
     const cpt = compteurs();
+    $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible").length;
+    $("stat-fin").textContent = missions.filter(m => st(m) === "terminee").length;
 
     if (user && profil){
       const nb = (cpt.parAuteur[user.uid] || 0) + (cpt.parTravailleur[user.uid] || 0);
@@ -540,6 +573,50 @@
 
   $("filtre").addEventListener("change", afficher);
   $("filtre-statut").addEventListener("change", afficher);
+
+  // ---------- Bannières ----------
+  // Ton numéro WhatsApp pour l'espace publicitaire, au format 229 + 10 chiffres (ex : "2290155000000").
+  // Laisse vide ("") tant que tu ne veux pas de lien.
+  const NUMERO_WA = "";
+
+  const BANNIERES = [
+    { titre:"Publie ta mission gratuitement", texte:"Ménage, livraison, jardinage… trouve de l'aide près de chez toi.", fond:"linear-gradient(135deg,#0a7d3b,#13a455)" },
+    { titre:"Besoin d'un revenu en plus ?", texte:"Choisis des missions autour de toi et fais-toi payer directement.", fond:"linear-gradient(135deg,#1a4fa0,#3b82f6)" },
+    { titre:"Ton commerce ici", texte:"Espace publicitaire disponible. Contacte-nous sur WhatsApp.", fond:"linear-gradient(135deg,#8a5a00,#f59e0b)", lien: NUMERO_WA ? "https://wa.me/" + NUMERO_WA : "" }
+  ];
+
+  (function(){
+    const zone = $("slider");
+    const piste = document.createElement("div"); piste.className = "piste";
+    const points = document.createElement("div"); points.className = "points";
+    BANNIERES.forEach((b, i) => {
+      const s = document.createElement(b.lien ? "a" : "div");
+      s.className = "slide";
+      if (b.lien){ s.href = b.lien; s.target = "_blank"; s.rel = "noopener"; }
+      s.style.background = b.image
+        ? "linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url('" + b.image + "') center/cover"
+        : b.fond;
+      const h = document.createElement("h3"); h.textContent = b.titre;
+      const p = document.createElement("p"); p.textContent = b.texte;
+      s.append(h, p);
+      piste.appendChild(s);
+      const pt = document.createElement("i");
+      if (i === 0) pt.className = "on";
+      points.appendChild(pt);
+    });
+    zone.append(piste, points);
+
+    let idx = 0;
+    const largeur = () => piste.clientWidth + 12;
+    piste.addEventListener("scroll", () => {
+      idx = Math.round(piste.scrollLeft / largeur());
+      Array.from(points.children).forEach((pt, i) => pt.classList.toggle("on", i === idx));
+    });
+    const minuteur = setInterval(() => {
+      piste.scrollTo({ left: ((idx + 1) % BANNIERES.length) * largeur(), behavior: "smooth" });
+    }, 5000);
+    piste.addEventListener("touchstart", () => clearInterval(minuteur), { once: true });
+  })();
 </script>
 </body>
 </html>
