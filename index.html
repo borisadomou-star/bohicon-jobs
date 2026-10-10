@@ -19,6 +19,8 @@
   button.danger{background:#fff;color:#b3261e;border:1px solid #b3261e;margin-top:8px;margin-bottom:0;padding:8px}
   button:disabled{opacity:.6}
   .lien{background:none;border:0;color:#0a7d3b;text-decoration:underline;font-weight:400;padding:4px;margin:0}
+  .check{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;margin-bottom:12px;color:#444}
+  .check input{width:auto;margin:3px 0 0}
   .job h3{margin:0 0 4px;font-size:1.05rem}
   .meta{font-size:.85rem;color:#555;margin-bottom:6px}
   .prix{color:#0a7d3b;font-weight:700}
@@ -28,7 +30,7 @@
   .erreur{background:#fdecea;color:#b3261e;padding:12px;border-radius:8px;margin-bottom:12px}
   .info{background:#e8f5e9;color:#0a5d2c;padding:12px;border-radius:8px;margin-bottom:12px}
   .cache{display:none}
-  .moi{font-size:.9rem;margin-bottom:10px;word-break:break-all}
+  .moi{font-size:.9rem;margin-bottom:10px;word-break:break-word}
 </style>
 </head>
 <body>
@@ -44,10 +46,28 @@
   <div class="card" id="bloc-connexion">
     <h2>Connexion</h2>
     <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
-    <input id="mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
+    <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
     <button id="btn-connexion">Se connecter</button>
-    <button id="btn-inscription" class="sec">Créer un compte</button>
+    <button id="btn-vers-inscription" class="sec">Créer un compte</button>
     <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+  </div>
+
+  <!-- Inscription -->
+  <div class="card cache" id="bloc-inscription">
+    <h2>Créer un compte</h2>
+    <div id="champs-inscription"></div>
+    <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
+    <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
+    <button id="btn-inscription">S'inscrire</button>
+    <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
+  </div>
+
+  <!-- Profil à compléter (compte existant sans profil) -->
+  <div class="card cache" id="bloc-profil">
+    <h2>Complète ton profil</h2>
+    <div id="champs-profil"></div>
+    <button id="btn-profil">Enregistrer</button>
+    <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
   </div>
 
   <!-- Compte connecté -->
@@ -65,7 +85,6 @@
       <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
     </select>
     <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
-    <input id="tel" type="tel" placeholder="Ton numéro WhatsApp (ex : 0155000000)">
     <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
     <button id="publier">Publier</button>
   </div>
@@ -84,7 +103,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, limit, onSnapshot, serverTimestamp }
+  import { getFirestore, collection, addDoc, deleteDoc, doc, getDoc, setDoc, query, orderBy, limit, onSnapshot, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, sendPasswordResetEmail }
@@ -106,7 +125,47 @@
 
   let missions = [];
   let user = null;
+  let profil = null;
+  let enInscription = false;
+  let vueInscription = false;
   const $ = id => document.getElementById(id);
+
+  // Champs du profil, injectés dans l'inscription et dans « compléter le profil »
+  const champs = p => `
+    <input id="${p}prenom" placeholder="Prénom" maxlength="40" autocomplete="given-name">
+    <input id="${p}nom" placeholder="Nom" maxlength="40" autocomplete="family-name">
+    <input id="${p}tel" type="tel" placeholder="Numéro WhatsApp (ex : 0155000000)" autocomplete="tel">
+    <select id="${p}ville">
+      <option value="">Ville de résidence…</option>
+      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+    </select>
+    <input id="${p}adresse" placeholder="Quartier / adresse de résidence" maxlength="100" autocomplete="street-address">
+    <select id="${p}role">
+      <option value="les deux">Je veux trouver ET publier des missions</option>
+      <option value="travailleur">Je cherche des missions à faire</option>
+      <option value="client">Je veux publier des missions</option>
+    </select>
+    <label class="check"><input type="checkbox" id="${p}ok">
+      <span>J'ai 18 ans ou plus et j'accepte que mes informations servent au fonctionnement de la plateforme.</span></label>`;
+  $("champs-inscription").innerHTML = champs("i-");
+  $("champs-profil").innerHTML = champs("p-");
+
+  // Lit et valide les champs du profil ; renvoie null si invalide
+  function lireProfil(p){
+    const prenom = $(p + "prenom").value.trim();
+    const nom = $(p + "nom").value.trim();
+    const tel = $(p + "tel").value.trim();
+    const ville = $(p + "ville").value;
+    const adresse = $(p + "adresse").value.trim();
+    const role = $(p + "role").value;
+    if (prenom.length < 2 || nom.length < 2){ afficherMessage("Entre ton prénom et ton nom."); return null; }
+    if (tel.replace(/\D/g, "").length < 8){ afficherMessage("Numéro WhatsApp invalide."); return null; }
+    if (!ville){ afficherMessage("Choisis ta ville de résidence."); return null; }
+    if (adresse.length < 3){ afficherMessage("Entre ton quartier ou adresse de résidence."); return null; }
+    if (!$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
+    return { prenom, nom, tel, ville, adresse, role };
+  }
 
   function afficherMessage(texte, type){
     const z = $("message");
@@ -116,6 +175,7 @@
     e.className = type === "info" ? "info" : "erreur";
     e.textContent = texte;
     z.appendChild(e);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function texteErreurAuth(e){
@@ -123,7 +183,7 @@
       case "auth/invalid-email": return "Adresse e-mail invalide.";
       case "auth/missing-password": return "Entre ton mot de passe.";
       case "auth/weak-password": return "Mot de passe trop court (6 caractères minimum).";
-      case "auth/email-already-in-use": return "Cet e-mail a déjà un compte. Clique sur « Se connecter ».";
+      case "auth/email-already-in-use": return "Cet e-mail a déjà un compte. Clique sur « J'ai déjà un compte ».";
       case "auth/invalid-credential":
       case "auth/wrong-password":
       case "auth/user-not-found": return "E-mail ou mot de passe incorrect.";
@@ -138,6 +198,19 @@
     if (!n.startsWith("229")) n = "229" + n;
     const msg = encodeURIComponent("Bonjour, je suis intéressé par la mission : " + titre);
     return "https://wa.me/" + n + "?text=" + msg;
+  }
+
+  function majUI(){
+    const connecte = !!user;
+    const aProfil = !!profil;
+    $("bloc-connexion").classList.toggle("cache", connecte || vueInscription);
+    $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
+    $("bloc-profil").classList.toggle("cache", !(connecte && !aProfil && !enInscription));
+    $("bloc-compte").classList.toggle("cache", !(connecte && aProfil));
+    $("bloc-publier").classList.toggle("cache", !(connecte && aProfil));
+    $("moi").textContent = (connecte && aProfil)
+      ? "Connecté : " + profil.prenom + " " + profil.nom + " (" + user.email + ")" : "";
+    afficher();
   }
 
   function afficher(){
@@ -158,6 +231,7 @@
       const p = document.createElement("span"); p.className = "prix";
       p.textContent = Number(m.prix).toLocaleString("fr-FR") + " FCFA";
       meta.appendChild(p);
+      if (m.auteur) meta.appendChild(document.createTextNode(" · par " + m.auteur));
       const d = document.createElement("div"); d.textContent = m.desc || "";
       c.append(h, meta, d);
 
@@ -199,15 +273,21 @@
     $("liste").innerHTML = "";
   });
 
-  // État de connexion
-  onAuthStateChanged(auth, u => {
+  // État de connexion + chargement du profil
+  onAuthStateChanged(auth, async u => {
     user = u;
-    $("bloc-connexion").classList.toggle("cache", !!u);
-    $("bloc-compte").classList.toggle("cache", !u);
-    $("bloc-publier").classList.toggle("cache", !u);
-    $("moi").textContent = u ? "Connecté : " + u.email : "";
-    afficher();
+    profil = null;
+    if (u && !enInscription){
+      try {
+        const s = await getDoc(doc(db, "users", u.uid));
+        profil = s.exists() ? s.data() : null;
+      } catch (e) { console.error(e); }
+    }
+    majUI();
   });
+
+  $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
+  $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
@@ -219,10 +299,35 @@
 
   $("btn-inscription").addEventListener("click", async () => {
     afficherMessage("");
+    const data = lireProfil("i-");
+    if (!data) return;
+    const btn = $("btn-inscription");
+    btn.disabled = true; btn.textContent = "Création du compte…";
+    enInscription = true;
     try {
-      await createUserWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
-      $("mdp").value = "";
-    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+      const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
+      await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp() });
+      profil = data;
+      $("i-mdp").value = "";
+    } catch (e) {
+      console.error(e);
+      afficherMessage(e.code ? texteErreurAuth(e) : "Compte créé, mais le profil n'a pas pu être enregistré. Complète-le ci-dessous.");
+    }
+    enInscription = false;
+    user = auth.currentUser;
+    btn.disabled = false; btn.textContent = "S'inscrire";
+    majUI();
+  });
+
+  $("btn-profil").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("p-");
+    if (!data || !user) return;
+    try {
+      await setDoc(doc(db, "users", user.uid), { ...data, email: user.email, createdAt: serverTimestamp() }, { merge: true });
+      profil = data;
+      majUI();
+    } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
   });
 
   $("btn-reset").addEventListener("click", async () => {
@@ -235,29 +340,31 @@
   });
 
   $("btn-deconnexion").addEventListener("click", () => signOut(auth));
+  $("btn-deco-profil").addEventListener("click", () => signOut(auth));
 
   $("publier").addEventListener("click", async () => {
-    if (!user){ afficherMessage("Connecte-toi pour publier."); return; }
+    if (!user || !profil){ afficherMessage("Connecte-toi et complète ton profil pour publier."); return; }
     const titre = $("titre").value.trim();
     const ville = $("ville").value;
     const prix = Number($("prix").value);
-    const tel = $("tel").value.trim();
     const desc = $("desc").value.trim();
 
-    if (!titre || !prix || prix < 0 || !tel){
-      alert("Remplis au moins le titre, le prix et ton numéro WhatsApp.");
-      return;
-    }
-    if (tel.replace(/\D/g, "").length < 8){
-      alert("Numéro WhatsApp invalide.");
+    if (!titre || !prix || prix < 0){
+      alert("Remplis au moins le titre et le prix.");
       return;
     }
 
     const btn = $("publier");
     btn.disabled = true; btn.textContent = "Publication…";
     try {
-      await addDoc(missionsRef, { titre, ville, prix, tel, desc, uid: user.uid, createdAt: serverTimestamp() });
-      ["titre","prix","tel","desc"].forEach(id => $(id).value = "");
+      await addDoc(missionsRef, {
+        titre, ville, prix, desc,
+        tel: profil.tel,
+        auteur: profil.prenom + " " + profil.nom.charAt(0).toUpperCase() + ".",
+        uid: user.uid,
+        createdAt: serverTimestamp()
+      });
+      ["titre","prix","desc"].forEach(id => $(id).value = "");
       afficherMessage("");
     } catch (e) {
       console.error(e);
@@ -269,4 +376,4 @@
   $("filtre").addEventListener("change", afficher);
 </script>
 </body>
-     </html>
+ </html>
