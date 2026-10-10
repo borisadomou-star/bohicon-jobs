@@ -15,13 +15,20 @@
   h2{font-size:1.1rem;margin:0 0 10px}
   input,select,textarea,button{width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;font-size:1rem;font-family:inherit}
   button{background:#0a7d3b;color:#fff;border:0;font-weight:600;cursor:pointer}
+  button.sec{background:#fff;color:#0a7d3b;border:1px solid #0a7d3b}
+  button.danger{background:#fff;color:#b3261e;border:1px solid #b3261e;margin-top:8px;margin-bottom:0;padding:8px}
   button:disabled{opacity:.6}
+  .lien{background:none;border:0;color:#0a7d3b;text-decoration:underline;font-weight:400;padding:4px;margin:0}
   .job h3{margin:0 0 4px;font-size:1.05rem}
   .meta{font-size:.85rem;color:#555;margin-bottom:6px}
   .prix{color:#0a7d3b;font-weight:700}
   .wa{display:block;text-align:center;background:#25d366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px}
+  .verrou{display:block;text-align:center;background:#eee;color:#555;padding:10px;border-radius:8px;margin-top:8px;font-size:.9rem}
   .vide{text-align:center;color:#777;padding:20px}
   .erreur{background:#fdecea;color:#b3261e;padding:12px;border-radius:8px;margin-bottom:12px}
+  .info{background:#e8f5e9;color:#0a5d2c;padding:12px;border-radius:8px;margin-bottom:12px}
+  .cache{display:none}
+  .moi{font-size:.9rem;margin-bottom:10px;word-break:break-all}
 </style>
 </head>
 <body>
@@ -31,7 +38,26 @@
 </header>
 
 <main>
-  <div class="card">
+  <div id="message"></div>
+
+  <!-- Connexion -->
+  <div class="card" id="bloc-connexion">
+    <h2>Connexion</h2>
+    <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
+    <input id="mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
+    <button id="btn-connexion">Se connecter</button>
+    <button id="btn-inscription" class="sec">Créer un compte</button>
+    <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+  </div>
+
+  <!-- Compte connecté -->
+  <div class="card cache" id="bloc-compte">
+    <div class="moi" id="moi"></div>
+    <button id="btn-deconnexion" class="sec" style="margin-bottom:0">Se déconnecter</button>
+  </div>
+
+  <!-- Publication -->
+  <div class="card cache" id="bloc-publier">
     <h2>Publier une mission</h2>
     <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
     <select id="ville">
@@ -46,21 +72,23 @@
 
   <div class="card">
     <h2>Missions disponibles</h2>
-    <select id="filtre">
+    <select id="filtre" style="margin-bottom:0">
       <option value="">Toutes les villes</option>
       <option>Bohicon</option><option>Abomey</option><option>Covè</option>
       <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
     </select>
   </div>
 
-  <div id="erreur"></div>
   <div id="liste"><div class="vide">Chargement…</div></div>
 </main>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp }
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, limit, onSnapshot, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           signOut, sendPasswordResetEmail }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
@@ -73,18 +101,36 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
   const missionsRef = collection(db, "missions");
 
   let missions = [];
+  let user = null;
   const $ = id => document.getElementById(id);
 
-  function afficherErreur(msg){
-    $("erreur").innerHTML = "";
-    if (!msg) return;
+  function afficherMessage(texte, type){
+    const z = $("message");
+    z.innerHTML = "";
+    if (!texte) return;
     const e = document.createElement("div");
-    e.className = "erreur";
-    e.textContent = msg;
-    $("erreur").appendChild(e);
+    e.className = type === "info" ? "info" : "erreur";
+    e.textContent = texte;
+    z.appendChild(e);
+  }
+
+  function texteErreurAuth(e){
+    switch (e.code){
+      case "auth/invalid-email": return "Adresse e-mail invalide.";
+      case "auth/missing-password": return "Entre ton mot de passe.";
+      case "auth/weak-password": return "Mot de passe trop court (6 caractères minimum).";
+      case "auth/email-already-in-use": return "Cet e-mail a déjà un compte. Clique sur « Se connecter ».";
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found": return "E-mail ou mot de passe incorrect.";
+      case "auth/too-many-requests": return "Trop de tentatives. Réessaie dans quelques minutes.";
+      case "auth/network-request-failed": return "Problème de connexion internet.";
+      default: return "Une erreur est survenue. Réessaie.";
+    }
   }
 
   function lienWhatsApp(tel, titre){
@@ -113,27 +159,85 @@
       p.textContent = Number(m.prix).toLocaleString("fr-FR") + " FCFA";
       meta.appendChild(p);
       const d = document.createElement("div"); d.textContent = m.desc || "";
-      const a = document.createElement("a");
-      a.className = "wa"; a.textContent = "Contacter sur WhatsApp";
-      a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
-      c.append(h, meta, d, a);
+      c.append(h, meta, d);
+
+      if (user){
+        const a = document.createElement("a");
+        a.className = "wa"; a.textContent = "Contacter sur WhatsApp";
+        a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
+        c.appendChild(a);
+      } else {
+        const v = document.createElement("div");
+        v.className = "verrou";
+        v.textContent = "🔒 Connecte-toi pour contacter";
+        c.appendChild(v);
+      }
+
+      if (user && m.uid === user.uid){
+        const b = document.createElement("button");
+        b.className = "danger";
+        b.textContent = "Supprimer ma mission";
+        b.addEventListener("click", async () => {
+          if (!confirm("Supprimer cette mission ?")) return;
+          try { await deleteDoc(doc(db, "missions", m.id)); }
+          catch (e) { console.error(e); afficherMessage("Suppression impossible. Réessaie."); }
+        });
+        c.appendChild(b);
+      }
       liste.appendChild(c);
     });
   }
 
-  // Écoute en temps réel : toutes les missions de tout le monde
+  // Missions en temps réel
   const q = query(missionsRef, orderBy("createdAt", "desc"), limit(100));
   onSnapshot(q, snap => {
-    afficherErreur("");
-    missions = snap.docs.map(d => d.data());
+    missions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     afficher();
   }, err => {
     console.error(err);
-    afficherErreur("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
+    afficherMessage("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
     $("liste").innerHTML = "";
   });
 
+  // État de connexion
+  onAuthStateChanged(auth, u => {
+    user = u;
+    $("bloc-connexion").classList.toggle("cache", !!u);
+    $("bloc-compte").classList.toggle("cache", !u);
+    $("bloc-publier").classList.toggle("cache", !u);
+    $("moi").textContent = u ? "Connecté : " + u.email : "";
+    afficher();
+  });
+
+  $("btn-connexion").addEventListener("click", async () => {
+    afficherMessage("");
+    try {
+      await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
+      $("mdp").value = "";
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-inscription").addEventListener("click", async () => {
+    afficherMessage("");
+    try {
+      await createUserWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
+      $("mdp").value = "";
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-reset").addEventListener("click", async () => {
+    const email = $("email").value.trim();
+    if (!email){ afficherMessage("Entre ton e-mail ci-dessus, puis reclique sur « Mot de passe oublié ? »."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      afficherMessage("E-mail envoyé. Vérifie ta boîte de réception (et les spams).", "info");
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-deconnexion").addEventListener("click", () => signOut(auth));
+
   $("publier").addEventListener("click", async () => {
+    if (!user){ afficherMessage("Connecte-toi pour publier."); return; }
     const titre = $("titre").value.trim();
     const ville = $("ville").value;
     const prix = Number($("prix").value);
@@ -144,8 +248,7 @@
       alert("Remplis au moins le titre, le prix et ton numéro WhatsApp.");
       return;
     }
-    const chiffres = tel.replace(/\D/g, "");
-    if (chiffres.length < 8){
+    if (tel.replace(/\D/g, "").length < 8){
       alert("Numéro WhatsApp invalide.");
       return;
     }
@@ -153,12 +256,12 @@
     const btn = $("publier");
     btn.disabled = true; btn.textContent = "Publication…";
     try {
-      await addDoc(missionsRef, { titre, ville, prix, tel, desc, createdAt: serverTimestamp() });
+      await addDoc(missionsRef, { titre, ville, prix, tel, desc, uid: user.uid, createdAt: serverTimestamp() });
       ["titre","prix","tel","desc"].forEach(id => $(id).value = "");
-      afficherErreur("");
+      afficherMessage("");
     } catch (e) {
       console.error(e);
-      afficherErreur("La mission n'a pas pu être publiée. Réessaie.");
+      afficherMessage("La mission n'a pas pu être publiée. Réessaie.");
     }
     btn.disabled = false; btn.textContent = "Publier";
   });
@@ -166,4 +269,4 @@
   $("filtre").addEventListener("change", afficher);
 </script>
 </body>
-</html>
+     </html>
