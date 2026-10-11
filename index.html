@@ -267,6 +267,8 @@
         <option>Bohicon</option><option>Abomey</option><option>Covè</option>
         <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
       </select>
+      <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
+      <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
       <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
       <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
       <button id="publier">Publier</button>
@@ -371,6 +373,7 @@
   let vues = new Set();
   let dernieresCles = new Set();
   let minuteurToast = null;
+  const adressesVues = {};
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -767,7 +770,9 @@
       const n = cpt.parAuteur[m.uid] || 0;
       meta.appendChild(document.createTextNode(" · par " + m.auteur + (n ? " (✔️ " + pluriel(n, "mission") + " terminée" + (n > 1 ? "s" : "") + ")" : "")));
     }
-    c.append(h, meta, el("div", "", m.desc || ""));
+    c.append(h, meta);
+    if (m.lieu) c.appendChild(el("div", "meta", user ? "📌 Lieu : " + m.lieu : "📌 Lieu visible après connexion"));
+    c.appendChild(el("div", "", m.desc || ""));
 
     if (statut !== "disponible" && m.workerNom){
       const w = el("div", "meta", "Attribuée à " + m.workerNom);
@@ -881,6 +886,22 @@
         w.href = lienWhatsAppMsg(m.tel, "Bonjour, merci de m'avoir choisi(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
         w.target = "_blank"; w.rel = "noopener";
         actions.appendChild(w);
+        if (adressesVues[m.id]){
+          const info = el("div", "info", adressesVues[m.id]);
+          info.style.marginBottom = "0";
+          actions.appendChild(info);
+        } else {
+          const bAdr = el("button", "sec mini", "📍 Voir l'adresse précise");
+          bAdr.type = "button";
+          bAdr.addEventListener("click", async () => {
+            try {
+              const s = await getDoc(doc(db, "missions", m.id, "prive", "adresse"));
+              adressesVues[m.id] = s.exists() ? "📍 " + s.data().adresse : "Aucune adresse précise renseignée : demande-la à l'auteur sur WhatsApp.";
+              afficher();
+            } catch (e) { console.error(e); afficherMessage("Impossible de lire l'adresse. Réessaie."); }
+          });
+          actions.appendChild(bAdr);
+        }
       }
     } else if (mesCandidatures.some(x => x.missionId === m.id)){
       actions.appendChild(el("div", "verrou", "Cette mission a été attribuée à quelqu'un d'autre."));
@@ -1004,25 +1025,35 @@
     const ville = $("ville").value;
     const prix = Number($("prix").value);
     const desc = $("desc").value.trim();
+    const lieu = $("lieu").value.trim();
+    const adressePrecise = $("adresse-precise").value.trim();
 
     if (!titre || !prix || prix < 0){
       alert("Remplis au moins le titre et le prix.");
+      return;
+    }
+    if (lieu.length < 3){
+      alert("Indique le lieu d'exécution de la mission (quartier ou repère).");
       return;
     }
 
     const btn = $("publier");
     btn.disabled = true; btn.textContent = "Publication…";
     try {
-      await addDoc(missionsRef, {
-        titre, ville, prix, desc,
+      const ref = await addDoc(missionsRef, {
+        titre, ville, lieu, prix, desc,
         tel: profil.tel,
         auteur: nomCourt(profil),
         uid: user.uid,
         statut: "disponible",
         createdAt: serverTimestamp()
       });
-      ["titre","prix","desc"].forEach(id => $(id).value = "");
+      ["titre","lieu","adresse-precise","prix","desc"].forEach(id => $(id).value = "");
       afficherMessage("");
+      if (adressePrecise){
+        try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
+        catch (e) { console.error(e); afficherMessage("Mission publiée, mais l'adresse précise n'a pas pu être enregistrée."); }
+      }
     } catch (e) {
       console.error(e);
       afficherMessage("La mission n'a pas pu être publiée. Réessaie.");
