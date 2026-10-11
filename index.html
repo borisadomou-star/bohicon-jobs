@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b6b3a">
+<script src="config.js"></script>
 <title>Bohicon Jobs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,6 +64,31 @@
   .check{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;margin-bottom:14px;color:var(--gris)}
   .check input{width:auto;margin:4px 0 0;accent-color:var(--vert)}
   .check a{color:var(--vert)}
+
+  /* Mon compte */
+  .onglets{display:flex;gap:6px;background:var(--fond);border-radius:999px;padding:4px;margin-bottom:14px}
+  .onglet{flex:1;width:auto;margin:0;padding:10px 6px;background:transparent;color:var(--gris);box-shadow:none;font-size:.88rem}
+  .onglet.on{background:#fff;color:var(--vert);box-shadow:0 2px 8px rgba(8,69,42,.14)}
+  .salut{font-size:1.1rem;font-weight:700;color:var(--vert-fonce)}
+  .prof{font-size:.85rem;color:var(--gris);margin-bottom:12px;word-break:break-word}
+  .score{background:linear-gradient(135deg,#08572f,#12995a);color:#fff;border-radius:20px;padding:16px;margin-bottom:12px}
+  .score-haut{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .score-n{font-size:2.4rem;font-weight:700;line-height:1}
+  .score-l{font-size:.8rem;opacity:.9}
+  .niveau{background:var(--jaune);color:#1a1a1a;font-weight:700;font-size:.8rem;padding:4px 12px;border-radius:999px}
+  .barre{height:8px;background:rgba(255,255,255,.25);border-radius:999px;margin:12px 0 6px;overflow:hidden}
+  .barre i{display:block;height:100%;background:var(--jaune);border-radius:999px}
+  .score-t{font-size:.78rem;opacity:.92}
+  .tuiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .tuile-s{background:var(--fond);border-radius:16px;padding:12px}
+  .tuile-s b{display:block;font-size:1.1rem;color:var(--vert-fonce);word-break:break-word}
+  .tuile-s span{font-size:.75rem;color:var(--gris)}
+  .tuile-s small{display:block;font-size:.72rem;color:var(--gris);margin-top:2px}
+  .aide{font-size:.76rem;color:var(--gris);line-height:1.45;margin:4px 0 12px}
+  .h-ligne{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--trait)}
+  .h-ligne:last-child{border-bottom:0}
+  .h-titre{font-weight:600;font-size:.93rem;word-break:break-word}
+  .h-sous{font-size:.8rem;color:var(--gris)}
 
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
@@ -183,10 +209,27 @@
       <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
     </div>
 
-    <!-- Compte connecté -->
+    <!-- Mon compte -->
     <div class="card cache" id="bloc-compte">
-      <div class="moi" id="moi"></div>
-      <button id="btn-deconnexion" class="sec" style="margin-bottom:0">Se déconnecter</button>
+      <div class="onglets">
+        <button class="onglet on" data-t="resume" type="button">Résumé</button>
+        <button class="onglet" data-t="histo" type="button">Historique</button>
+        <button class="onglet" data-t="profil" type="button">Profil</button>
+      </div>
+      <div id="t-resume"></div>
+      <div id="t-histo" class="cache">
+        <select id="histo-filtre">
+          <option value="tout">Toutes mes missions</option>
+          <option value="realisee">Missions que j'ai réalisées</option>
+          <option value="publiee">Missions que j'ai publiées</option>
+        </select>
+        <div id="liste-histo"></div>
+      </div>
+      <div id="t-profil" class="cache">
+        <div id="champs-edit"></div>
+        <button id="btn-edit" type="button">Enregistrer mes informations</button>
+      </div>
+      <button id="btn-deconnexion" class="sec" style="margin:6px 0 0">Se déconnecter</button>
     </div>
 
     <!-- Publication -->
@@ -240,21 +283,30 @@
   <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
 </footer>
 
+<datalist id="professions">
+  <option value="Étudiant(e)"><option value="Commerçant(e)"><option value="Conducteur de moto-taxi">
+  <option value="Chauffeur"><option value="Livreur"><option value="Couturier(ère)">
+  <option value="Coiffeur(se)"><option value="Maçon"><option value="Électricien">
+  <option value="Plombier"><option value="Mécanicien"><option value="Menuisier">
+  <option value="Soudeur"><option value="Agriculteur(trice)"><option value="Enseignant(e)">
+  <option value="Infirmier(ère)"><option value="Cuisinier(ère)"><option value="Agent commercial">
+  <option value="Artisan"><option value="Autre">
+</datalist>
+
 <a id="fab-wa" class="fab cache" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp">💬</a>
 <button id="fab-haut" class="fab" type="button" aria-label="Revenir en haut">↑</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, getDocs, setDoc,
-           query, orderBy, limit, onSnapshot, serverTimestamp }
+           query, where, orderBy, limit, onSnapshot, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  // Ton numéro WhatsApp pour l'espace publicitaire et le bouton flottant, au format 229 + 10 chiffres
-  // (ex : "2290155000000"). Laisse vide ("") pour ne rien afficher.
-  const NUMERO_WA = "2290167079595";
+  // Le numéro WhatsApp se règle dans le fichier config.js (pas ici).
+  const NUMERO_WA = (window.CONFIG && window.CONFIG.NUMERO_WA) || "";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
@@ -275,6 +327,11 @@
   let profil = null;
   let enInscription = false;
   let vueInscription = false;
+  let profilRempli = false;
+  let mesPubliees = [];
+  let mesRealisees = [];
+  let suivis = [];
+  let suiviUid = null;
   const dejaInteresse = new Set();
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -285,9 +342,10 @@
   const pluriel = (n, mot) => n + " " + mot + (n > 1 ? "s" : "");
 
   // ---------- Champs du profil ----------
-  const champs = p => `
+  const champs = (p, avecOk = true) => `
     <input id="${p}prenom" placeholder="Prénom" maxlength="40" autocomplete="given-name">
     <input id="${p}nom" placeholder="Nom" maxlength="40" autocomplete="family-name">
+    <input id="${p}profession" list="professions" placeholder="Profession (ex : couturière, étudiant, chauffeur)" maxlength="60" autocomplete="off">
     <input id="${p}tel" type="tel" placeholder="Numéro WhatsApp (ex : 0155000000)" autocomplete="tel">
     <select id="${p}ville">
       <option value="">Ville de résidence…</option>
@@ -300,24 +358,27 @@
       <option value="travailleur">Je cherche des missions à faire</option>
       <option value="client">Je veux publier des missions</option>
     </select>
-    <label class="check"><input type="checkbox" id="${p}ok">
-      <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>`;
+    ${avecOk ? `<label class="check"><input type="checkbox" id="${p}ok">
+      <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>` : ""}`;
   $("champs-inscription").innerHTML = champs("i-");
   $("champs-profil").innerHTML = champs("p-");
+  $("champs-edit").innerHTML = champs("e-", false);
 
-  function lireProfil(p){
+  function lireProfil(p, exigerOk = true){
     const prenom = $(p + "prenom").value.trim();
     const nom = $(p + "nom").value.trim();
+    const profession = $(p + "profession").value.trim();
     const tel = $(p + "tel").value.trim();
     const ville = $(p + "ville").value;
     const adresse = $(p + "adresse").value.trim();
     const role = $(p + "role").value;
     if (prenom.length < 2 || nom.length < 2){ afficherMessage("Entre ton prénom et ton nom."); return null; }
+    if (profession.length < 2){ afficherMessage("Indique ta profession."); return null; }
     if (tel.replace(/\D/g, "").length < 8){ afficherMessage("Numéro WhatsApp invalide."); return null; }
     if (!ville){ afficherMessage("Choisis ta ville de résidence."); return null; }
     if (adresse.length < 3){ afficherMessage("Entre ton quartier ou adresse de résidence."); return null; }
-    if (!$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
-    return { prenom, nom, tel, ville, adresse, role };
+    if (exigerOk && !$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
+    return { prenom, nom, profession, tel, ville, adresse, role };
   }
 
   function afficherMessage(texte, type){
@@ -364,15 +425,140 @@
     return { parAuteur, parTravailleur };
   }
 
+  // ---------- Tableau de bord personnel ----------
+  const el = (tag, cls, texte) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (texte !== undefined) e.textContent = texte;
+    return e;
+  };
+  const profilOk = () => !!(profil && profil.profession);
+  const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
+  const dateMs = m => {
+    const t = m.termineeAt || m.createdAt;
+    return t && t.toMillis ? t.toMillis() : 0;
+  };
+  const dateTexte = ms => ms ? new Date(ms).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
+
+  function remplir(p, d){
+    ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
+    $(p + "ville").value = d.ville || "";
+    $(p + "role").value = d.role || "les deux";
+  }
+
+  const NIVEAUX = [
+    { nom: "Débutant", min: 0 }, { nom: "Actif", min: 10 }, { nom: "Confirmé", min: 50 }, { nom: "Expert", min: 100 }
+  ];
+
+  function statsPerso(){
+    const realisees = mesRealisees.filter(m => m.uid !== user.uid);
+    const faites = realisees.filter(m => st(m) === "terminee");
+    const encours = realisees.filter(m => st(m) === "attribuee").length;
+    const confiees = mesPubliees.filter(m => st(m) === "terminee").length;
+    const debut = new Date(); debut.setDate(1); debut.setHours(0, 0, 0, 0);
+    const gains = faites.reduce((s, m) => s + Number(m.prix || 0), 0);
+    const gainsMois = faites.filter(m => dateMs(m) >= debut.getTime()).reduce((s, m) => s + Number(m.prix || 0), 0);
+    const points = faites.length * 10 + confiees * 5;
+    let idx = 0;
+    NIVEAUX.forEach((n, i) => { if (points >= n.min) idx = i; });
+    return { faites: faites.length, encours, confiees, publiees: mesPubliees.length, gains, gainsMois, points, idx };
+  }
+
+  function majHisto(){
+    if (!user) return;
+    const zone = $("liste-histo");
+    zone.innerHTML = "";
+    const f = $("histo-filtre").value;
+    const items = [];
+    if (f !== "publiee") mesRealisees.filter(m => m.uid !== user.uid).forEach(m => items.push({ m, role: "Réalisée" }));
+    if (f !== "realisee") mesPubliees.forEach(m => items.push({ m, role: "Publiée" }));
+    items.sort((a, b) => dateMs(b.m) - dateMs(a.m));
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucune mission pour l'instant.")); return; }
+    items.forEach(({ m, role }) => {
+      const ligne = el("div", "h-ligne");
+      const gauche = el("div");
+      gauche.appendChild(el("div", "h-titre", m.titre));
+      gauche.appendChild(el("div", "h-sous", [role, fcfa(m.prix), dateTexte(dateMs(m))].filter(Boolean).join(" · ")));
+      ligne.append(gauche, el("span", "badge b-" + st(m), LIBELLES[st(m)]));
+      zone.appendChild(ligne);
+    });
+  }
+
+  function majTableau(){
+    if (!user || !profilOk()) return;
+    const s = statsPerso();
+    const r = $("t-resume");
+    r.innerHTML = "";
+    r.appendChild(el("div", "salut", "Bonjour " + profil.prenom + " 👋"));
+    r.appendChild(el("div", "prof", "💼 " + profil.profession + " · 📍 " + profil.ville));
+
+    const sc = el("div", "score");
+    const haut = el("div", "score-haut");
+    const g = el("div");
+    g.appendChild(el("div", "score-n", String(s.points)));
+    g.appendChild(el("div", "score-l", "points de score"));
+    haut.append(g, el("span", "niveau", "Niveau " + NIVEAUX[s.idx].nom));
+    sc.appendChild(haut);
+    const suivant = NIVEAUX[s.idx + 1];
+    const barre = el("div", "barre");
+    const rempli = document.createElement("i");
+    const pct = suivant ? Math.min(100, Math.round((s.points - NIVEAUX[s.idx].min) / (suivant.min - NIVEAUX[s.idx].min) * 100)) : 100;
+    rempli.style.width = pct + "%";
+    barre.appendChild(rempli);
+    sc.appendChild(barre);
+    sc.appendChild(el("div", "score-t", suivant ? (suivant.min - s.points) + " points avant le niveau " + suivant.nom : "Tu as atteint le niveau maximum 🎉"));
+    r.appendChild(sc);
+
+    const tuile = (valeur, label, sous) => {
+      const t = el("div", "tuile-s");
+      t.appendChild(el("b", "", valeur));
+      t.appendChild(el("span", "", label));
+      if (sous) t.appendChild(el("small", "", sous));
+      return t;
+    };
+    const tuiles = el("div", "tuiles");
+    tuiles.append(
+      tuile(fcfa(s.gains), "Gains total"),
+      tuile(fcfa(s.gainsMois), "Gains ce mois-ci"),
+      tuile(String(s.faites), "Missions réalisées", s.encours ? s.encours + " en cours" : ""),
+      tuile(String(s.publiees), "Missions publiées", s.confiees + " terminée" + (s.confiees > 1 ? "s" : ""))
+    );
+    r.appendChild(tuiles);
+    r.appendChild(el("p", "aide", "Score : +10 points par mission réalisée, +5 par mission publiée et terminée. Les gains sont indicatifs : ils additionnent le prix des missions terminées, les paiements se faisant directement entre utilisateurs."));
+    majHisto();
+  }
+
+  function stopperSuivi(){
+    suivis.forEach(f => f());
+    suivis = [];
+    mesPubliees = [];
+    mesRealisees = [];
+    suiviUid = null;
+  }
+
+  function suivreMesMissions(){
+    suiviUid = user.uid;
+    const lire = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    suivis.push(onSnapshot(query(missionsRef, where("uid", "==", user.uid)),
+      snap => { mesPubliees = lire(snap); majTableau(); }, e => console.error(e)));
+    suivis.push(onSnapshot(query(missionsRef, where("workerUid", "==", user.uid)),
+      snap => { mesRealisees = lire(snap); majTableau(); }, e => console.error(e)));
+  }
+
   function majUI(){
     const connecte = !!user;
-    const aProfil = !!profil;
+    const complet = profilOk();
     $("bloc-connexion").classList.toggle("cache", connecte || vueInscription);
     $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
-    $("bloc-profil").classList.toggle("cache", !(connecte && !aProfil && !enInscription));
-    $("bloc-compte").classList.toggle("cache", !(connecte && aProfil));
-    $("bloc-publier").classList.toggle("cache", !(connecte && aProfil));
+    $("bloc-profil").classList.toggle("cache", !(connecte && !complet && !enInscription));
+    $("bloc-compte").classList.toggle("cache", !(connecte && complet));
+    $("bloc-publier").classList.toggle("cache", !(connecte && complet));
+    if (connecte && !complet && !enInscription && profil && !profilRempli){ remplir("p-", profil); profilRempli = true; }
+    if (!connecte) profilRempli = false;
+    const uid = user ? user.uid : null;
+    if (uid !== suiviUid){ stopperSuivi(); if (user) suivreMesMissions(); }
     afficher();
+    majTableau();
   }
 
   // ---------- Liste des intéressés (visible par l'auteur) ----------
@@ -388,7 +574,7 @@
         ligne.className = "ligne";
         const n = cpt.parTravailleur[c.uid] || 0;
         const nom = document.createElement("div");
-        nom.textContent = "👤 " + c.nom + (n ? " · ✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "");
+        nom.textContent = "👤 " + c.nom + (c.profession ? " · " + c.profession : "") + (n ? " · ✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "");
         if (m.workerUid === c.uid) nom.textContent += " · choisi(e)";
         const a = document.createElement("a");
         a.className = "wa petit"; a.textContent = "Contacter sur WhatsApp";
@@ -475,7 +661,7 @@
         bFin.className = "mini"; bFin.textContent = "✅ Marquer comme terminée";
         bFin.addEventListener("click", async () => {
           if (!confirm("Confirmer que la mission est terminée ?")) return;
-          try { await updateDoc(doc(db, "missions", m.id), { statut: "terminee" }); }
+          try { await updateDoc(doc(db, "missions", m.id), { statut: "terminee", termineeAt: serverTimestamp() }); }
           catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
         });
         const bRetour = document.createElement("button");
@@ -504,11 +690,11 @@
       } else {
         bInt.textContent = "🙋 Je suis intéressé";
         bInt.addEventListener("click", async () => {
-          if (!profil){ afficherMessage("Complète ton profil pour te proposer."); return; }
+          if (!profilOk()){ afficherMessage("Complète ton profil pour te proposer."); return; }
           bInt.disabled = true;
           try {
             await setDoc(doc(db, "missions", m.id, "candidatures", user.uid),
-              { uid: user.uid, nom: nomCourt(profil), tel: profil.tel, createdAt: serverTimestamp() });
+              { uid: user.uid, nom: nomCourt(profil), profession: profil.profession, tel: profil.tel, createdAt: serverTimestamp() });
             dejaInteresse.add(m.id);
             bInt.textContent = "✅ Intérêt envoyé";
           } catch (e) {
@@ -540,14 +726,6 @@
     const cpt = compteurs();
     $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible").length;
     $("stat-fin").textContent = missions.filter(m => st(m) === "terminee").length;
-
-    if (user && profil){
-      const nb = (cpt.parAuteur[user.uid] || 0) + (cpt.parTravailleur[user.uid] || 0);
-      $("moi").textContent = "Connecté : " + profil.prenom + " " + profil.nom + " (" + user.email + ")"
-        + (nb ? " · ✔️ " + pluriel(nb, "mission") + " terminée" + (nb > 1 ? "s" : "") : "");
-    } else {
-      $("moi").textContent = "";
-    }
 
     const liste = $("liste");
     liste.innerHTML = "";
@@ -641,7 +819,7 @@
 
   // ---------- Publication ----------
   $("publier").addEventListener("click", async () => {
-    if (!user || !profil){ afficherMessage("Connecte-toi et complète ton profil pour publier."); return; }
+    if (!user || !profilOk()){ afficherMessage("Connecte-toi et complète ton profil pour publier."); return; }
     const titre = $("titre").value.trim();
     const ville = $("ville").value;
     const prix = Number($("prix").value);
@@ -674,6 +852,25 @@
 
   $("filtre").addEventListener("change", afficher);
   $("filtre-statut").addEventListener("change", afficher);
+
+  // ---------- Onglets, historique et édition du profil ----------
+  document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
+    ["resume", "histo", "profil"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    if (b.dataset.t === "profil" && profil) remplir("e-", profil);
+  }));
+  $("histo-filtre").addEventListener("change", majHisto);
+  $("btn-edit").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("e-", false);
+    if (!data || !user) return;
+    try {
+      await setDoc(doc(db, "users", user.uid), data, { merge: true });
+      profil = { ...profil, ...data };
+      afficherMessage("Profil mis à jour.", "info");
+      majTableau();
+    } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
+  });
 
   // ---------- Navigation et boutons flottants ----------
   const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });

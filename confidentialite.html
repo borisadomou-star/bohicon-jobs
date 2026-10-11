@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b6b3a">
+<script src="config.js"></script>
 <title>Confidentialité et conditions d'utilisation – Bohicon Jobs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,7 +77,7 @@
   <div class="hero-in">
     <div class="tuile" aria-hidden="true">🔒</div>
     <h1>Confidentialité et conditions d'utilisation</h1>
-    <span class="maj">Dernière mise à jour : 10 octobre 2026</span>
+    <span class="maj">Dernière mise à jour : 11 octobre 2026</span>
   </div>
 </div>
 
@@ -92,6 +93,7 @@
     <p>Lors de ton inscription et de ton utilisation du site, nous enregistrons :</p>
     <ul>
       <li>ton prénom et ton nom ;</li>
+      <li>ta profession (par exemple couturier, étudiant, chauffeur) ;</li>
       <li>ton adresse e-mail et ton mot de passe (le mot de passe est géré par le service de connexion de Google Firebase : nous ne le voyons pas) ;</li>
       <li>ton numéro WhatsApp ;</li>
       <li>ta ville et ton quartier ou adresse de résidence ;</li>
@@ -106,7 +108,7 @@
     <ul>
       <li>Créer et sécuriser ton compte.</li>
       <li>Afficher tes missions et te mettre en relation avec d'autres utilisateurs.</li>
-      <li>Calculer le nombre de missions terminées affiché sur le site.</li>
+      <li>Calculer le nombre de missions terminées affiché sur le site, ainsi que ton historique, tes gains indicatifs et ton score.</li>
       <li>Prévenir les abus et les fausses annonces.</li>
     </ul>
     <p>Nous ne vendons pas tes données.</p>
@@ -117,7 +119,8 @@
     <ul>
       <li><strong>Tout visiteur</strong> voit les missions publiées, ainsi que ton prénom et l'initiale de ton nom (par exemple « Awa K. »).</li>
       <li><strong>Les utilisateurs connectés</strong> peuvent accéder au bouton de contact WhatsApp d'une mission.</li>
-      <li><strong>L'auteur d'une mission</strong> voit le nom et le numéro WhatsApp des personnes qui se proposent pour sa mission.</li>
+      <li><strong>L'auteur d'une mission</strong> voit le nom, la profession et le numéro WhatsApp des personnes qui se proposent pour sa mission.</li>
+      <li><strong>Ton historique, tes gains et ton score</strong> ne sont visibles que par toi. Les montants sont indicatifs (ils additionnent le prix des missions terminées) : les paiements se font directement entre utilisateurs.</li>
       <li><strong>Ton adresse de résidence</strong> reste privée : elle n'est affichée à aucun autre utilisateur.</li>
     </ul>
     <p>Quand tu partages ton numéro WhatsApp dans le cadre d'une mission, des échanges peuvent ensuite avoir lieu hors du site. Nous ne contrôlons pas ces échanges.</p>
@@ -185,9 +188,9 @@
 <button id="fab-haut" class="fab" type="button" aria-label="Revenir en haut">↑</button>
 
 <script>
-  // Renseigne ici tes coordonnées de contact (laisse vide ce que tu ne veux pas afficher)
-  const WHATSAPP = "2290167079595";   // format : 229 + numéro, par exemple "2290155000000"
-  const EMAIL = "borisadomou@gmail.com";      // par exemple "contact@exemple.com"
+  // Tes coordonnées se règlent dans le fichier config.js
+  const WHATSAPP = (window.CONFIG && window.CONFIG.NUMERO_WA) || "";
+  const EMAIL = (window.CONFIG && window.CONFIG.EMAIL) || "";
 
   (function(){
     const zone = document.getElementById("contact");
