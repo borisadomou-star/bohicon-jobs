@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b6b3a">
+<meta name="robots" content="noindex, nofollow">
+<title>Administration – Bohicon Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vert:#0b6b3a; --vert2:#12995a; --vert-fonce:#08452a; --jaune:#fcd116; --rouge:#e8112d;
+    --fond:#f1f5f2; --encre:#12261b; --gris:#5b6b62; --trait:#dbe7df;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;background:var(--fond);color:var(--encre);line-height:1.5}
+  .cache{display:none!important}
+
+  .topbar{position:sticky;top:0;z-index:50;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:0 2px 10px rgba(8,69,42,.12)}
+  .marque{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--vert-fonce);font-weight:700}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+  .btn-retour{background:var(--jaune);color:#1a1a1a;border-radius:999px;padding:10px 18px;font-weight:700;font-size:.92rem;text-decoration:none}
+
+  .hero{background:linear-gradient(160deg,#08572f 0%,#0b7a42 60%,#12995a 100%);color:#fff;text-align:center;padding:24px 16px 70px}
+  .hero h1{font-size:1.4rem;margin:8px 0 4px}
+  .hero p{margin:0;opacity:.9;font-size:.9rem}
+  .tuile{width:60px;height:60px;margin:0 auto;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+
+  main{max-width:720px;margin:-44px auto 0;padding:0 16px 24px;position:relative;z-index:2}
+  .card{background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
+  h2{font-size:1.1rem;margin:0 0 12px;color:var(--vert-fonce)}
+  h3{font-size:.95rem;margin:14px 0 6px;color:var(--vert)}
+
+  input,select{width:100%;padding:13px 14px;margin-bottom:10px;border:1.5px solid transparent;background:var(--fond);border-radius:14px;font-size:1rem;font-family:inherit;color:var(--encre)}
+  input:focus,select:focus{outline:none;border-color:var(--vert);background:#fff}
+  button{width:100%;padding:13px 18px;margin-bottom:10px;border:0;border-radius:999px;background:var(--vert);color:#fff;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer}
+  button:disabled{opacity:.6}
+  button.sec{background:#fff;color:var(--vert);border:1.5px solid var(--vert)}
+  button.danger{background:#fff;color:#b3261e;border:1.5px solid #b3261e}
+  button.mini{width:auto;padding:8px 14px;margin:0;font-size:.85rem}
+  a{color:var(--vert)}
+  button:focus-visible,a:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
+
+  .onglets{display:flex;gap:6px;background:#fff;border-radius:999px;padding:4px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
+  .onglet{flex:1;width:auto;margin:0;padding:10px 6px;background:transparent;color:var(--gris);font-size:.88rem}
+  .onglet.on{background:var(--vert);color:#fff}
+
+  .tuiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tuile-s{background:var(--fond);border-radius:16px;padding:12px}
+  .tuile-s b{display:block;font-size:1.25rem;color:var(--vert-fonce);word-break:break-word}
+  .tuile-s span{font-size:.75rem;color:var(--gris)}
+  .ligne-stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--trait);font-size:.9rem}
+  .ligne-stat:last-child{border-bottom:0}
+
+  .rang{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--trait)}
+  .rang:last-child{border-bottom:0}
+  .h-titre{font-weight:600;font-size:.95rem;word-break:break-word}
+  .h-sous{font-size:.8rem;color:var(--gris);word-break:break-word}
+  .btns{display:flex;flex-direction:column;gap:6px;flex:none}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 10px;border-radius:999px;margin-left:6px;vertical-align:middle;font-weight:600}
+  .b-disponible{background:#e3f4ea;color:#0a5d2c}
+  .b-attribuee{background:#fff1d6;color:#8a5a00}
+  .b-terminee{background:#e3ecfb;color:#1a4fa0}
+  .b-susp{background:#fdecea;color:#b3261e}
+  .vide{text-align:center;color:var(--gris);padding:24px}
+  .erreur{background:#fdecea;color:#b3261e;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .info{background:#e3f4ea;color:#0a5d2c;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .note{font-size:.78rem;color:var(--gris);margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="marque" href="index.html"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
+  <a class="btn-retour" href="index.html">← Site</a>
+</div>
+
+<div class="hero">
+  <div class="tuile" aria-hidden="true">🛡️</div>
+  <h1>Espace administrateur</h1>
+  <p>Réservé à l'équipe de Bohicon Jobs</p>
+</div>
+
+<main>
+  <div id="message"></div>
+
+  <!-- Connexion -->
+  <div class="card" id="bloc-login">
+    <h2>Connexion administrateur</h2>
+    <input id="email" type="email" placeholder="E-mail" autocomplete="email">
+    <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <button id="btn-login">Se connecter</button>
+  </div>
+
+  <!-- Accès refusé -->
+  <div class="card cache" id="bloc-refus">
+    <h2>Accès réservé</h2>
+    <p>Ce compte n'est pas autorisé à accéder à l'espace administrateur.</p>
+    <button class="sec" id="btn-deco-refus" style="margin-bottom:0">Se déconnecter</button>
+  </div>
+
+  <!-- Console -->
+  <div id="console" class="cache">
+    <div class="onglets">
+      <button class="onglet on" data-t="apercu" type="button">Aperçu</button>
+      <button class="onglet" data-t="users" type="button">Utilisateurs</button>
+      <button class="onglet" data-t="missions" type="button">Missions</button>
+    </div>
+
+    <div id="t-apercu" class="card"></div>
+
+    <div id="t-users" class="card cache">
+      <input id="q-users" type="search" placeholder="Rechercher (nom, profession, ville, e-mail, téléphone)">
+      <button class="sec" id="btn-export" type="button">⬇️ Exporter les utilisateurs (CSV)</button>
+      <div id="liste-users"></div>
+    </div>
+
+    <div id="t-missions" class="card cache">
+      <select id="f-statut">
+        <option value="toutes">Tous les statuts</option>
+        <option value="disponible">Disponibles</option>
+        <option value="attribuee">Attribuées</option>
+        <option value="terminee">Terminées</option>
+      </select>
+      <input id="q-missions" type="search" placeholder="Rechercher (titre, ville, auteur)">
+      <div id="liste-missions"></div>
+    </div>
+
+    <p class="note">Les données sont lues en direct, dans la limite de 500 éléments par rubrique.</p>
+    <button class="sec" id="btn-deco" type="button">Se déconnecter</button>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, updateDoc, writeBatch, query, limit, onSnapshot }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
+    authDomain: "bohicon-jobs.firebaseapp.com",
+    projectId: "bohicon-jobs",
+    storageBucket: "bohicon-jobs.firebasestorage.app",
+    messagingSenderId: "505683521455",
+    appId: "1:505683521455:web:d9bcf7a1b1143eeaf9895a"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const $ = id => document.getElementById(id);
+  const el = (tag, cls, texte) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (texte !== undefined) e.textContent = texte;
+    return e;
+  };
+  const LIB = { disponible: "Disponible", attribuee: "Attribuée", terminee: "Terminée" };
+  const st = m => m.statut || "disponible";
+  const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
+  const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
+  const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
+
+  let users = [], missions = [], cands = [], unsubs = [], moi = null;
+
+  function message(texte, type){
+    const z = $("message");
+    z.innerHTML = "";
+    if (!texte) return;
+    z.appendChild(el("div", type === "info" ? "info" : "erreur", texte));
+    z.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  // ---------- Statistiques ----------
+  function compter(liste, cle){
+    const o = {};
+    liste.forEach(x => { const k = cle(x) || "—"; o[k] = (o[k] || 0) + 1; });
+    return Object.entries(o).sort((a, b) => b[1] - a[1]);
+  }
+  function listeCompte(titre, paires, max){
+    const bloc = el("div");
+    bloc.appendChild(el("h3", "", titre));
+    if (!paires.length) bloc.appendChild(el("div", "h-sous", "Aucune donnée"));
+    paires.slice(0, max).forEach(([k, n]) => {
+      const l = el("div", "ligne-stat");
+      l.append(el("span", "", k), el("b", "", String(n)));
+      bloc.appendChild(l);
+    });
+    return bloc;
+  }
+
+  function rendreApercu(){
+    const z = $("t-apercu");
+    z.innerHTML = "";
+    z.appendChild(el("h2", "", "Aperçu"));
+    const semaine = Date.now() - 7 * 24 * 3600 * 1000;
+    const terminees = missions.filter(m => st(m) === "terminee");
+    const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+    const g = el("div", "tuiles");
+    g.append(
+      tuile(users.length, "Utilisateurs"),
+      tuile(users.filter(u => u.suspendu).length, "Comptes suspendus"),
+      tuile(missions.length, "Missions"),
+      tuile(missions.filter(m => ms(m) >= semaine).length, "Missions (7 derniers jours)"),
+      tuile(missions.filter(m => st(m) === "disponible").length, "Disponibles"),
+      tuile(missions.filter(m => st(m) === "attribuee").length, "Attribuées"),
+      tuile(terminees.length, "Terminées"),
+      tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Valeur des missions terminées"),
+      tuile(cands.length, "Candidatures"),
+      tuile(cands.filter(c => c.statut === "en_attente").length, "Candidatures en attente")
+    );
+    z.appendChild(g);
+    z.appendChild(listeCompte("Utilisateurs par type d'usage", compter(users, u => u.role), 5));
+    z.appendChild(listeCompte("Utilisateurs par ville", compter(users, u => u.ville), 6));
+    z.appendChild(listeCompte("Professions les plus fréquentes", compter(users, u => (u.profession || "").trim().toLowerCase()), 6));
+    z.appendChild(listeCompte("Missions par ville", compter(missions, m => m.ville), 6));
+  }
+
+  // ---------- Utilisateurs ----------
+  function rendreUsers(){
+    const zone = $("liste-users");
+    zone.innerHTML = "";
+    const q = $("q-users").value.trim().toLowerCase();
+    const items = users
+      .filter(u => !q || [u.prenom, u.nom, u.profession, u.ville, u.email, u.tel, u.role].join(" ").toLowerCase().includes(q))
+      .sort((a, b) => ((a.nom || "") + (a.prenom || "")).localeCompare((b.nom || "") + (b.prenom || ""), "fr"));
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucun utilisateur.")); return; }
+    items.forEach(u => {
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", (u.prenom || "") + " " + (u.nom || ""));
+      if (u.suspendu) titre.appendChild(el("span", "badge b-susp", "Suspendu"));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", [u.profession, u.ville, u.role].filter(Boolean).join(" · ")));
+      g.appendChild(el("div", "h-sous", "📞 " + (u.tel || "—") + " · ✉️ " + (u.email || "—")));
+      const pub = missions.filter(m => m.uid === u.id).length;
+      const real = missions.filter(m => m.workerUid === u.id && st(m) === "terminee").length;
+      g.appendChild(el("div", "h-sous", pub + " publiée(s) · " + real + " réalisée(s)"));
+
+      const btns = el("div", "btns");
+      if (u.tel){
+        let n = String(u.tel).replace(/\D/g, "");
+        if (!n.startsWith("229")) n = "229" + n;
+        const a = el("a", "", "WhatsApp");
+        a.href = "https://wa.me/" + n; a.target = "_blank"; a.rel = "noopener";
+        btns.appendChild(a);
+      }
+      if (moi && u.id !== moi.uid){
+        const b = el("button", u.suspendu ? "sec mini" : "danger mini", u.suspendu ? "Réactiver" : "Suspendre");
+        b.type = "button";
+        b.addEventListener("click", async () => {
+          const txt = u.suspendu
+            ? "Réactiver le compte de " + u.prenom + " " + u.nom + " ?"
+            : "Suspendre " + u.prenom + " " + u.nom + " ? Cette personne ne pourra plus publier ni se proposer.";
+          if (!confirm(txt)) return;
+          try { await updateDoc(doc(db, "users", u.id), { suspendu: !u.suspendu }); }
+          catch (e) { console.error(e); message("Action impossible. Vérifie les règles Firestore."); }
+        });
+        btns.appendChild(b);
+      }
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
+  // ---------- Missions ----------
+  function rendreMissions(){
+    const zone = $("liste-missions");
+    zone.innerHTML = "";
+    const f = $("f-statut").value;
+    const q = $("q-missions").value.trim().toLowerCase();
+    const items = missions
+      .filter(m => (f === "toutes" || st(m) === f) && (!q || [m.titre, m.ville, m.auteur].join(" ").toLowerCase().includes(q)))
+      .sort((a, b) => ms(b) - ms(a));
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucune mission.")); return; }
+    items.forEach(m => {
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", m.titre || "(sans titre)");
+      titre.appendChild(el("span", "badge b-" + st(m), LIB[st(m)]));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", ["📍 " + (m.ville || "—"), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
+      if (m.desc) g.appendChild(el("div", "h-sous", m.desc));
+      const nc = cands.filter(c => c.missionId === m.id).length;
+      g.appendChild(el("div", "h-sous", nc + " candidature(s)" + (m.workerNom ? " · attribuée à " + m.workerNom : "")));
+      const b = el("button", "danger mini", "Supprimer");
+      b.type = "button";
+      b.addEventListener("click", async () => {
+        if (!confirm("Supprimer définitivement cette mission et ses candidatures ?")) return;
+        try {
+          const lot = writeBatch(db);
+          lot.delete(doc(db, "missions", m.id));
+          cands.filter(c => c.missionId === m.id).forEach(c => lot.delete(doc(db, "candidatures", c.id)));
+          await lot.commit();
+        } catch (e) { console.error(e); message("Suppression impossible. Vérifie les règles Firestore."); }
+      });
+      ligne.append(g, b);
+      zone.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); }
+
+  // ---------- Export CSV ----------
+  function cellule(v){
+    let s = String(v == null ? "" : v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;   // évite l'exécution de formules dans un tableur
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  $("btn-export").addEventListener("click", () => {
+    const entetes = ["Prénom", "Nom", "Profession", "Ville", "Type d'usage", "Téléphone", "E-mail", "Suspendu"];
+    const lignes = users.map(u => [u.prenom, u.nom, u.profession, u.ville, u.role, u.tel, u.email, u.suspendu ? "oui" : "non"].map(cellule).join(","));
+    const csv = "\ufeff" + [entetes.map(cellule).join(","), ...lignes].join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = "utilisateurs-bohicon-jobs.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+
+  // ---------- Données en direct ----------
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; }
+  function demarrer(){
+    const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
+    const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
+    unsubs.push(onSnapshot(query(collection(db, "users"), limit(500)), s => { users = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "missions"), limit(500)), s => { missions = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => { cands = lire(s); rendre(); }, err));
+  }
+
+  // ---------- Accès ----------
+  onAuthStateChanged(auth, async u => {
+    arreter();
+    moi = u;
+    $("bloc-login").classList.toggle("cache", !!u);
+    $("bloc-refus").classList.add("cache");
+    $("console").classList.add("cache");
+    if (!u) return;
+    try {
+      const a = await getDoc(doc(db, "admins", u.uid));
+      if (a.exists()){
+        $("console").classList.remove("cache");
+        demarrer();
+      } else {
+        $("bloc-refus").classList.remove("cache");
+      }
+    } catch (e) {
+      console.error(e);
+      $("bloc-refus").classList.remove("cache");
+    }
+  });
+
+  $("btn-login").addEventListener("click", async () => {
+    message("");
+    try { await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value); $("mdp").value = ""; }
+    catch (e) { console.error(e); message("E-mail ou mot de passe incorrect."); }
+  });
+  $("btn-deco").addEventListener("click", () => signOut(auth));
+  $("btn-deco-refus").addEventListener("click", () => signOut(auth));
+
+  document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
+    ["apercu", "users", "missions"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+  }));
+  $("q-users").addEventListener("input", rendreUsers);
+  $("q-missions").addEventListener("input", rendreMissions);
+  $("f-statut").addEventListener("change", rendreMissions);
+</script>
+</body>
+</html>

@@ -285,6 +285,7 @@
 <footer>
   <a href="confidentialite.html">Confidentialité et conditions d'utilisation</a>
   <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
+  <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
 
 <datalist id="professions">
@@ -442,8 +443,9 @@
   };
   const profilOk = () => !!(profil && profil.profession);
   const roleActuel = () => (profil && profil.role) || "les deux";
-  const peutPublier = () => roleActuel() !== "travailleur";
-  const peutPostuler = () => roleActuel() !== "client";
+  const suspendu = () => !!(profil && profil.suspendu);
+  const peutPublier = () => !suspendu() && roleActuel() !== "travailleur";
+  const peutPostuler = () => !suspendu() && roleActuel() !== "client";
   const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
   const dateMs = m => {
     const t = m.termineeAt || m.createdAt;
@@ -544,6 +546,7 @@
     r.innerHTML = "";
     r.appendChild(el("div", "salut", "Bonjour " + profil.prenom + " 👋"));
     r.appendChild(el("div", "prof", "💼 " + profil.profession + " · 📍 " + profil.ville));
+    if (suspendu()) r.appendChild(el("div", "erreur", "⚠️ Ton compte est suspendu : tu ne peux plus publier ni te proposer. Contacte l'administrateur."));
 
     const sc = el("div", "score");
     const haut = el("div", "score-haut");
@@ -868,6 +871,13 @@
         profil = s.exists() ? s.data() : null;
       } catch (e) { console.error(e); }
     }
+    $("lien-admin").classList.add("cache");
+    if (u){
+      try {
+        const a = await getDoc(doc(db, "admins", u.uid));
+        if (a.exists()) $("lien-admin").classList.remove("cache");
+      } catch (e) { /* pas administrateur */ }
+    }
     majUI();
   });
 
@@ -987,6 +997,9 @@
   $("btn-mon-espace").addEventListener("click", () => defiler($("espace")));
   $("cta-publier").addEventListener("click", () => {
     if (!user){ vueInscription = true; majUI(); }
+    else if (profilOk() && suspendu()){
+      afficherMessage("Ton compte est suspendu : tu ne peux plus publier. Contacte l'administrateur.");
+    }
     else if (profilOk() && !peutPublier()){
       afficherMessage("Ton profil est réglé pour chercher des missions. Pour en publier, change ton type d'usage dans l'onglet Profil.", "info");
     }
