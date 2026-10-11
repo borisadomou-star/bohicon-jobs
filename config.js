@@ -3,6 +3,6 @@
 // EMAIL : ton adresse e-mail de contact, par exemple "contact@exemple.com".
 // Laisse "" pour ne rien afficher.
 window.CONFIG = {
-  NUMERO_WA: "",
-  EMAIL: ""
+  NUMERO_WA: "2290167079595",
+  EMAIL: "borisadomou@gmail.com"
 };
