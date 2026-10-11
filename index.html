@@ -94,6 +94,23 @@
   .duo button{flex:1;width:auto}
   .b-refus{background:#fdecea;color:#b3261e}
 
+  /* Notifications */
+  .droite{display:flex;align-items:center;gap:8px}
+  .cloche{position:relative;width:44px;height:44px;margin:0;padding:0;border-radius:50%;background:var(--fond);color:var(--vert-fonce);box-shadow:none;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+  .pastille{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--rouge);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panneau{position:fixed;top:66px;right:10px;width:min(94vw,380px);max-height:72vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 16px 40px rgba(8,69,42,.28);z-index:70;padding:14px}
+  .tete-notifs{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .tete-notifs h2{margin:0}
+  .tete-notifs .lien{width:auto;font-size:.8rem}
+  .notif{display:flex;gap:10px;padding:10px 8px;border-bottom:1px solid var(--trait);border-radius:12px;cursor:pointer;font-size:.88rem}
+  .notif:last-child{border-bottom:0}
+  .notif.nonlu{background:#eef9f2}
+  .notif .pt{flex:none;width:9px;height:9px;border-radius:50%;background:var(--rouge);margin-top:7px}
+  .notif.lu .pt{background:transparent}
+  .notif small{display:block;color:var(--gris);font-size:.74rem}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);top:72px;width:min(92vw,420px);background:var(--vert-fonce);color:#fff;border-radius:16px;padding:12px 16px;font-size:.9rem;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:80;cursor:pointer}
+  .wa.gris{background:var(--gris)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -162,8 +179,14 @@
 
 <div class="topbar">
   <a class="marque" href="#haut"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
-  <button class="btn-espace" id="btn-mon-espace" type="button">Mon espace</button>
+  <div class="droite">
+    <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
+    <button class="btn-espace" id="btn-mon-espace" type="button">Mon espace</button>
+  </div>
 </div>
+
+<div id="panneau-notifs" class="panneau cache" role="dialog" aria-label="Notifications"></div>
+<div id="toast" class="toast cache" role="status" aria-live="polite"></div>
 
 <section class="hero" id="haut">
   <div class="hero-in">
@@ -342,6 +365,12 @@
   let suiviUid = null;
   let filtreRole = "";
   const ouverts = new Set();
+  const TITRE_BASE = document.title;
+  const charges = { pub: false, real: false, cand: false, recu: false, missions: false };
+  let vuInit = false;
+  let vues = new Set();
+  let dernieresCles = new Set();
+  let minuteurToast = null;
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -421,6 +450,12 @@
     if (!n.startsWith("229")) n = "229" + n;
     const msg = encodeURIComponent("Bonjour, je vous contacte pour la mission : " + titre);
     return "https://wa.me/" + n + "?text=" + msg;
+  }
+
+  function lienWhatsAppMsg(tel, texte){
+    let n = String(tel).replace(/\D/g, "");
+    if (!n.startsWith("229")) n = "229" + n;
+    return "https://wa.me/" + n + "?text=" + encodeURIComponent(texte);
   }
 
   // ---------- Compteurs (calculés sur les missions chargées) ----------
@@ -601,6 +636,7 @@
         : "Score : +5 points par mission publiée et terminée. Le montant confié additionne le prix des missions terminées.";
     r.appendChild(el("p", "aide", regle + " Les paiements se font directement entre utilisateurs."));
     majHisto();
+    majNotifs();
   }
 
   function stopperSuivi(){
@@ -611,6 +647,10 @@
     mesCandidatures = [];
     candidaturesRecues = [];
     suiviUid = null;
+    charges.pub = charges.real = charges.cand = charges.recu = false;
+    vuInit = false;
+    vues = new Set();
+    dernieresCles = new Set();
   }
 
   function suivreMesMissions(){
@@ -618,13 +658,13 @@
     const lire = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
     const erreur = e => console.error(e);
     suivis.push(onSnapshot(query(missionsRef, where("uid", "==", user.uid)),
-      snap => { mesPubliees = lire(snap); afficher(); majTableau(); }, erreur));
+      snap => { mesPubliees = lire(snap); charges.pub = true; afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(missionsRef, where("workerUid", "==", user.uid)),
-      snap => { mesRealisees = lire(snap); afficher(); majTableau(); }, erreur));
+      snap => { mesRealisees = lire(snap); charges.real = true; afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(candRef, where("uid", "==", user.uid)),
-      snap => { mesCandidatures = lire(snap); afficher(); majTableau(); }, erreur));
+      snap => { mesCandidatures = lire(snap); charges.cand = true; afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(candRef, where("auteurUid", "==", user.uid)),
-      snap => { candidaturesRecues = lire(snap); afficher(); majTableau(); }, erreur));
+      snap => { candidaturesRecues = lire(snap); charges.recu = true; afficher(); majTableau(); }, erreur));
   }
 
   function majUI(){
@@ -641,6 +681,7 @@
     if (uid !== suiviUid){ stopperSuivi(); if (user) suivreMesMissions(); }
     afficher();
     majTableau();
+    majNotifs();
   }
 
   // ---------- Liste des intéressés (visible par l'auteur) ----------
@@ -659,9 +700,18 @@
         choisi ? "✅ Choisi(e)" : (c.statut === "refusee" ? "❌ Refusé(e)" : "")
       ].filter(Boolean).join(" · ")));
 
+      const prenomC = String(c.nom || "").split(" ")[0];
       if (c.statut !== "refusee"){
-        const a = el("a", "wa petit", "Contacter sur WhatsApp");
-        a.href = lienWhatsApp(c.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
+        const texte = choisi
+          ? "Bonjour " + prenomC + ", bonne nouvelle : vous êtes retenu(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?"
+          : "Bonjour " + prenomC + ", je vous contacte au sujet de la mission « " + m.titre + " ».";
+        const a = el("a", "wa petit", choisi ? "💬 Prévenir sur WhatsApp : retenu(e)" : "Contacter sur WhatsApp");
+        a.href = lienWhatsAppMsg(c.tel, texte); a.target = "_blank"; a.rel = "noopener";
+        ligne.appendChild(a);
+      } else {
+        const a = el("a", "wa petit gris", "💬 Prévenir sur WhatsApp : refus");
+        a.href = lienWhatsAppMsg(c.tel, "Bonjour " + prenomC + ", merci pour votre intérêt pour la mission « " + m.titre + " ». Malheureusement, je ne peux pas donner suite cette fois. Bonne continuation !");
+        a.target = "_blank"; a.rel = "noopener";
         ligne.appendChild(a);
       }
 
@@ -706,6 +756,7 @@
   function carte(m, cpt){
     const statut = st(m);
     const c = el("div", "card job s-" + statut);
+    c.dataset.id = m.id;
 
     const h = el("h3", "", m.titre);
     h.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
@@ -824,6 +875,13 @@
       const o = el("div", "info", statut === "terminee" ? "✔️ Tu as réalisé cette mission." : "🎉 Tu as été choisi(e) pour cette mission !");
       o.style.marginBottom = "0";
       actions.appendChild(o);
+      if (statut === "attribuee"){
+        const w = el("a", "wa", "💬 Écrire à l'auteur sur WhatsApp");
+        w.style.marginTop = "0";
+        w.href = lienWhatsAppMsg(m.tel, "Bonjour, merci de m'avoir choisi(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+        w.target = "_blank"; w.rel = "noopener";
+        actions.appendChild(w);
+      }
     } else if (mesCandidatures.some(x => x.missionId === m.id)){
       actions.appendChild(el("div", "verrou", "Cette mission a été attribuée à quelqu'un d'autre."));
     }
@@ -854,7 +912,9 @@
   const q = query(missionsRef, orderBy("createdAt", "desc"), limit(200));
   onSnapshot(q, snap => {
     missions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    charges.missions = true;
     afficher();
+    majNotifs();
   }, err => {
     console.error(err);
     afficherMessage("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
@@ -991,6 +1051,138 @@
       majUI();
     } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
   });
+
+  // ---------- Notifications dans le site ----------
+  function cleStockage(){ return "bj_vues_" + (user ? user.uid : ""); }
+  function chargerVues(){
+    try {
+      const brut = localStorage.getItem(cleStockage());
+      vues = new Set(brut ? JSON.parse(brut) : []);
+      return brut !== null;
+    } catch (e) { vues = new Set(); return false; }
+  }
+  function sauverVues(){
+    try { localStorage.setItem(cleStockage(), JSON.stringify([...vues])); } catch (e) { /* stockage indisponible */ }
+  }
+
+  function calculerNotifs(){
+    if (!user || !profilOk()) return [];
+    const liste = [];
+    const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
+    candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).forEach(c => liste.push({
+      cle: "recu:" + c.id, ms: dateMs(c), type: "recu", missionId: c.missionId,
+      texte: "🙋 Nouveau candidat pour « " + c.titre + " » : " + c.nom + (c.profession ? " (" + c.profession + ")" : "")
+    }));
+    mesCandidatures.forEach(c => {
+      const e = etatCandidature(c);
+      if (e.startsWith("Retenue")) liste.push({ cle: "ret:" + c.id, ms: 0, type: "moi", texte: "🎉 Tu as été choisi(e) pour « " + c.titre + " »" });
+      else if (e === "Refusée") liste.push({ cle: "ref:" + c.id, ms: 0, type: "moi", texte: "❌ Ta candidature pour « " + c.titre + " » n'a pas été retenue" });
+      else if (e === "Non retenue") liste.push({ cle: "non:" + c.id, ms: 0, type: "moi", texte: "La mission « " + c.titre + " » a été attribuée à quelqu'un d'autre" });
+    });
+    mesRealisees.filter(m => m.uid !== user.uid && st(m) === "terminee").forEach(m => liste.push({
+      cle: "fin:" + m.id, ms: dateMs(m), type: "moi",
+      texte: "✔️ La mission « " + m.titre + " » est terminée : +10 points et " + fcfa(m.prix) + " de gains indicatifs."
+    }));
+    return liste.sort((a, b) => b.ms - a.ms);
+  }
+
+  function afficherToast(texte){
+    const t = $("toast");
+    t.textContent = texte;
+    t.classList.remove("cache");
+    clearTimeout(minuteurToast);
+    minuteurToast = setTimeout(() => t.classList.add("cache"), 7000);
+    try { if (navigator.vibrate) navigator.vibrate(200); } catch (e) { /* non supporté */ }
+  }
+
+  function majNotifs(){
+    const actif = !!user && profilOk();
+    $("btn-cloche").classList.toggle("cache", !actif);
+    if (!actif){
+      document.title = TITRE_BASE;
+      $("panneau-notifs").classList.add("cache");
+      return;
+    }
+    if (!vuInit){
+      if (!Object.values(charges).every(Boolean)) return;
+      const existait = chargerVues();
+      if (!existait){ calculerNotifs().forEach(n => vues.add(n.cle)); sauverVues(); }
+      dernieresCles = new Set(calculerNotifs().map(n => n.cle));
+      vuInit = true;
+    }
+    const liste = calculerNotifs();
+    const nonLus = liste.filter(n => !vues.has(n.cle));
+    const nouvelles = nonLus.filter(n => !dernieresCles.has(n.cle));
+    dernieresCles = new Set(liste.map(n => n.cle));
+    if (nouvelles.length) afficherToast(nouvelles.length === 1 ? nouvelles[0].texte : "🔔 " + nouvelles.length + " nouvelles notifications");
+    const p = $("cloche-n");
+    p.textContent = nonLus.length > 9 ? "9+" : String(nonLus.length);
+    p.classList.toggle("cache", !nonLus.length);
+    document.title = nonLus.length ? "(" + nonLus.length + ") " + TITRE_BASE : TITRE_BASE;
+    if (!$("panneau-notifs").classList.contains("cache")) rendrePanneau(liste);
+  }
+
+  function rendrePanneau(liste){
+    const z = $("panneau-notifs");
+    z.innerHTML = "";
+    const tete = el("div", "tete-notifs");
+    tete.appendChild(el("h2", "", "Notifications"));
+    const tout = el("button", "lien", "Tout marquer comme lu");
+    tout.type = "button";
+    tout.addEventListener("click", e => { e.stopPropagation(); marquerTout(); });
+    tete.appendChild(tout);
+    z.appendChild(tete);
+    if (!liste.length){ z.appendChild(el("div", "vide", "Aucune notification pour l'instant.")); return; }
+    liste.slice().sort((a, b) => (vues.has(a.cle) ? 1 : 0) - (vues.has(b.cle) ? 1 : 0) || b.ms - a.ms).slice(0, 30).forEach(n => {
+      const lu = vues.has(n.cle);
+      const l = el("div", "notif " + (lu ? "lu" : "nonlu"));
+      l.appendChild(el("span", "pt"));
+      const c = el("div");
+      c.appendChild(el("div", "", n.texte));
+      if (n.ms) c.appendChild(el("small", "", dateTexte(n.ms)));
+      l.appendChild(c);
+      l.addEventListener("click", () => {
+        fermerPanneau();
+        if (n.type === "recu"){
+          ouverts.add(n.missionId);
+          afficher();
+          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
+          defiler(cible || $("missions"));
+        } else {
+          defiler($("espace"));
+        }
+      });
+      z.appendChild(l);
+    });
+  }
+
+  function marquerTout(){
+    calculerNotifs().forEach(n => vues.add(n.cle));
+    sauverVues();
+    majNotifs();
+  }
+  function ouvrirPanneau(){
+    $("toast").classList.add("cache");
+    $("panneau-notifs").classList.remove("cache");
+    rendrePanneau(calculerNotifs());
+  }
+  function fermerPanneau(){
+    const p = $("panneau-notifs");
+    if (p.classList.contains("cache")) return;
+    p.classList.add("cache");
+    marquerTout();
+  }
+
+  $("btn-cloche").addEventListener("click", e => {
+    e.stopPropagation();
+    if ($("panneau-notifs").classList.contains("cache")) ouvrirPanneau(); else fermerPanneau();
+  });
+  $("toast").addEventListener("click", e => { e.stopPropagation(); ouvrirPanneau(); });
+  document.addEventListener("click", e => {
+    const p = $("panneau-notifs");
+    if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
 
   // ---------- Navigation et boutons flottants ----------
   const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
