@@ -90,6 +90,10 @@
   .h-titre{font-weight:600;font-size:.93rem;word-break:break-word}
   .h-sous{font-size:.8rem;color:var(--gris)}
 
+  .duo{display:flex;gap:8px;margin-top:2px}
+  .duo button{flex:1;width:auto}
+  .b-refus{background:#fdecea;color:#b3261e}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -298,7 +302,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, getDocs, setDoc,
+  import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, writeBatch, setDoc,
            query, where, orderBy, limit, onSnapshot, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -321,6 +325,7 @@
   const db = getFirestore(app);
   const auth = getAuth(app);
   const missionsRef = collection(db, "missions");
+  const candRef = collection(db, "candidatures");
 
   let missions = [];
   let user = null;
@@ -330,9 +335,12 @@
   let profilRempli = false;
   let mesPubliees = [];
   let mesRealisees = [];
+  let mesCandidatures = [];
+  let candidaturesRecues = [];
   let suivis = [];
   let suiviUid = null;
-  const dejaInteresse = new Set();
+  let filtreRole = "";
+  const ouverts = new Set();
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -425,7 +433,7 @@
     return { parAuteur, parTravailleur };
   }
 
-  // ---------- Tableau de bord personnel ----------
+  // ---------- Rôles et tableau de bord personnel ----------
   const el = (tag, cls, texte) => {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -433,6 +441,9 @@
     return e;
   };
   const profilOk = () => !!(profil && profil.profession);
+  const roleActuel = () => (profil && profil.role) || "les deux";
+  const peutPublier = () => roleActuel() !== "travailleur";
+  const peutPostuler = () => roleActuel() !== "client";
   const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
   const dateMs = m => {
     const t = m.termineeAt || m.createdAt;
@@ -450,36 +461,78 @@
     { nom: "Débutant", min: 0 }, { nom: "Actif", min: 10 }, { nom: "Confirmé", min: 50 }, { nom: "Expert", min: 100 }
   ];
 
+  // État d'une candidature, du point de vue du candidat
+  function etatCandidature(c){
+    if (c.statut === "refusee") return "Refusée";
+    const m = missions.find(x => x.id === c.missionId);
+    if (m && st(m) !== "disponible") return m.workerUid === c.uid ? "Retenue ✅" : "Non retenue";
+    if (c.statut === "acceptee") return "Retenue ✅";
+    return "En attente";
+  }
+
   function statsPerso(){
     const realisees = mesRealisees.filter(m => m.uid !== user.uid);
     const faites = realisees.filter(m => st(m) === "terminee");
-    const encours = realisees.filter(m => st(m) === "attribuee").length;
-    const confiees = mesPubliees.filter(m => st(m) === "terminee").length;
+    const encoursTrav = realisees.filter(m => st(m) === "attribuee").length;
+    const terminees = mesPubliees.filter(m => st(m) === "terminee");
+    const encoursPub = mesPubliees.filter(m => st(m) === "attribuee").length;
     const debut = new Date(); debut.setDate(1); debut.setHours(0, 0, 0, 0);
-    const gains = faites.reduce((s, m) => s + Number(m.prix || 0), 0);
-    const gainsMois = faites.filter(m => dateMs(m) >= debut.getTime()).reduce((s, m) => s + Number(m.prix || 0), 0);
-    const points = faites.length * 10 + confiees * 5;
+    const somme = liste => liste.reduce((s, m) => s + Number(m.prix || 0), 0);
+    const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
+    const points = faites.length * 10 + terminees.length * 5;
     let idx = 0;
     NIVEAUX.forEach((n, i) => { if (points >= n.min) idx = i; });
-    return { faites: faites.length, encours, confiees, publiees: mesPubliees.length, gains, gainsMois, points, idx };
+    return {
+      faites: faites.length, encoursTrav, terminees: terminees.length, encoursPub,
+      publiees: mesPubliees.length,
+      gains: somme(faites),
+      gainsMois: somme(faites.filter(m => dateMs(m) >= debut.getTime())),
+      confie: somme(terminees),
+      enAttente: mesCandidatures.filter(c => etatCandidature(c) === "En attente").length,
+      aTraiter: candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).length,
+      points, idx
+    };
+  }
+
+  function majFiltreHisto(){
+    const cle = roleActuel();
+    if (cle === filtreRole) return;
+    filtreRole = cle;
+    const sel = $("histo-filtre");
+    const opts = [["tout", "Tout mon historique"]];
+    if (peutPostuler()) opts.push(["realisee", "Missions que j'ai réalisées"], ["candidature", "Mes candidatures"]);
+    if (peutPublier()) opts.push(["publiee", "Missions que j'ai publiées"]);
+    sel.innerHTML = "";
+    opts.forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sel.appendChild(o); });
+    sel.value = "tout";
   }
 
   function majHisto(){
     if (!user) return;
+    majFiltreHisto();
     const zone = $("liste-histo");
     zone.innerHTML = "";
     const f = $("histo-filtre").value;
     const items = [];
-    if (f !== "publiee") mesRealisees.filter(m => m.uid !== user.uid).forEach(m => items.push({ m, role: "Réalisée" }));
-    if (f !== "realisee") mesPubliees.forEach(m => items.push({ m, role: "Publiée" }));
-    items.sort((a, b) => dateMs(b.m) - dateMs(a.m));
+    const ligneMission = (m, role) => ({ titre: m.titre, role, prix: m.prix, ms: dateMs(m), etat: LIBELLES[st(m)], cls: "b-" + st(m) });
+    if (peutPostuler() && (f === "tout" || f === "realisee"))
+      mesRealisees.filter(m => m.uid !== user.uid).forEach(m => items.push(ligneMission(m, "Réalisée")));
+    if (peutPublier() && (f === "tout" || f === "publiee"))
+      mesPubliees.forEach(m => items.push(ligneMission(m, "Publiée")));
+    if (peutPostuler() && (f === "tout" || f === "candidature"))
+      mesCandidatures.filter(c => !mesRealisees.some(m => m.id === c.missionId)).forEach(c => {
+        const e = etatCandidature(c);
+        items.push({ titre: c.titre, role: "Candidature", prix: c.prix, ms: dateMs(c), etat: e,
+          cls: e === "En attente" ? "b-attribuee" : (e.startsWith("Retenue") ? "b-disponible" : "b-refus") });
+      });
+    items.sort((a, b) => b.ms - a.ms);
     if (!items.length){ zone.appendChild(el("div", "vide", "Aucune mission pour l'instant.")); return; }
-    items.forEach(({ m, role }) => {
+    items.forEach(i => {
       const ligne = el("div", "h-ligne");
       const gauche = el("div");
-      gauche.appendChild(el("div", "h-titre", m.titre));
-      gauche.appendChild(el("div", "h-sous", [role, fcfa(m.prix), dateTexte(dateMs(m))].filter(Boolean).join(" · ")));
-      ligne.append(gauche, el("span", "badge b-" + st(m), LIBELLES[st(m)]));
+      gauche.appendChild(el("div", "h-titre", i.titre));
+      gauche.appendChild(el("div", "h-sous", [i.role, fcfa(i.prix), dateTexte(i.ms)].filter(Boolean).join(" · ")));
+      ligne.append(gauche, el("span", "badge " + i.cls, i.etat));
       zone.appendChild(ligne);
     });
   }
@@ -516,15 +569,34 @@
       if (sous) t.appendChild(el("small", "", sous));
       return t;
     };
+    const pl = n => n > 1 ? "s" : "";
     const tuiles = el("div", "tuiles");
-    tuiles.append(
-      tuile(fcfa(s.gains), "Gains total"),
-      tuile(fcfa(s.gainsMois), "Gains ce mois-ci"),
-      tuile(String(s.faites), "Missions réalisées", s.encours ? s.encours + " en cours" : ""),
-      tuile(String(s.publiees), "Missions publiées", s.confiees + " terminée" + (s.confiees > 1 ? "s" : ""))
-    );
+    if (peutPostuler()){
+      tuiles.append(
+        tuile(fcfa(s.gains), "Gains total"),
+        tuile(fcfa(s.gainsMois), "Gains ce mois-ci"),
+        tuile(String(s.faites), "Missions réalisées", s.encoursTrav ? s.encoursTrav + " en cours" : ""),
+        tuile(String(s.enAttente), "Candidatures en attente")
+      );
+    }
+    if (peutPublier()){
+      tuiles.append(
+        tuile(String(s.publiees), "Missions publiées", s.terminees + " terminée" + pl(s.terminees)),
+        tuile(String(s.aTraiter), "Candidatures à traiter")
+      );
+      if (!peutPostuler()) tuiles.append(
+        tuile(String(s.encoursPub), "Missions en cours"),
+        tuile(fcfa(s.confie), "Montant confié")
+      );
+    }
     r.appendChild(tuiles);
-    r.appendChild(el("p", "aide", "Score : +10 points par mission réalisée, +5 par mission publiée et terminée. Les gains sont indicatifs : ils additionnent le prix des missions terminées, les paiements se faisant directement entre utilisateurs."));
+
+    const regle = peutPostuler() && peutPublier()
+      ? "Score : +10 points par mission réalisée, +5 par mission publiée et terminée. Les gains sont indicatifs : ils additionnent le prix des missions terminées."
+      : peutPostuler()
+        ? "Score : +10 points par mission réalisée. Les gains sont indicatifs : ils additionnent le prix des missions terminées."
+        : "Score : +5 points par mission publiée et terminée. Le montant confié additionne le prix des missions terminées.";
+    r.appendChild(el("p", "aide", regle + " Les paiements se font directement entre utilisateurs."));
     majHisto();
   }
 
@@ -533,16 +605,23 @@
     suivis = [];
     mesPubliees = [];
     mesRealisees = [];
+    mesCandidatures = [];
+    candidaturesRecues = [];
     suiviUid = null;
   }
 
   function suivreMesMissions(){
     suiviUid = user.uid;
     const lire = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const erreur = e => console.error(e);
     suivis.push(onSnapshot(query(missionsRef, where("uid", "==", user.uid)),
-      snap => { mesPubliees = lire(snap); majTableau(); }, e => console.error(e)));
+      snap => { mesPubliees = lire(snap); afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(missionsRef, where("workerUid", "==", user.uid)),
-      snap => { mesRealisees = lire(snap); majTableau(); }, e => console.error(e)));
+      snap => { mesRealisees = lire(snap); afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(candRef, where("uid", "==", user.uid)),
+      snap => { mesCandidatures = lire(snap); afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(candRef, where("auteurUid", "==", user.uid)),
+      snap => { candidaturesRecues = lire(snap); afficher(); majTableau(); }, erreur));
   }
 
   function majUI(){
@@ -552,7 +631,7 @@
     $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
     $("bloc-profil").classList.toggle("cache", !(connecte && !complet && !enInscription));
     $("bloc-compte").classList.toggle("cache", !(connecte && complet));
-    $("bloc-publier").classList.toggle("cache", !(connecte && complet));
+    $("bloc-publier").classList.toggle("cache", !(connecte && complet && peutPublier()));
     if (connecte && !complet && !enInscription && profil && !profilRempli){ remplir("p-", profil); profilRempli = true; }
     if (!connecte) profilRempli = false;
     const uid = user ? user.uid : null;
@@ -562,157 +641,188 @@
   }
 
   // ---------- Liste des intéressés (visible par l'auteur) ----------
-  async function chargerInteresses(m, zone, cpt){
-    zone.textContent = "Chargement…";
-    try {
-      const snap = await getDocs(collection(db, "missions", m.id, "candidatures"));
-      zone.innerHTML = "";
-      if (snap.empty){ zone.textContent = "Personne pour l'instant."; return; }
-      snap.forEach(d => {
-        const c = d.data();
-        const ligne = document.createElement("div");
-        ligne.className = "ligne";
-        const n = cpt.parTravailleur[c.uid] || 0;
-        const nom = document.createElement("div");
-        nom.textContent = "👤 " + c.nom + (c.profession ? " · " + c.profession : "") + (n ? " · ✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "");
-        if (m.workerUid === c.uid) nom.textContent += " · choisi(e)";
-        const a = document.createElement("a");
-        a.className = "wa petit"; a.textContent = "Contacter sur WhatsApp";
+  function remplirInteresses(m, zone, cpt){
+    zone.innerHTML = "";
+    const recues = candidaturesRecues.filter(c => c.missionId === m.id).sort((a, b) => dateMs(a) - dateMs(b));
+    if (!recues.length){ zone.textContent = "Personne pour l'instant."; return; }
+    const dispo = st(m) === "disponible";
+    recues.forEach(c => {
+      const ligne = el("div", "ligne");
+      const n = cpt.parTravailleur[c.uid] || 0;
+      const choisi = !dispo && m.workerUid === c.uid;
+      ligne.appendChild(el("div", "h-titre", "👤 " + c.nom + (c.profession ? " · " + c.profession : "")));
+      ligne.appendChild(el("div", "h-sous", [
+        n ? "✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
+        choisi ? "✅ Choisi(e)" : (c.statut === "refusee" ? "❌ Refusé(e)" : "")
+      ].filter(Boolean).join(" · ")));
+
+      if (c.statut !== "refusee"){
+        const a = el("a", "wa petit", "Contacter sur WhatsApp");
         a.href = lienWhatsApp(c.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
-        ligne.append(nom, a);
-        if (st(m) === "disponible"){
-          const b = document.createElement("button");
-          b.className = "sec mini"; b.textContent = "Choisir cette personne";
-          b.addEventListener("click", async () => {
-            if (!confirm("Attribuer la mission à " + c.nom + " ?")) return;
-            try { await updateDoc(doc(db, "missions", m.id), { statut: "attribuee", workerUid: c.uid, workerNom: c.nom }); }
+        ligne.appendChild(a);
+      }
+
+      if (dispo){
+        const rangee = el("div", "duo");
+        if (c.statut !== "refusee"){
+          const ok = el("button", "mini", "✅ Accepter");
+          ok.type = "button";
+          ok.addEventListener("click", async () => {
+            if (!confirm("Attribuer la mission à " + c.nom + " ? Les autres candidats verront qu'elle est attribuée.")) return;
+            try {
+              const lot = writeBatch(db);
+              lot.update(doc(db, "missions", m.id), { statut: "attribuee", workerUid: c.uid, workerNom: c.nom });
+              lot.update(doc(db, "candidatures", c.id), { statut: "acceptee" });
+              await lot.commit();
+            } catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          });
+          const non = el("button", "danger mini", "❌ Refuser");
+          non.type = "button";
+          non.addEventListener("click", async () => {
+            if (!confirm("Refuser la candidature de " + c.nom + " ?")) return;
+            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "refusee" }); }
             catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
           });
-          ligne.appendChild(b);
+          rangee.append(ok, non);
+        } else {
+          const annul = el("button", "sec mini", "↩️ Annuler le refus");
+          annul.type = "button";
+          annul.addEventListener("click", async () => {
+            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "en_attente" }); }
+            catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          });
+          rangee.appendChild(annul);
         }
-        zone.appendChild(ligne);
-      });
-    } catch (e) {
-      console.error(e);
-      zone.textContent = "Impossible de charger la liste.";
-    }
+        ligne.appendChild(rangee);
+      }
+      zone.appendChild(ligne);
+    });
   }
 
   // ---------- Carte d'une mission ----------
   function carte(m, cpt){
     const statut = st(m);
-    const c = document.createElement("div");
-    c.className = "card job s-" + statut;
+    const c = el("div", "card job s-" + statut);
 
-    const h = document.createElement("h3");
-    h.textContent = m.titre;
-    const badge = document.createElement("span");
-    badge.className = "badge b-" + statut;
-    badge.textContent = LIBELLES[statut];
-    h.appendChild(badge);
+    const h = el("h3", "", m.titre);
+    h.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
 
-    const meta = document.createElement("div"); meta.className = "meta";
-    meta.textContent = "📍 " + m.ville + " · ";
-    const p = document.createElement("span"); p.className = "prix";
-    p.textContent = Number(m.prix).toLocaleString("fr-FR") + " FCFA";
-    meta.appendChild(p);
+    const meta = el("div", "meta", "📍 " + m.ville + " · ");
+    meta.appendChild(el("span", "prix", fcfa(m.prix)));
     if (m.auteur){
       const n = cpt.parAuteur[m.uid] || 0;
       meta.appendChild(document.createTextNode(" · par " + m.auteur + (n ? " (✔️ " + pluriel(n, "mission") + " terminée" + (n > 1 ? "s" : "") + ")" : "")));
     }
-    const d = document.createElement("div"); d.textContent = m.desc || "";
-    c.append(h, meta, d);
+    c.append(h, meta, el("div", "", m.desc || ""));
 
     if (statut !== "disponible" && m.workerNom){
-      const w = document.createElement("div");
-      w.className = "meta"; w.style.marginTop = "6px";
-      w.textContent = "Attribuée à " + m.workerNom;
+      const w = el("div", "meta", "Attribuée à " + m.workerNom);
+      w.style.marginTop = "6px";
       c.appendChild(w);
     }
 
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
     if (!user){
-      const v = document.createElement("div");
-      v.className = "verrou";
-      v.textContent = "🔒 Connecte-toi pour participer";
-      c.appendChild(v);
+      c.appendChild(el("div", "verrou", "🔒 Connecte-toi pour participer"));
       return c;
     }
 
+    const actions = el("div", "actions");
+
     if (m.uid === user.uid){
       // --- Actions de l'auteur ---
-      const zone = document.createElement("div");
-      zone.className = "sous cache";
-
       if (statut !== "terminee"){
-        const bVoir = document.createElement("button");
-        bVoir.className = "sec mini"; bVoir.textContent = "👥 Voir les intéressés";
+        const recues = candidaturesRecues.filter(x => x.missionId === m.id);
+        const attente = recues.filter(x => x.statut === "en_attente").length;
+        const bVoir = el("button", "sec mini",
+          "👥 Intéressés (" + recues.length + ")" + (statut === "disponible" && attente ? " · " + attente + " à traiter" : ""));
+        bVoir.type = "button";
         bVoir.addEventListener("click", () => {
-          const ouvert = !zone.classList.contains("cache");
-          zone.classList.toggle("cache", ouvert);
-          if (!ouvert) chargerInteresses(m, zone, cpt);
+          if (ouverts.has(m.id)) ouverts.delete(m.id); else ouverts.add(m.id);
+          afficher();
         });
-        actions.append(bVoir, zone);
+        actions.appendChild(bVoir);
+        if (ouverts.has(m.id)){
+          const zone = el("div", "sous");
+          remplirInteresses(m, zone, cpt);
+          actions.appendChild(zone);
+        }
       }
       if (statut === "attribuee"){
-        const bFin = document.createElement("button");
-        bFin.className = "mini"; bFin.textContent = "✅ Marquer comme terminée";
+        const bFin = el("button", "mini", "✅ Marquer comme terminée");
+        bFin.type = "button";
         bFin.addEventListener("click", async () => {
           if (!confirm("Confirmer que la mission est terminée ?")) return;
           try { await updateDoc(doc(db, "missions", m.id), { statut: "terminee", termineeAt: serverTimestamp() }); }
           catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
         });
-        const bRetour = document.createElement("button");
-        bRetour.className = "sec mini"; bRetour.textContent = "↩️ Remettre disponible";
+        const bRetour = el("button", "sec mini", "↩️ Remettre disponible");
+        bRetour.type = "button";
         bRetour.addEventListener("click", async () => {
           if (!confirm("Remettre la mission en disponible ?")) return;
-          try { await updateDoc(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() }); }
-          catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          try {
+            const lot = writeBatch(db);
+            lot.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
+            const idCand = m.id + "_" + m.workerUid;
+            if (candidaturesRecues.some(x => x.id === idCand)) lot.update(doc(db, "candidatures", idCand), { statut: "en_attente" });
+            await lot.commit();
+          } catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
         });
         actions.append(bFin, bRetour);
       }
-      const bSup = document.createElement("button");
-      bSup.className = "danger mini"; bSup.textContent = "Supprimer ma mission";
+      const bSup = el("button", "danger mini", "Supprimer ma mission");
+      bSup.type = "button";
       bSup.addEventListener("click", async () => {
         if (!confirm("Supprimer cette mission ?")) return;
         try { await deleteDoc(doc(db, "missions", m.id)); }
         catch (e) { console.error(e); afficherMessage("Suppression impossible. Réessaie."); }
       });
       actions.appendChild(bSup);
+
     } else if (statut === "disponible"){
-      // --- Actions d'un visiteur connecté ---
-      const bInt = document.createElement("button");
-      bInt.className = "mini";
-      if (dejaInteresse.has(m.id)){
-        bInt.textContent = "✅ Intérêt envoyé"; bInt.disabled = true;
-      } else {
-        bInt.textContent = "🙋 Je suis intéressé";
-        bInt.addEventListener("click", async () => {
-          if (!profilOk()){ afficherMessage("Complète ton profil pour te proposer."); return; }
-          bInt.disabled = true;
-          try {
-            await setDoc(doc(db, "missions", m.id, "candidatures", user.uid),
-              { uid: user.uid, nom: nomCourt(profil), profession: profil.profession, tel: profil.tel, createdAt: serverTimestamp() });
-            dejaInteresse.add(m.id);
-            bInt.textContent = "✅ Intérêt envoyé";
-          } catch (e) {
-            console.error(e);
-            bInt.disabled = false;
-            afficherMessage("Impossible d'envoyer ton intérêt. Réessaie.");
+      // --- Visiteur connecté : se proposer ---
+      if (peutPostuler()){
+        const maCand = mesCandidatures.find(x => x.missionId === m.id);
+        if (maCand && maCand.statut === "refusee"){
+          actions.appendChild(el("div", "verrou", "❌ Ta candidature n'a pas été retenue pour cette mission."));
+        } else {
+          if (maCand){
+            const o = el("div", "info", "✅ Intérêt envoyé : l'auteur va te répondre.");
+            o.style.marginBottom = "0";
+            actions.appendChild(o);
+          } else {
+            const bInt = el("button", "mini", "🙋 Je suis intéressé");
+            bInt.type = "button";
+            bInt.addEventListener("click", async () => {
+              if (!profilOk()){ afficherMessage("Complète ton profil pour te proposer."); return; }
+              bInt.disabled = true;
+              try {
+                await setDoc(doc(db, "candidatures", m.id + "_" + user.uid), {
+                  missionId: m.id, uid: user.uid, auteurUid: m.uid,
+                  nom: nomCourt(profil), profession: profil.profession, tel: profil.tel,
+                  titre: m.titre, prix: m.prix, ville: m.ville,
+                  statut: "en_attente", createdAt: serverTimestamp()
+                });
+              } catch (e) {
+                console.error(e);
+                bInt.disabled = false;
+                afficherMessage("Impossible d'envoyer ton intérêt. Réessaie.");
+              }
+            });
+            actions.appendChild(bInt);
           }
-        });
+          const a = el("a", "wa", "Contacter sur WhatsApp");
+          a.style.marginTop = "0";
+          a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
+          actions.appendChild(a);
+        }
       }
-      const a = document.createElement("a");
-      a.className = "wa"; a.style.marginTop = "0"; a.textContent = "Contacter sur WhatsApp";
-      a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
-      actions.append(bInt, a);
+
     } else if (m.workerUid === user.uid){
-      const o = document.createElement("div");
-      o.className = "info"; o.style.marginBottom = "0";
-      o.textContent = statut === "terminee" ? "✔️ Tu as réalisé cette mission." : "🎉 Tu as été choisi(e) pour cette mission !";
+      const o = el("div", "info", statut === "terminee" ? "✔️ Tu as réalisé cette mission." : "🎉 Tu as été choisi(e) pour cette mission !");
+      o.style.marginBottom = "0";
       actions.appendChild(o);
+    } else if (mesCandidatures.some(x => x.missionId === m.id)){
+      actions.appendChild(el("div", "verrou", "Cette mission a été attribuée à quelqu'un d'autre."));
     }
 
     if (actions.childNodes.length) c.appendChild(actions);
@@ -868,7 +978,7 @@
       await setDoc(doc(db, "users", user.uid), data, { merge: true });
       profil = { ...profil, ...data };
       afficherMessage("Profil mis à jour.", "info");
-      majTableau();
+      majUI();
     } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
   });
 
@@ -877,6 +987,9 @@
   $("btn-mon-espace").addEventListener("click", () => defiler($("espace")));
   $("cta-publier").addEventListener("click", () => {
     if (!user){ vueInscription = true; majUI(); }
+    else if (profilOk() && !peutPublier()){
+      afficherMessage("Ton profil est réglé pour chercher des missions. Pour en publier, change ton type d'usage dans l'onglet Profil.", "info");
+    }
     defiler($("espace"));
   });
   window.addEventListener("scroll", () => $("fab-haut").classList.toggle("on", window.scrollY > 400), { passive: true });
