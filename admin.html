@@ -98,6 +98,10 @@
   <div class="card cache" id="bloc-refus">
     <h2>Accès réservé</h2>
     <p>Ce compte n'est pas autorisé à accéder à l'espace administrateur.</p>
+    <p class="h-sous" id="refus-email"></p>
+    <p class="h-sous" id="refus-raison"></p>
+    <p class="h-sous">UID de ce compte : <b id="refus-uid" style="word-break:break-all"></b></p>
+    <button class="sec" id="btn-copier-uid" type="button">Copier l'UID</button>
     <button class="sec" id="btn-deco-refus" style="margin-bottom:0">Se déconnecter</button>
   </div>
 
@@ -340,16 +344,21 @@
     $("bloc-refus").classList.add("cache");
     $("console").classList.add("cache");
     if (!u) return;
+    $("refus-email").textContent = "Compte connecté : " + (u.email || "");
+    $("refus-uid").textContent = u.uid;
+    $("refus-raison").textContent = "";
     try {
       const a = await getDoc(doc(db, "admins", u.uid));
       if (a.exists()){
         $("console").classList.remove("cache");
         demarrer();
       } else {
+        $("refus-raison").textContent = "Cause : le document admins/" + u.uid + " n'existe pas dans Firestore (ID différent ou collection non créée).";
         $("bloc-refus").classList.remove("cache");
       }
     } catch (e) {
       console.error(e);
+      $("refus-raison").textContent = "Cause : lecture impossible (" + (e.code || e.message) + "). Les règles Firestore ne sont probablement pas publiées.";
       $("bloc-refus").classList.remove("cache");
     }
   });
@@ -361,6 +370,11 @@
   });
   $("btn-deco").addEventListener("click", () => signOut(auth));
   $("btn-deco-refus").addEventListener("click", () => signOut(auth));
+  $("btn-copier-uid").addEventListener("click", async () => {
+    const uid = $("refus-uid").textContent;
+    try { await navigator.clipboard.writeText(uid); message("UID copié.", "info"); }
+    catch (e) { message("Copie impossible : sélectionne l'UID affiché et copie-le à la main."); }
+  });
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
