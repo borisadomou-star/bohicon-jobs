@@ -3,155 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b6b3a">
 <title>Bohicon Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --vert:#0b6b3a; --vert2:#12995a; --vert-fonce:#08452a; --jaune:#fcd116; --rouge:#e8112d;
+    --fond:#f1f5f2; --encre:#12261b; --gris:#5b6b62; --trait:#dbe7df;
+  }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,sans-serif;background:#f4f6f8;color:#1a1a1a}
-  header{background:#0a7d3b;color:#fff;padding:20px 16px;text-align:center}
-  header h1{margin:0;font-size:1.5rem}
-  header p{margin:4px 0 0;opacity:.9;font-size:.9rem}
-  main{max-width:640px;margin:0 auto;padding:16px}
-  .card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-  h2{font-size:1.1rem;margin:0 0 10px}
-  input,select,textarea,button{width:100%;padding:12px;margin-bottom:10px;border:1px solid #ccc;border-radius:8px;font-size:1rem;font-family:inherit}
-  button{background:#0a7d3b;color:#fff;border:0;font-weight:600;cursor:pointer}
-  button.sec{background:#fff;color:#0a7d3b;border:1px solid #0a7d3b}
-  button.danger{background:#fff;color:#b3261e;border:1px solid #b3261e}
-  button.mini{padding:8px;margin:0}
-  button:disabled{opacity:.6}
-  .lien{background:none;border:0;color:#0a7d3b;text-decoration:underline;font-weight:400;padding:4px;margin:0}
-  .check{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;margin-bottom:12px;color:#444}
-  .check input{width:auto;margin:3px 0 0}
-  .job h3{margin:0 0 4px;font-size:1.05rem}
-  .meta{font-size:.85rem;color:#555;margin-bottom:6px}
-  .prix{color:#0a7d3b;font-weight:700}
-  .badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;font-weight:600}
-  .b-disponible{background:#e8f5e9;color:#0a5d2c}
-  .b-attribuee{background:#fff4e0;color:#8a5a00}
-  .b-terminee{background:#e6eefc;color:#1a4fa0}
-  .wa{display:block;text-align:center;background:#25d366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px}
-  .wa.petit{padding:8px;margin-top:0}
-  .verrou{display:block;text-align:center;background:#eee;color:#555;padding:10px;border-radius:8px;margin-top:8px;font-size:.9rem}
-  .actions{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-  .sous{background:#f7f7f7;border-radius:8px;padding:10px;margin-top:4px;font-size:.9rem}
-  .ligne{display:flex;flex-direction:column;gap:6px;padding:8px 0;border-bottom:1px solid #e5e5e5}
-  .ligne:last-child{border-bottom:0}
-  .vide{text-align:center;color:#777;padding:20px}
-  .erreur{background:#fdecea;color:#b3261e;padding:12px;border-radius:8px;margin-bottom:12px}
-  .info{background:#e8f5e9;color:#0a5d2c;padding:12px;border-radius:8px;margin-bottom:12px}
-  .cache{display:none}
-  .moi{font-size:.9rem;margin-bottom:10px;word-break:break-word}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;background:var(--fond);color:var(--encre);line-height:1.5}
+  .cache{display:none!important}
 
-  /* Vitrine */
-  .hero{background:linear-gradient(135deg,#0a7d3b,#13a455);color:#fff;text-align:center;padding:28px 16px 32px}
-  .hero h2{font-size:1.4rem;margin:0 0 8px;line-height:1.25}
-  .hero p{margin:0 auto 16px;max-width:460px;opacity:.95}
-  .stats{display:flex;justify-content:center;gap:12px;margin-bottom:18px}
-  .stats div{background:rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;min-width:120px}
-  .stats b{display:block;font-size:1.5rem}
-  .stats span{font-size:.8rem;opacity:.9}
-  .cta{display:inline-block;background:#fff;color:#0a7d3b;padding:12px 22px;border-radius:24px;font-weight:700;text-decoration:none}
-  .slider{max-width:640px;margin:16px auto 0;padding:0 16px}
+  /* Barre du haut */
+  .topbar{position:sticky;top:0;z-index:50;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:0 2px 10px rgba(8,69,42,.12)}
+  .marque{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--vert-fonce);font-weight:700;font-size:1.05rem}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;letter-spacing:.5px}
+
+  /* Bandeau d'accueil */
+  .hero{
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.10' stroke-width='2'%3E%3Ccircle cx='320' cy='110' r='40'/%3E%3Ccircle cx='320' cy='110' r='80'/%3E%3Ccircle cx='320' cy='110' r='120'/%3E%3Ccircle cx='320' cy='110' r='160'/%3E%3Ccircle cx='320' cy='110' r='200'/%3E%3C/g%3E%3C/svg%3E") right top / 420px no-repeat,
+      linear-gradient(160deg,#08572f 0%,#0b7a42 60%,#12995a 100%);
+    color:#fff;text-align:center;padding:32px 16px 88px}
+  .hero-in{max-width:680px;margin:0 auto}
+  .tuile{width:76px;height:76px;margin:0 auto 14px;border-radius:22px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+  .hero h1{font-size:clamp(1.45rem,5.5vw,2.1rem);line-height:1.25;margin:0 0 10px;font-weight:700}
+  .hero p{margin:0 auto 18px;max-width:480px;opacity:.95;font-size:.98rem}
+  .stats{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
+  .stats div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px;min-width:132px}
+  .stats b{display:block;font-size:1.7rem;line-height:1.1}
+  .stats span{font-size:.78rem;opacity:.92}
+  .cta-ligne{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+  button.cta{width:auto;margin:0;padding:14px 26px;background:var(--jaune);color:#1a1a1a;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+  .cta-sec{display:inline-block;color:#fff;border:1.5px solid rgba(255,255,255,.75);border-radius:999px;padding:12.5px 24px;text-decoration:none;font-weight:600}
+
+  /* Mise en page */
+  main{max-width:680px;margin:0 auto;padding:0 16px 8px}
+  #espace{position:relative;z-index:2;margin-top:-56px;scroll-margin-top:72px}
+  #missions{scroll-margin-top:72px}
+  .card{background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
+  h2{font-size:1.15rem;margin:0 0 12px;color:var(--vert-fonce);font-weight:700}
+
+  /* Champs et boutons */
+  input,select,textarea{width:100%;padding:13px 14px;margin-bottom:10px;border:1.5px solid transparent;background:var(--fond);border-radius:14px;font-size:1rem;font-family:inherit;color:var(--encre)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--vert);background:#fff}
+  button{width:100%;padding:14px 18px;margin-bottom:10px;border:0;border-radius:999px;background:var(--vert);color:#fff;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 6px 14px rgba(11,107,58,.25)}
+  button:active{transform:scale(.98)}
+  button.sec{background:#fff;color:var(--vert);border:1.5px solid var(--vert);box-shadow:none}
+  button.danger{background:#fff;color:#b3261e;border:1.5px solid #b3261e;box-shadow:none}
+  button.mini{padding:10px 14px;margin:0;font-size:.9rem}
+  button:disabled{opacity:.6}
+  .lien{background:none;border:0;color:var(--vert);text-decoration:underline;font-weight:400;padding:4px;margin:0;box-shadow:none}
+  button:focus-visible,a:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
+  .btn-espace{width:auto;margin:0;padding:10px 18px;background:var(--jaune);color:#1a1a1a;box-shadow:none;font-size:.92rem;font-weight:700}
+  .check{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;margin-bottom:14px;color:var(--gris)}
+  .check input{width:auto;margin:4px 0 0;accent-color:var(--vert)}
+  .check a{color:var(--vert)}
+
+  /* Étapes */
+  .etapes{display:flex;align-items:flex-start;margin-top:4px}
+  .etape{flex:1;text-align:center;position:relative;padding:0 4px}
+  .etape:not(:last-child)::after{content:"";position:absolute;top:21px;left:calc(50% + 28px);right:calc(-50% + 28px);height:3px;border-radius:2px;background:var(--trait)}
+  .rond{width:44px;height:44px;margin:0 auto 8px;border-radius:50%;background:var(--vert);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px #dcefe3}
+  .etape:nth-child(3) .rond{background:var(--jaune);color:#1a1a1a;box-shadow:0 0 0 5px #fdf3c4}
+  .etape b{display:block;font-size:.85rem;color:var(--vert-fonce)}
+  .etape span{display:block;font-size:.76rem;color:var(--gris);line-height:1.35;margin-top:2px}
+
+  /* Missions */
+  .filtres{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .filtres select{margin:0}
+  .job{border-left:6px solid var(--vert2)}
+  .job.s-attribuee{border-left-color:#f5a623}
+  .job.s-terminee{border-left-color:#3b6fd4}
+  .job h3{margin:0 0 6px;font-size:1.05rem;font-weight:600}
+  .meta{font-size:.85rem;color:var(--gris);margin-bottom:6px}
+  .prix{display:inline-block;background:#e3f4ea;color:var(--vert);font-weight:700;padding:2px 10px;border-radius:999px}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 10px;border-radius:999px;margin-left:6px;vertical-align:middle;font-weight:600}
+  .b-disponible{background:#e3f4ea;color:#0a5d2c}
+  .b-attribuee{background:#fff1d6;color:#8a5a00}
+  .b-terminee{background:#e3ecfb;color:#1a4fa0}
+  .wa{display:block;text-align:center;background:#128c4a;color:#fff;padding:12px;border-radius:999px;text-decoration:none;font-weight:600;margin-top:8px}
+  .wa.petit{padding:9px;margin-top:0;font-size:.9rem}
+  .verrou{display:block;text-align:center;background:var(--fond);color:var(--gris);padding:12px;border-radius:999px;margin-top:8px;font-size:.88rem}
+  .actions{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .sous{background:var(--fond);border-radius:14px;padding:10px 12px;margin-top:4px;font-size:.9rem}
+  .ligne{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid var(--trait)}
+  .ligne:last-child{border-bottom:0}
+  .vide{text-align:center;color:var(--gris);padding:24px}
+  .erreur{background:#fdecea;color:#b3261e;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .info{background:#e3f4ea;color:#0a5d2c;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .moi{font-size:.92rem;margin-bottom:12px;word-break:break-word}
+
+  /* Bannières */
+  .slider{margin:0 0 14px}
   .piste{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;scrollbar-width:none}
   .piste::-webkit-scrollbar{display:none}
-  .slide{flex:0 0 100%;scroll-snap-align:center;border-radius:14px;padding:20px;color:#fff;min-height:130px;display:flex;flex-direction:column;justify-content:center;text-decoration:none}
-  .slide h3{margin:0 0 6px;font-size:1.15rem}
-  .slide p{margin:0;font-size:.9rem;opacity:.95}
-  .points{display:flex;justify-content:center;gap:6px;margin-top:8px}
-  .points i{width:8px;height:8px;border-radius:50%;background:#c9d1d9}
-  .points i.on{background:#0a7d3b}
+  .slide{flex:0 0 100%;scroll-snap-align:center;border-radius:22px;padding:20px;color:#fff;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;text-decoration:none;box-shadow:0 8px 24px rgba(8,69,42,.12)}
+  .slide h3{margin:0 0 6px;font-size:1.15rem;font-weight:700}
+  .slide p{margin:0;font-size:.88rem;opacity:.96}
+  .points{display:flex;justify-content:center;gap:6px;margin-top:10px}
+  .points i{width:8px;height:8px;border-radius:50%;background:#c3d3c9;transition:all .2s}
+  .points i.on{background:var(--vert);width:22px;border-radius:6px}
+
+  /* Pied de page */
+  .drapeau{display:flex;height:6px;margin-top:24px}
+  .drapeau span{flex:1}
+  .drapeau span:nth-child(1){background:#008751}
+  .drapeau span:nth-child(2){background:var(--jaune)}
+  .drapeau span:nth-child(3){background:var(--rouge)}
+  footer{background:var(--vert-fonce);color:#d3e5d9;text-align:center;padding:26px 16px 34px;font-size:.85rem}
+  footer a{color:var(--jaune);text-decoration:none;font-weight:600}
+  footer p{margin:6px 0 0}
+
+  /* Boutons flottants */
+  .fab{position:fixed;right:16px;width:52px;height:52px;margin:0;padding:0;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.28);z-index:60;font-size:1.35rem;text-decoration:none}
+  #fab-haut{bottom:16px;background:var(--jaune);color:#1a1a1a;opacity:0;pointer-events:none;transition:opacity .2s}
+  #fab-haut.on{opacity:1;pointer-events:auto}
+  #fab-wa{bottom:80px;background:#128c4a;color:#fff}
+
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Bohicon Jobs</h1>
-  <p>Trouve une mission rémunérée ou publie la tienne</p>
-</header>
 
-<section class="hero">
-  <h2>Des petits jobs, de vraies opportunités à Bohicon</h2>
-  <p>Publie une mission ou trouve un travail près de chez toi, en quelques minutes.</p>
-  <div class="stats">
-    <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
-    <div><b id="stat-fin">0</b><span>missions terminées</span></div>
+<div class="topbar">
+  <a class="marque" href="#haut"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
+  <button class="btn-espace" id="btn-mon-espace" type="button">Mon espace</button>
+</div>
+
+<section class="hero" id="haut">
+  <div class="hero-in">
+    <div class="tuile" aria-hidden="true">💼</div>
+    <h1>Trouve un petit job ou la bonne personne, à Bohicon</h1>
+    <p>Ménage, livraison, jardinage… publie une mission gratuitement ou propose tes services en quelques minutes.</p>
+    <div class="stats">
+      <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
+      <div><b id="stat-fin">0</b><span>missions terminées</span></div>
+    </div>
+    <div class="cta-ligne">
+      <button class="cta" id="cta-publier" type="button">Publier une mission</button>
+      <a class="cta-sec" href="#missions">Voir les missions</a>
+    </div>
   </div>
-  <a href="#liste" class="cta">Voir les missions</a>
 </section>
 
-<div class="slider" id="slider"></div>
-
 <main>
-  <div id="message"></div>
+  <div id="espace">
+    <div id="message"></div>
 
-  <!-- Connexion -->
-  <div class="card" id="bloc-connexion">
-    <h2>Connexion</h2>
-    <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
-    <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
-    <button id="btn-connexion">Se connecter</button>
-    <button id="btn-vers-inscription" class="sec">Créer un compte</button>
-    <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+    <!-- Connexion -->
+    <div class="card" id="bloc-connexion">
+      <h2>Connexion</h2>
+      <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
+      <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <button id="btn-connexion">Se connecter</button>
+      <button id="btn-vers-inscription" class="sec">Créer un compte</button>
+      <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+    </div>
+
+    <!-- Inscription -->
+    <div class="card cache" id="bloc-inscription">
+      <h2>Créer un compte</h2>
+      <div id="champs-inscription"></div>
+      <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
+      <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
+      <button id="btn-inscription">S'inscrire</button>
+      <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
+    </div>
+
+    <!-- Profil à compléter -->
+    <div class="card cache" id="bloc-profil">
+      <h2>Complète ton profil</h2>
+      <div id="champs-profil"></div>
+      <button id="btn-profil">Enregistrer</button>
+      <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
+    </div>
+
+    <!-- Compte connecté -->
+    <div class="card cache" id="bloc-compte">
+      <div class="moi" id="moi"></div>
+      <button id="btn-deconnexion" class="sec" style="margin-bottom:0">Se déconnecter</button>
+    </div>
+
+    <!-- Publication -->
+    <div class="card cache" id="bloc-publier">
+      <h2>Publier une mission</h2>
+      <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
+      <select id="ville">
+        <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+        <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+      </select>
+      <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
+      <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
+      <button id="publier">Publier</button>
+    </div>
   </div>
 
-  <!-- Inscription -->
-  <div class="card cache" id="bloc-inscription">
-    <h2>Créer un compte</h2>
-    <div id="champs-inscription"></div>
-    <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
-    <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
-    <button id="btn-inscription">S'inscrire</button>
-    <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
-  </div>
+  <div class="slider" id="slider"></div>
 
-  <!-- Profil à compléter -->
-  <div class="card cache" id="bloc-profil">
-    <h2>Complète ton profil</h2>
-    <div id="champs-profil"></div>
-    <button id="btn-profil">Enregistrer</button>
-    <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
-  </div>
+  <section class="card">
+    <h2>Comment ça marche</h2>
+    <div class="etapes">
+      <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
+      <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
+      <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
+    </div>
+  </section>
 
-  <!-- Compte connecté -->
-  <div class="card cache" id="bloc-compte">
-    <div class="moi" id="moi"></div>
-    <button id="btn-deconnexion" class="sec" style="margin-bottom:0">Se déconnecter</button>
-  </div>
-
-  <!-- Publication -->
-  <div class="card cache" id="bloc-publier">
-    <h2>Publier une mission</h2>
-    <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
-    <select id="ville">
-      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
-      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
-    </select>
-    <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
-    <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
-    <button id="publier">Publier</button>
-  </div>
-
-  <div class="card">
+  <section class="card" id="missions">
     <h2>Missions</h2>
-    <select id="filtre-statut">
-      <option value="disponible">Disponibles</option>
-      <option value="attribuee">Attribuées</option>
-      <option value="terminee">Terminées</option>
-      <option value="toutes">Toutes</option>
-    </select>
-    <select id="filtre" style="margin-bottom:0">
-      <option value="">Toutes les villes</option>
-      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
-      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
-    </select>
-  </div>
+    <div class="filtres">
+      <select id="filtre-statut">
+        <option value="disponible">Disponibles</option>
+        <option value="attribuee">Attribuées</option>
+        <option value="terminee">Terminées</option>
+        <option value="toutes">Toutes</option>
+      </select>
+      <select id="filtre">
+        <option value="">Toutes les villes</option>
+        <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+        <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+      </select>
+    </div>
+  </section>
 
   <div id="liste"><div class="vide">Chargement…</div></div>
 </main>
 
-<footer style="text-align:center;padding:20px 16px;font-size:.85rem;color:#666">
-  <a href="confidentialite.html" style="color:#0a7d3b">Confidentialité et conditions d'utilisation</a>
+<div class="drapeau" aria-hidden="true"><span></span><span></span><span></span></div>
+<footer>
+  <a href="confidentialite.html">Confidentialité et conditions d'utilisation</a>
+  <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
 </footer>
- <script type="module">
+
+<a id="fab-wa" class="fab cache" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp">💬</a>
+<button id="fab-haut" class="fab" type="button" aria-label="Revenir en haut">↑</button>
+
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, getDocs, setDoc,
            query, orderBy, limit, onSnapshot, serverTimestamp }
@@ -159,6 +251,10 @@
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  // Ton numéro WhatsApp pour l'espace publicitaire et le bouton flottant, au format 229 + 10 chiffres
+  // (ex : "2290155000000"). Laisse vide ("") pour ne rien afficher.
+  const NUMERO_WA = "";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
@@ -181,6 +277,7 @@
   let vueInscription = false;
   const dejaInteresse = new Set();
   const $ = id => document.getElementById(id);
+  const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const LIBELLES = { disponible: "Disponible", attribuee: "Attribuée", terminee: "Terminée" };
   const st = m => m.statut || "disponible";
@@ -204,7 +301,7 @@
       <option value="client">Je veux publier des missions</option>
     </select>
     <label class="check"><input type="checkbox" id="${p}ok">
-            <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>`;
+      <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>`;
   $("champs-inscription").innerHTML = champs("i-");
   $("champs-profil").innerHTML = champs("p-");
 
@@ -231,7 +328,7 @@
     e.className = type === "info" ? "info" : "erreur";
     e.textContent = texte;
     z.appendChild(e);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    z.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
   }
 
   function texteErreurAuth(e){
@@ -319,7 +416,7 @@
   function carte(m, cpt){
     const statut = st(m);
     const c = document.createElement("div");
-    c.className = "card job";
+    c.className = "card job s-" + statut;
 
     const h = document.createElement("h3");
     h.textContent = m.titre;
@@ -401,6 +498,7 @@
     } else if (statut === "disponible"){
       // --- Actions d'un visiteur connecté ---
       const bInt = document.createElement("button");
+      bInt.className = "mini";
       if (dejaInteresse.has(m.id)){
         bInt.textContent = "✅ Intérêt envoyé"; bInt.disabled = true;
       } else {
@@ -577,17 +675,30 @@
   $("filtre").addEventListener("change", afficher);
   $("filtre-statut").addEventListener("change", afficher);
 
-  // ---------- Bannières ----------
-  // Ton numéro WhatsApp pour l'espace publicitaire, au format 229 + 10 chiffres (ex : "2290155000000").
-  // Laisse vide ("") tant que tu ne veux pas de lien.
-  const NUMERO_WA = "2290167079595";
+  // ---------- Navigation et boutons flottants ----------
+  const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
+  $("btn-mon-espace").addEventListener("click", () => defiler($("espace")));
+  $("cta-publier").addEventListener("click", () => {
+    if (!user){ vueInscription = true; majUI(); }
+    defiler($("espace"));
+  });
+  window.addEventListener("scroll", () => $("fab-haut").classList.toggle("on", window.scrollY > 400), { passive: true });
+  $("fab-haut").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }));
+  if (NUMERO_WA){
+    const f = $("fab-wa");
+    f.href = "https://wa.me/" + NUMERO_WA;
+    f.classList.remove("cache");
+  }
+  $("annee").textContent = new Date().getFullYear();
 
+  // ---------- Bannières ----------
   const BANNIERES = [
     { titre:"Publie ta mission gratuitement", texte:"Ménage, livraison, jardinage… trouve de l'aide près de chez toi.", image:"promo1.jpg", fond:"linear-gradient(135deg,#0a7d3b,#13a455)" },
     { titre:"Besoin d'un revenu en plus ?", texte:"Choisis des missions autour de toi et fais-toi payer directement.", image:"promo2.jpg", fond:"linear-gradient(135deg,#1a4fa0,#3b82f6)" },
     { titre:"Ton commerce ici", texte:"Espace publicitaire disponible. Contacte-nous sur WhatsApp.", image:"promo3.jpg", fond:"linear-gradient(135deg,#8a5a00,#f59e0b)", lien: NUMERO_WA ? "https://wa.me/" + NUMERO_WA : "" }
- ];
-   (function(){
+  ];
+
+  (function(){
     const zone = $("slider");
     const piste = document.createElement("div"); piste.className = "piste";
     const points = document.createElement("div"); points.className = "points";
@@ -596,7 +707,7 @@
       s.className = "slide";
       if (b.lien){ s.href = b.lien; s.target = "_blank"; s.rel = "noopener"; }
       s.style.background = b.image
-        ? "linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url('" + b.image + "') center/cover"
+        ? "linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,.18)), url('" + b.image + "') center/cover, " + b.fond
         : b.fond;
       const h = document.createElement("h3"); h.textContent = b.titre;
       const p = document.createElement("p"); p.textContent = b.texte;
@@ -614,10 +725,12 @@
       idx = Math.round(piste.scrollLeft / largeur());
       Array.from(points.children).forEach((pt, i) => pt.classList.toggle("on", i === idx));
     });
-    const minuteur = setInterval(() => {
-      piste.scrollTo({ left: ((idx + 1) % BANNIERES.length) * largeur(), behavior: "smooth" });
-    }, 5000);
-    piste.addEventListener("touchstart", () => clearInterval(minuteur), { once: true });
+    if (!reduit){
+      const minuteur = setInterval(() => {
+        piste.scrollTo({ left: ((idx + 1) % BANNIERES.length) * largeur(), behavior: "smooth" });
+      }, 5000);
+      piste.addEventListener("touchstart", () => clearInterval(minuteur), { once: true });
+    }
   })();
 </script>
 </body>
