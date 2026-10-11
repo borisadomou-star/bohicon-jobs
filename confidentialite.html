@@ -3,41 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b6b3a">
 <title>Confidentialité et conditions d'utilisation – Bohicon Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --vert:#0b6b3a; --vert2:#12995a; --vert-fonce:#08452a; --jaune:#fcd116; --rouge:#e8112d;
+    --fond:#f1f5f2; --encre:#12261b; --gris:#5b6b62; --trait:#dbe7df;
+  }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,sans-serif;background:#f4f6f8;color:#1a1a1a;line-height:1.6}
-  header{background:#0a7d3b;color:#fff;padding:20px 16px;text-align:center}
-  header h1{margin:0;font-size:1.3rem}
-  main{max-width:680px;margin:0 auto;padding:16px}
-  .retour{display:inline-block;margin-bottom:12px;color:#0a7d3b;font-weight:600;text-decoration:none}
-  section{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-  h2{font-size:1.1rem;margin:0 0 8px;color:#0a5d2c}
-  h3{font-size:1rem;margin:14px 0 4px}
-  p,li{font-size:.95rem}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;background:var(--fond);color:var(--encre);line-height:1.65}
+
+  /* Barre du haut */
+  .topbar{position:sticky;top:0;z-index:50;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:0 2px 10px rgba(8,69,42,.12)}
+  .marque{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--vert-fonce);font-weight:700;font-size:1.05rem}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;letter-spacing:.5px}
+  .btn-retour{background:var(--jaune);color:#1a1a1a;border-radius:999px;padding:10px 18px;font-weight:700;font-size:.92rem;text-decoration:none}
+
+  /* Bandeau */
+  .hero{
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.10' stroke-width='2'%3E%3Ccircle cx='320' cy='110' r='40'/%3E%3Ccircle cx='320' cy='110' r='80'/%3E%3Ccircle cx='320' cy='110' r='120'/%3E%3Ccircle cx='320' cy='110' r='160'/%3E%3Ccircle cx='320' cy='110' r='200'/%3E%3C/g%3E%3C/svg%3E") right top / 420px no-repeat,
+      linear-gradient(160deg,#08572f 0%,#0b7a42 60%,#12995a 100%);
+    color:#fff;text-align:center;padding:28px 16px 72px}
+  .hero-in{max-width:680px;margin:0 auto}
+  .tuile{width:68px;height:68px;margin:0 auto 12px;border-radius:20px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:2rem}
+  .hero h1{font-size:clamp(1.3rem,5vw,1.8rem);line-height:1.25;margin:0 0 10px;font-weight:700}
+  .maj{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 14px;font-size:.8rem}
+
+  /* Contenu */
+  main{max-width:680px;margin:-44px auto 0;padding:0 16px 8px;position:relative;z-index:2}
+  section{background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
+  h2{display:flex;align-items:center;gap:10px;font-size:1.1rem;margin:0 0 10px;color:var(--vert-fonce);font-weight:700}
+  .num{flex:none;width:32px;height:32px;border-radius:50%;background:var(--vert);color:#fff;font-size:.9rem;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px #dcefe3}
+  h3{font-size:.98rem;margin:16px 0 4px;color:var(--vert);font-weight:600}
+  p,li{font-size:.93rem}
+  p{margin:6px 0}
   ul{padding-left:20px;margin:6px 0}
-  .maj{color:#666;font-size:.85rem}
-  .note{background:#fff4e0;color:#6b4500;border-radius:8px;padding:10px 12px;font-size:.9rem}
-  footer{text-align:center;padding:16px;font-size:.85rem;color:#666}
+  li{margin-bottom:4px}
+  a{color:var(--vert)}
+  .note{background:#fff7d6;color:#5c4700;border-radius:18px;padding:14px 16px;font-size:.9rem;margin-bottom:14px}
+
+  /* Pied de page */
+  .drapeau{display:flex;height:6px;margin-top:24px}
+  .drapeau span{flex:1}
+  .drapeau span:nth-child(1){background:#008751}
+  .drapeau span:nth-child(2){background:var(--jaune)}
+  .drapeau span:nth-child(3){background:var(--rouge)}
+  footer{background:var(--vert-fonce);color:#d3e5d9;text-align:center;padding:26px 16px 34px;font-size:.85rem}
+  footer a{color:var(--jaune);text-decoration:none;font-weight:600}
+  footer p{margin:6px 0 0}
+
+  /* Bouton flottant */
+  .fab{position:fixed;right:16px;bottom:16px;width:52px;height:52px;border:0;border-radius:50%;background:var(--jaune);color:#1a1a1a;font-size:1.35rem;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.28);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
+  .fab.on{opacity:1;pointer-events:auto}
+
+  a:focus-visible,button:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Confidentialité et conditions d'utilisation</h1>
-</header>
+
+<div class="topbar">
+  <a class="marque" href="index.html"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
+  <a class="btn-retour" href="index.html">← Retour au site</a>
+</div>
+
+<div class="hero">
+  <div class="hero-in">
+    <div class="tuile" aria-hidden="true">🔒</div>
+    <h1>Confidentialité et conditions d'utilisation</h1>
+    <span class="maj">Dernière mise à jour : 10 octobre 2026</span>
+  </div>
+</div>
 
 <main>
-  <a class="retour" href="index.html">← Retour au site</a>
-  <p class="maj">Dernière mise à jour : 10 octobre 2026</p>
-
   <section>
-    <h2>1. Qui sommes-nous ?</h2>
+    <h2><span class="num">1</span>Qui sommes-nous ?</h2>
     <p>Bohicon Jobs est une plateforme gratuite de mise en relation entre des personnes qui proposent de petites missions rémunérées (ménage, livraison, jardinage, etc.) et des personnes qui souhaitent les réaliser, à Bohicon et dans les communes voisines.</p>
     <p>Bohicon Jobs met les gens en contact. Nous ne sommes ni l'employeur des travailleurs, ni partie aux accords conclus entre utilisateurs.</p>
   </section>
 
   <section>
-    <h2>2. Les données que nous collectons</h2>
+    <h2><span class="num">2</span>Les données que nous collectons</h2>
     <p>Lors de ton inscription et de ton utilisation du site, nous enregistrons :</p>
     <ul>
       <li>ton prénom et ton nom ;</li>
@@ -51,7 +102,7 @@
   </section>
 
   <section>
-    <h2>3. Pourquoi nous les utilisons</h2>
+    <h2><span class="num">3</span>Pourquoi nous les utilisons</h2>
     <ul>
       <li>Créer et sécuriser ton compte.</li>
       <li>Afficher tes missions et te mettre en relation avec d'autres utilisateurs.</li>
@@ -62,7 +113,7 @@
   </section>
 
   <section>
-    <h2>4. Qui peut voir quoi</h2>
+    <h2><span class="num">4</span>Qui peut voir quoi</h2>
     <ul>
       <li><strong>Tout visiteur</strong> voit les missions publiées, ainsi que ton prénom et l'initiale de ton nom (par exemple « Awa K. »).</li>
       <li><strong>Les utilisateurs connectés</strong> peuvent accéder au bouton de contact WhatsApp d'une mission.</li>
@@ -73,23 +124,23 @@
   </section>
 
   <section>
-    <h2>5. Où sont stockées les données</h2>
+    <h2><span class="num">5</span>Où sont stockées les données</h2>
     <p>Le site est hébergé sur GitHub Pages. Tes données (compte, profil, missions) sont enregistrées chez Google, via les services Firebase Authentication et Cloud Firestore, sur des serveurs de Google qui peuvent se trouver hors du Bénin.</p>
   </section>
 
   <section>
-    <h2>6. Durée de conservation</h2>
+    <h2><span class="num">6</span>Durée de conservation</h2>
     <p>Nous conservons tes données tant que ton compte est actif. Tu peux demander la suppression de ton compte et de tes données à tout moment (voir la rubrique « Tes droits »).</p>
   </section>
 
   <section>
-    <h2>7. Tes droits</h2>
+    <h2><span class="num">7</span>Tes droits</h2>
     <p>Tu peux demander à consulter, corriger ou supprimer les informations que nous avons sur toi, conformément à la réglementation béninoise sur la protection des données personnelles. Pour cela, contacte-nous :</p>
     <p id="contact">Contact : à renseigner.</p>
   </section>
 
   <section>
-    <h2>8. Conditions d'utilisation</h2>
+    <h2><span class="num">8</span>Conditions d'utilisation</h2>
 
     <h3>Qui peut s'inscrire</h3>
     <p>Tu dois avoir 18 ans ou plus et fournir des informations exactes. Un compte est personnel : ne le partage pas.</p>
@@ -125,12 +176,18 @@
   <p class="note">En créant un compte, tu confirmes avoir lu cette page et en accepter le contenu.</p>
 </main>
 
-<footer>Bohicon Jobs</footer>
+<div class="drapeau" aria-hidden="true"><span></span><span></span><span></span></div>
+<footer>
+  <a href="index.html">← Retour au site</a>
+  <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
+</footer>
+
+<button id="fab-haut" class="fab" type="button" aria-label="Revenir en haut">↑</button>
 
 <script>
   // Renseigne ici tes coordonnées de contact (laisse vide ce que tu ne veux pas afficher)
-  const WHATSAPP = "2290167079595";   // format : 229 + numéro, par exemple "2290155000000"
-  const EMAIL = "borisadomou@gmail.com";      // par exemple "contact@exemple.com"
+  const WHATSAPP = "";   // format : 229 + numéro, par exemple "2290155000000"
+  const EMAIL = "";      // par exemple "contact@exemple.com"
 
   (function(){
     const zone = document.getElementById("contact");
@@ -148,13 +205,19 @@
       a.textContent = EMAIL;
       morceaux.push(a);
     }
-    if (!morceaux.length) return;
-    zone.textContent = "Contact : ";
-    morceaux.forEach((m, i) => {
-      if (i > 0) zone.appendChild(document.createTextNode(" · "));
-      zone.appendChild(m);
-    });
+    if (morceaux.length){
+      zone.textContent = "Contact : ";
+      morceaux.forEach((m, i) => {
+        if (i > 0) zone.appendChild(document.createTextNode(" · "));
+        zone.appendChild(m);
+      });
+    }
   })();
+
+  document.getElementById("annee").textContent = new Date().getFullYear();
+  const fab = document.getElementById("fab-haut");
+  window.addEventListener("scroll", () => fab.classList.toggle("on", window.scrollY > 400), { passive: true });
+  fab.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 </script>
 </body>
 </html>
