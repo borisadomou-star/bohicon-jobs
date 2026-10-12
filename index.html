@@ -130,6 +130,12 @@
   .sig{margin-top:6px;text-align:right}
   .sig .lien{width:auto;font-size:.78rem;color:var(--gris)}
 
+  .plus{margin:10px 0 0}
+  .plus summary{cursor:pointer;color:var(--vert);font-weight:600;font-size:.88rem;padding:6px 0}
+  .plus .filtres{margin-top:8px}
+  .resultats{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:.82rem;color:var(--gris)}
+  .resultats .lien{width:auto;font-size:.82rem}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -282,6 +288,7 @@
     <div class="card cache" id="bloc-publier">
       <h2>Publier une mission</h2>
       <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
+      <select id="categorie" aria-label="Catégorie de la mission"></select>
       <select id="ville">
         <option>Bohicon</option><option>Abomey</option><option>Covè</option>
         <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
@@ -317,6 +324,7 @@
 
   <section class="card" id="missions">
     <h2>Missions</h2>
+    <input id="recherche" type="search" placeholder="🔍 Rechercher (titre, quartier, mot-clé…)" autocomplete="off">
     <div class="filtres">
       <select id="filtre-statut">
         <option value="disponible">Disponibles</option>
@@ -329,6 +337,28 @@
         <option>Bohicon</option><option>Abomey</option><option>Covè</option>
         <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
       </select>
+    </div>
+    <details class="plus">
+      <summary>Plus de filtres</summary>
+      <div class="filtres">
+        <select id="f-cat"></select>
+        <select id="f-prix">
+          <option value="">Tous les prix</option>
+          <option value="0-2000">Jusqu'à 2 000 FCFA</option>
+          <option value="2000-5000">2 000 à 5 000 FCFA</option>
+          <option value="5000-">Plus de 5 000 FCFA</option>
+        </select>
+        <select id="f-tri">
+          <option value="recentes">Plus récentes</option>
+          <option value="urgentes">Urgentes d'abord</option>
+          <option value="prix-asc">Prix croissant</option>
+          <option value="prix-desc">Prix décroissant</option>
+        </select>
+      </div>
+    </details>
+    <div class="resultats">
+      <span id="compteur-res"></span>
+      <button id="btn-reset-filtres" class="lien cache" type="button">Réinitialiser les filtres</button>
     </div>
   </section>
 
@@ -552,8 +582,8 @@
     if (!id) return;
     const m = missions.find(x => x.id === id);
     if (!m){ afficherMessage("Cette mission n'existe plus ou n'est plus disponible.", "info"); return; }
+    reinitialiserFiltres();
     $("filtre-statut").value = "toutes";
-    $("filtre").value = "";
     afficher();
     const cible = document.querySelector('[data-id="' + id.replace(/[^A-Za-z0-9]/g, "") + '"]');
     if (cible){
@@ -561,6 +591,25 @@
       cible.classList.add("surligne");
       setTimeout(() => cible.classList.remove("surligne"), 3000);
     }
+  }
+
+  const CATEGORIES = [
+    ["menage", "🧹", "Ménage et nettoyage"], ["livraison", "🛵", "Livraison et courses"],
+    ["jardinage", "🌿", "Jardinage et extérieur"], ["bricolage", "🔧", "Bricolage et réparation"],
+    ["cuisine", "🍳", "Cuisine et événements"], ["domicile", "🏠", "Aide à domicile"],
+    ["transport", "📦", "Déménagement et transport"], ["cours", "📚", "Cours et soutien scolaire"],
+    ["informatique", "💻", "Informatique et bureautique"], ["autre", "✨", "Autre"]
+  ];
+  const catInfo = cle => CATEGORIES.find(c => c[0] === cle) || null;
+  const normaliser = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  function reinitialiserFiltres(){
+    $("recherche").value = "";
+    $("filtre").value = "";
+    $("f-cat").value = "";
+    $("f-prix").value = "";
+    $("f-tri").value = "recentes";
+    $("filtre-statut").value = "disponible";
   }
 
   function rafraichir(){ afficher(); majTableau(); }
@@ -978,6 +1027,8 @@
       if (nr) meta.appendChild(document.createTextNode(" · " + etoilesTxt(nr)));
     }
     c.append(h, meta);
+    const cat = catInfo(m.categorie);
+    if (cat) c.appendChild(el("div", "meta", cat[1] + " " + cat[2]));
     if (m.lieu) c.appendChild(el("div", "meta", user ? "📌 Lieu : " + m.lieu : "📌 Lieu visible après connexion"));
     const q = quandTexte(m);
     if (q){
@@ -1185,9 +1236,31 @@
 
     const liste = $("liste");
     liste.innerHTML = "";
-    const items = missions.filter(m => (!f || m.ville === f) && (fs === "toutes" || st(m) === fs || (fs === "attribuee" && st(m) === "a_confirmer")));
+    const q = normaliser($("recherche").value.trim());
+    const cat = $("f-cat").value;
+    const px = $("f-prix").value;
+    const tri = $("f-tri").value;
+    const dansPrix = p => {
+      const n = Number(p || 0);
+      if (px === "0-2000") return n <= 2000;
+      if (px === "2000-5000") return n > 2000 && n <= 5000;
+      if (px === "5000-") return n > 5000;
+      return true;
+    };
+    let items = missions.filter(m =>
+      (!f || m.ville === f)
+      && (fs === "toutes" || st(m) === fs || (fs === "attribuee" && st(m) === "a_confirmer"))
+      && (!cat || m.categorie === cat)
+      && dansPrix(m.prix)
+      && (!q || normaliser([m.titre, m.desc, m.lieu, m.ville, (catInfo(m.categorie) || [])[2]].join(" ")).includes(q)));
+    if (tri === "urgentes") items = items.slice().sort((a, b) => (b.quand === "urgent") - (a.quand === "urgent"));
+    else if (tri === "prix-asc") items = items.slice().sort((a, b) => Number(a.prix || 0) - Number(b.prix || 0));
+    else if (tri === "prix-desc") items = items.slice().sort((a, b) => Number(b.prix || 0) - Number(a.prix || 0));
+    $("compteur-res").textContent = items.length + " mission" + (items.length > 1 ? "s" : "");
+    const filtreActif = q || f || cat || px || tri !== "recentes" || fs !== "disponible";
+    $("btn-reset-filtres").classList.toggle("cache", !filtreActif);
     if (items.length === 0){
-      liste.innerHTML = '<div class="vide">Aucune mission dans cette catégorie.</div>';
+      liste.innerHTML = '<div class="vide">Aucune mission ne correspond à ta recherche.</div>';
       return;
     }
     items.forEach(m => liste.appendChild(carte(m, cpt)));
@@ -1295,9 +1368,14 @@
     const quand = $("quand").value;
     const dateExec = $("date-exec").value;
     const heureExec = $("heure-exec").value;
+    const categorie = $("categorie").value;
 
     if (!titre || !prix || prix < 0){
       alert("Remplis au moins le titre et le prix.");
+      return;
+    }
+    if (!categorie){
+      alert("Choisis la catégorie de la mission.");
       return;
     }
     if (lieu.length < 3){
@@ -1313,7 +1391,7 @@
     btn.disabled = true; btn.textContent = "Publication…";
     try {
       const ref = await addDoc(missionsRef, {
-        titre, ville, lieu, quand,
+        titre, ville, lieu, categorie, quand,
         dateExec: quand === "date" ? dateExec : "",
         heureExec: quand === "date" ? heureExec : "",
         prix, desc,
@@ -1325,6 +1403,7 @@
       });
       ["titre","lieu","adresse-precise","prix","desc","date-exec","heure-exec"].forEach(id => $(id).value = "");
       $("quand").value = "flexible";
+      $("categorie").value = "";
       $("bloc-date").classList.add("cache");
       afficherMessage("");
       if (adressePrecise){
@@ -1473,8 +1552,8 @@
           const cible = document.querySelector('[data-id="' + n.missionId + '"]');
           defiler(cible || $("missions"));
         } else if (n.type === "carte"){
+          reinitialiserFiltres();
           $("filtre-statut").value = "toutes";
-          $("filtre").value = "";
           afficher();
           const cible = document.querySelector('[data-id="' + n.missionId + '"]');
           defiler(cible || $("missions"));
@@ -1517,6 +1596,23 @@
     if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
+
+  // ---------- Catégories, recherche et filtres ----------
+  (function(){
+    const remplirCat = (sel, premier) => {
+      const o0 = el("option", "", premier);
+      o0.value = "";
+      sel.appendChild(o0);
+      CATEGORIES.forEach(([k, e, l]) => { const o = el("option", "", e + " " + l); o.value = k; sel.appendChild(o); });
+    };
+    remplirCat($("categorie"), "Catégorie de la mission…");
+    remplirCat($("f-cat"), "Toutes les catégories");
+  })();
+  $("recherche").addEventListener("input", afficher);
+  $("f-cat").addEventListener("change", afficher);
+  $("f-prix").addEventListener("change", afficher);
+  $("f-tri").addEventListener("change", afficher);
+  $("btn-reset-filtres").addEventListener("click", () => { reinitialiserFiltres(); afficher(); });
 
   // ---------- Date souhaitée et invitation ----------
   $("date-exec").min = aujourdhui();
