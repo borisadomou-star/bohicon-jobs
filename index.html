@@ -118,6 +118,15 @@
   .surligne{animation:flash 2.6s ease}
   @keyframes flash{0%,100%{box-shadow:0 8px 24px rgba(8,69,42,.08)}25%,60%{box-shadow:0 0 0 5px var(--jaune)}}
 
+  .b-a_confirmer{background:#fff1d6;color:#8a5a00}
+  .job.s-a_confirmer{border-left-color:#f5a623}
+  .etoiles{display:flex;gap:2px;margin:4px 0 8px}
+  .etoile{width:auto;margin:0;padding:0 4px;background:none;color:#e0a800;box-shadow:none;font-size:1.7rem}
+  .avis-form{margin-top:8px;padding-top:8px;border-top:1px dashed var(--trait)}
+  .avis-form textarea{margin-bottom:8px}
+  .avis-ligne{padding:10px 0;border-bottom:1px solid var(--trait)}
+  .avis-ligne:last-child{border-bottom:0}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -386,16 +395,18 @@
   let filtreRole = "";
   const ouverts = new Set();
   const TITRE_BASE = document.title;
-  const charges = { pub: false, real: false, cand: false, recu: false, missions: false };
+  const charges = { pub: false, real: false, cand: false, recu: false, avis: false, missions: false };
   let vuInit = false;
   let vues = new Set();
   let dernieresCles = new Set();
   let minuteurToast = null;
   const adressesVues = {};
+  const brouillons = {};
+  let avisTous = [];
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const LIBELLES = { disponible: "Disponible", attribuee: "Attribuée", terminee: "Terminée" };
+  const LIBELLES = { disponible: "Disponible", attribuee: "Attribuée", a_confirmer: "À confirmer", terminee: "Terminée" };
   const st = m => m.statut || "disponible";
   const nomCourt = p => p.prenom + " " + p.nom.charAt(0).toUpperCase() + ".";
   const pluriel = (n, mot) => n + " " + mot + (n > 1 ? "s" : "");
@@ -547,6 +558,67 @@
     }
   }
 
+  function rafraichir(){ afficher(); majTableau(); }
+
+  function bouton(texte, cls, action){
+    const b = el("button", cls, texte);
+    b.type = "button";
+    b.addEventListener("click", async () => {
+      try { await action(); }
+      catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+    });
+    return b;
+  }
+
+  function notesPour(uid){
+    const l = avisTous.filter(a => a.pour === uid);
+    if (!l.length) return null;
+    return { moy: l.reduce((s, a) => s + Number(a.note || 0), 0) / l.length, n: l.length };
+  }
+  const etoilesTxt = r => "⭐ " + r.moy.toFixed(1).replace(".", ",") + " (" + r.n + " avis)";
+
+  // Qui puis-je noter pour cette mission terminée ? (null si déjà fait ou non concerné)
+  function cibleAvis(m){
+    if (!user || st(m) !== "terminee") return null;
+    if (avisTous.some(a => a.id === m.id + "_" + user.uid)) return null;
+    if (m.uid === user.uid && m.workerUid) return { uid: m.workerUid, nom: m.workerNom || "le travailleur" };
+    if (m.workerUid === user.uid) return { uid: m.uid, nom: m.auteur || "l'auteur" };
+    return null;
+  }
+
+  function formAvis(m, pourUid, pourNom){
+    const b = brouillons[m.id] || (brouillons[m.id] = { note: 0, texte: "", ouvert: false });
+    const zone = el("div", "avis-form");
+    if (!b.ouvert){
+      zone.appendChild(bouton("⭐ Laisser un avis à " + pourNom, "sec mini", async () => { b.ouvert = true; rafraichir(); }));
+      return zone;
+    }
+    zone.appendChild(el("div", "h-sous", "Ta note pour " + pourNom + " :"));
+    const rangee = el("div", "etoiles");
+    for (let i = 1; i <= 5; i++){
+      const s = el("button", "etoile", i <= b.note ? "★" : "☆");
+      s.type = "button";
+      s.setAttribute("aria-label", i + " sur 5");
+      s.addEventListener("click", () => { b.note = i; rafraichir(); });
+      rangee.appendChild(s);
+    }
+    zone.appendChild(rangee);
+    const ta = document.createElement("textarea");
+    ta.rows = 2; ta.maxLength = 300; ta.placeholder = "Commentaire (facultatif)"; ta.value = b.texte;
+    ta.addEventListener("input", () => { b.texte = ta.value; });
+    zone.appendChild(ta);
+    zone.appendChild(bouton("Envoyer mon avis", "mini", async () => {
+      if (b.note < 1){ afficherMessage("Choisis une note de 1 à 5 étoiles."); return; }
+      await setDoc(doc(db, "avis", m.id + "_" + user.uid), {
+        missionId: m.id, de: user.uid, deNom: nomCourt(profil), pour: pourUid,
+        note: b.note, commentaire: b.texte.trim(), titre: m.titre, createdAt: serverTimestamp()
+      });
+      delete brouillons[m.id];
+      afficherMessage("Merci pour ton avis !", "info");
+    }));
+    return zone;
+  }
+
   function remplir(p, d){
     ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
     $(p + "ville").value = d.ville || "";
@@ -569,9 +641,9 @@
   function statsPerso(){
     const realisees = mesRealisees.filter(m => m.uid !== user.uid);
     const faites = realisees.filter(m => st(m) === "terminee");
-    const encoursTrav = realisees.filter(m => st(m) === "attribuee").length;
+    const encoursTrav = realisees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length;
     const terminees = mesPubliees.filter(m => st(m) === "terminee");
-    const encoursPub = mesPubliees.filter(m => st(m) === "attribuee").length;
+    const encoursPub = mesPubliees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length;
     const debut = new Date(); debut.setDate(1); debut.setHours(0, 0, 0, 0);
     const somme = liste => liste.reduce((s, m) => s + Number(m.prix || 0), 0);
     const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
@@ -586,7 +658,7 @@
       confie: somme(terminees),
       enAttente: mesCandidatures.filter(c => etatCandidature(c) === "En attente").length,
       aTraiter: candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).length,
-      points, idx
+      points, idx, note: notesPour(user.uid)
     };
   }
 
@@ -610,7 +682,7 @@
     zone.innerHTML = "";
     const f = $("histo-filtre").value;
     const items = [];
-    const ligneMission = (m, role) => ({ titre: m.titre, role, prix: m.prix, ms: dateMs(m), etat: LIBELLES[st(m)], cls: "b-" + st(m) });
+    const ligneMission = (m, role) => ({ titre: m.titre, role, prix: m.prix, ms: dateMs(m), etat: LIBELLES[st(m)], cls: "b-" + st(m), mission: m });
     if (peutPostuler() && (f === "tout" || f === "realisee"))
       mesRealisees.filter(m => m.uid !== user.uid).forEach(m => items.push(ligneMission(m, "Réalisée")));
     if (peutPublier() && (f === "tout" || f === "publiee"))
@@ -630,6 +702,8 @@
       gauche.appendChild(el("div", "h-sous", [i.role, fcfa(i.prix), dateTexte(i.ms)].filter(Boolean).join(" · ")));
       ligne.append(gauche, el("span", "badge " + i.cls, i.etat));
       zone.appendChild(ligne);
+      const cible = i.mission ? cibleAvis(i.mission) : null;
+      if (cible) zone.appendChild(formAvis(i.mission, cible.uid, cible.nom));
     });
   }
 
@@ -686,6 +760,7 @@
         tuile(fcfa(s.confie), "Montant confié")
       );
     }
+    tuiles.append(tuile(s.note ? s.note.moy.toFixed(1).replace(".", ",") + " / 5" : "—", "Note moyenne", s.note ? s.note.n + " avis" : "Pas encore d'avis"));
     r.appendChild(tuiles);
 
     const regle = peutPostuler() && peutPublier()
@@ -694,6 +769,18 @@
         ? "Score : +10 points par mission réalisée. Les gains sont indicatifs : ils additionnent le prix des missions terminées."
         : "Score : +5 points par mission publiée et terminée. Le montant confié additionne le prix des missions terminées.";
     r.appendChild(el("p", "aide", regle + " Les paiements se font directement entre utilisateurs."));
+    const recus = avisTous.filter(a => a.pour === user.uid).slice(0, 5);
+    if (recus.length){
+      r.appendChild(el("h3", "", "Derniers avis reçus"));
+      recus.forEach(a => {
+        const n = Math.max(1, Math.min(5, Number(a.note) || 1));
+        const l = el("div", "avis-ligne");
+        l.appendChild(el("div", "h-titre", "★".repeat(n) + "☆".repeat(5 - n) + " · " + (a.deNom || "")));
+        if (a.commentaire) l.appendChild(el("div", "h-sous", a.commentaire));
+        l.appendChild(el("div", "h-sous", "Mission : " + (a.titre || "")));
+        r.appendChild(l);
+      });
+    }
     majHisto();
     majNotifs();
   }
@@ -706,7 +793,8 @@
     mesCandidatures = [];
     candidaturesRecues = [];
     suiviUid = null;
-    charges.pub = charges.real = charges.cand = charges.recu = false;
+    charges.pub = charges.real = charges.cand = charges.recu = charges.avis = false;
+    avisTous = [];
     vuInit = false;
     vues = new Set();
     dernieresCles = new Set();
@@ -724,6 +812,8 @@
       snap => { mesCandidatures = lire(snap); charges.cand = true; afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(candRef, where("auteurUid", "==", user.uid)),
       snap => { candidaturesRecues = lire(snap); charges.recu = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(collection(db, "avis"), orderBy("createdAt", "desc"), limit(500)),
+      snap => { avisTous = lire(snap); charges.avis = true; afficher(); majTableau(); }, erreur));
   }
 
   function majUI(){
@@ -756,6 +846,7 @@
       ligne.appendChild(el("div", "h-titre", "👤 " + c.nom + (c.profession ? " · " + c.profession : "")));
       ligne.appendChild(el("div", "h-sous", [
         n ? "✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
+        notesPour(c.uid) ? etoilesTxt(notesPour(c.uid)) : "Pas encore d'avis",
         choisi ? "✅ Choisi(e)" : (c.statut === "refusee" ? "❌ Refusé(e)" : "")
       ].filter(Boolean).join(" · ")));
 
@@ -831,6 +922,8 @@
     if (m.auteur){
       const n = cpt.parAuteur[m.uid] || 0;
       meta.appendChild(document.createTextNode(" · par " + m.auteur + (n ? " (✔️ " + pluriel(n, "mission") + " terminée" + (n > 1 ? "s" : "") + ")" : "")));
+      const nr = notesPour(m.uid);
+      if (nr) meta.appendChild(document.createTextNode(" · " + etoilesTxt(nr)));
     }
     c.append(h, meta);
     if (m.lieu) c.appendChild(el("div", "meta", user ? "📌 Lieu : " + m.lieu : "📌 Lieu visible après connexion"));
@@ -857,7 +950,10 @@
 
     if (m.uid === user.uid){
       // --- Actions de l'auteur ---
-      if (statut !== "terminee"){
+      const maj = champs => updateDoc(doc(db, "missions", m.id), champs);
+      const nomT = m.workerNom || "Le travailleur";
+
+      if (statut === "disponible" || statut === "attribuee"){
         const recues = candidaturesRecues.filter(x => x.missionId === m.id);
         const attente = recues.filter(x => x.statut === "en_attente").length;
         const bVoir = el("button", "sec mini",
@@ -874,36 +970,55 @@
           actions.appendChild(zone);
         }
       }
+
       if (statut === "attribuee"){
-        const bFin = el("button", "mini", "✅ Marquer comme terminée");
-        bFin.type = "button";
-        bFin.addEventListener("click", async () => {
-          if (!confirm("Confirmer que la mission est terminée ?")) return;
-          try { await updateDoc(doc(db, "missions", m.id), { statut: "terminee", termineeAt: serverTimestamp() }); }
-          catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
-        });
-        const bRetour = el("button", "sec mini", "↩️ Remettre disponible");
-        bRetour.type = "button";
-        bRetour.addEventListener("click", async () => {
-          if (!confirm("Remettre la mission en disponible ?")) return;
-          try {
+        actions.append(
+          bouton("✅ Marquer comme terminée", "mini", async () => {
+            if (!confirm("Tu déclares la mission terminée. " + nomT + " devra le confirmer.")) return;
+            await maj({ statut: "a_confirmer", declarePar: "auteur" });
+          }),
+          bouton("↩️ Remettre disponible", "sec mini", async () => {
+            if (!confirm("Remettre la mission en disponible ?")) return;
             const lot = writeBatch(db);
             lot.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
             const idCand = m.id + "_" + m.workerUid;
             if (candidaturesRecues.some(x => x.id === idCand)) lot.update(doc(db, "candidatures", idCand), { statut: "en_attente" });
             await lot.commit();
-          } catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
-        });
-        actions.append(bFin, bRetour);
+          })
+        );
       }
-      const bSup = el("button", "danger mini", "Supprimer ma mission");
-      bSup.type = "button";
-      bSup.addEventListener("click", async () => {
-        if (!confirm("Supprimer cette mission ?")) return;
-        try { await deleteDoc(doc(db, "missions", m.id)); }
-        catch (e) { console.error(e); afficherMessage("Suppression impossible. Réessaie."); }
-      });
-      actions.appendChild(bSup);
+
+      if (statut === "a_confirmer"){
+        const parT = m.declarePar === "travailleur";
+        const o = el("div", "info", parT
+          ? "⏳ " + nomT + " déclare avoir terminé la mission. Confirmes-tu ?"
+          : "⏳ En attente de la confirmation de " + nomT + ".");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        if (parT){
+          actions.append(
+            bouton("✅ Confirmer la fin de la mission", "mini", async () => {
+              if (!confirm("Confirmer que la mission est bien terminée ?")) return;
+              await maj({ statut: "terminee", termineeAt: serverTimestamp() });
+            }),
+            bouton("↩️ Pas encore terminée", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() }))
+          );
+        } else {
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() })));
+        }
+      }
+
+      if (statut === "terminee"){
+        const cible = cibleAvis(m);
+        if (cible) actions.appendChild(formAvis(m, cible.uid, cible.nom));
+      }
+
+      if (statut === "disponible" || statut === "attribuee"){
+        actions.appendChild(bouton("Supprimer ma mission", "danger mini", async () => {
+          if (!confirm("Supprimer cette mission ?")) return;
+          await deleteDoc(doc(db, "missions", m.id));
+        }));
+      }
 
     } else if (statut === "disponible"){
       // --- Visiteur connecté : se proposer ---
@@ -945,10 +1060,14 @@
       }
 
     } else if (m.workerUid === user.uid){
-      const o = el("div", "info", statut === "terminee" ? "✔️ Tu as réalisé cette mission." : "🎉 Tu as été choisi(e) pour cette mission !");
-      o.style.marginBottom = "0";
-      actions.appendChild(o);
+      // --- Actions du travailleur choisi ---
+      const maj = champs => updateDoc(doc(db, "missions", m.id), champs);
+      const auteurNom = m.auteur || "L'auteur";
+
       if (statut === "attribuee"){
+        const o = el("div", "info", "🎉 Tu as été choisi(e) pour cette mission !");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
         const w = el("a", "wa", "💬 Écrire à l'auteur sur WhatsApp");
         w.style.marginTop = "0";
         w.href = lienWhatsAppMsg(m.tel, "Bonjour, merci de m'avoir choisi(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
@@ -959,17 +1078,40 @@
           info.style.marginBottom = "0";
           actions.appendChild(info);
         } else {
-          const bAdr = el("button", "sec mini", "📍 Voir l'adresse précise");
-          bAdr.type = "button";
-          bAdr.addEventListener("click", async () => {
-            try {
-              const s = await getDoc(doc(db, "missions", m.id, "prive", "adresse"));
-              adressesVues[m.id] = s.exists() ? "📍 " + s.data().adresse : "Aucune adresse précise renseignée : demande-la à l'auteur sur WhatsApp.";
-              afficher();
-            } catch (e) { console.error(e); afficherMessage("Impossible de lire l'adresse. Réessaie."); }
-          });
-          actions.appendChild(bAdr);
+          actions.appendChild(bouton("📍 Voir l'adresse précise", "sec mini", async () => {
+            const s = await getDoc(doc(db, "missions", m.id, "prive", "adresse"));
+            adressesVues[m.id] = s.exists() ? "📍 " + s.data().adresse : "Aucune adresse précise renseignée : demande-la à l'auteur sur WhatsApp.";
+            afficher();
+          }));
         }
+        actions.appendChild(bouton("✅ J'ai terminé la mission", "mini", async () => {
+          if (!confirm("Tu déclares avoir terminé la mission. " + auteurNom + " devra le confirmer.")) return;
+          await maj({ statut: "a_confirmer", declarePar: "travailleur" });
+        }));
+      } else if (statut === "a_confirmer"){
+        const parA = m.declarePar === "auteur";
+        const o = el("div", "info", parA
+          ? "⏳ " + auteurNom + " déclare la mission terminée. Confirmes-tu ?"
+          : "⏳ En attente de la confirmation de " + auteurNom + ".");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        if (parA){
+          actions.append(
+            bouton("✅ Je confirme", "mini", async () => {
+              if (!confirm("Confirmer que la mission est terminée ?")) return;
+              await maj({ statut: "terminee", termineeAt: serverTimestamp() });
+            }),
+            bouton("❌ Ce n'est pas terminé", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() }))
+          );
+        } else {
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() })));
+        }
+      } else if (statut === "terminee"){
+        const o = el("div", "info", "✔️ Tu as réalisé cette mission.");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        const cible = cibleAvis(m);
+        if (cible) actions.appendChild(formAvis(m, cible.uid, cible.nom));
       }
     } else if (mesCandidatures.some(x => x.missionId === m.id)){
       actions.appendChild(el("div", "verrou", "Cette mission a été attribuée à quelqu'un d'autre."));
@@ -990,7 +1132,7 @@
 
     const liste = $("liste");
     liste.innerHTML = "";
-    const items = missions.filter(m => (!f || m.ville === f) && (fs === "toutes" || st(m) === fs));
+    const items = missions.filter(m => (!f || m.ville === f) && (fs === "toutes" || st(m) === fs || (fs === "attribuee" && st(m) === "a_confirmer")));
     if (items.length === 0){
       liste.innerHTML = '<div class="vide">Aucune mission dans cette catégorie.</div>';
       return;
@@ -1196,6 +1338,22 @@
       cle: "fin:" + m.id, ms: dateMs(m), type: "moi",
       texte: "✔️ La mission « " + m.titre + " » est terminée : +10 points et " + fcfa(m.prix) + " de gains indicatifs."
     }));
+    mesPubliees.filter(m => st(m) === "a_confirmer" && m.declarePar === "travailleur").forEach(m => liste.push({
+      cle: "conf:" + m.id + ":t", ms: 0, type: "carte", missionId: m.id,
+      texte: "⏳ " + (m.workerNom || "Le travailleur") + " déclare avoir terminé « " + m.titre + " » : confirme la fin de la mission."
+    }));
+    mesRealisees.filter(m => m.uid !== user.uid && st(m) === "a_confirmer" && m.declarePar === "auteur").forEach(m => liste.push({
+      cle: "conf:" + m.id + ":a", ms: 0, type: "carte", missionId: m.id,
+      texte: "⏳ " + (m.auteur || "L'auteur") + " déclare « " + m.titre + " » terminée : confirme-la."
+    }));
+    avisTous.filter(a => a.pour === user.uid).forEach(a => liste.push({
+      cle: "avis:" + a.id, ms: dateMs(a), type: "histo",
+      texte: "⭐ " + (a.deNom || "Quelqu'un") + " t'a laissé un avis (" + a.note + "/5) pour « " + a.titre + " »"
+    }));
+    mesPubliees.concat(mesRealisees.filter(m => m.uid !== user.uid)).forEach(m => {
+      const cible = cibleAvis(m);
+      if (cible) liste.push({ cle: "noter:" + m.id, ms: dateMs(m), type: "histo", texte: "⭐ Mission terminée : laisse un avis à " + cible.nom + "." });
+    });
     return liste.sort((a, b) => b.ms - a.ms);
   }
 
@@ -1261,6 +1419,16 @@
           afficher();
           const cible = document.querySelector('[data-id="' + n.missionId + '"]');
           defiler(cible || $("missions"));
+        } else if (n.type === "carte"){
+          $("filtre-statut").value = "toutes";
+          $("filtre").value = "";
+          afficher();
+          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
+          defiler(cible || $("missions"));
+        } else if (n.type === "histo"){
+          const t = document.querySelector('.onglet[data-t="histo"]');
+          if (t) t.click();
+          defiler($("espace"));
         } else {
           defiler($("espace"));
         }

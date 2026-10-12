@@ -63,6 +63,7 @@
   .b-disponible{background:#e3f4ea;color:#0a5d2c}
   .b-attribuee{background:#fff1d6;color:#8a5a00}
   .b-terminee{background:#e3ecfb;color:#1a4fa0}
+  .b-a_confirmer{background:#fff1d6;color:#8a5a00}
   .b-susp{background:#fdecea;color:#b3261e}
   .vide{text-align:center;color:var(--gris);padding:24px}
   .erreur{background:#fdecea;color:#b3261e;padding:12px 14px;border-radius:14px;margin-bottom:12px}
@@ -126,6 +127,7 @@
         <option value="toutes">Tous les statuts</option>
         <option value="disponible">Disponibles</option>
         <option value="attribuee">Attribuées</option>
+        <option value="a_confirmer">À confirmer</option>
         <option value="terminee">Terminées</option>
       </select>
       <input id="q-missions" type="search" placeholder="Rechercher (titre, ville, auteur)">
@@ -163,7 +165,7 @@
     if (texte !== undefined) e.textContent = texte;
     return e;
   };
-  const LIB = { disponible: "Disponible", attribuee: "Attribuée", terminee: "Terminée" };
+  const LIB = { disponible: "Disponible", attribuee: "Attribuée", a_confirmer: "À confirmer", terminee: "Terminée" };
   const st = m => m.statut || "disponible";
   const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
@@ -212,6 +214,7 @@
       tuile(missions.filter(m => ms(m) >= semaine).length, "Missions (7 derniers jours)"),
       tuile(missions.filter(m => st(m) === "disponible").length, "Disponibles"),
       tuile(missions.filter(m => st(m) === "attribuee").length, "Attribuées"),
+      tuile(missions.filter(m => st(m) === "a_confirmer").length, "À confirmer"),
       tuile(terminees.length, "Terminées"),
       tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Valeur des missions terminées"),
       tuile(cands.length, "Candidatures"),
