@@ -111,6 +111,13 @@
   .toast{position:fixed;left:50%;transform:translateX(-50%);top:72px;width:min(92vw,420px);background:var(--vert-fonce);color:#fff;border-radius:16px;padding:12px 16px;font-size:.9rem;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:80;cursor:pointer}
   .wa.gris{background:var(--gris)}
 
+  .etiq{display:block;font-size:.8rem;color:var(--gris);margin:2px 4px 4px}
+  .duo-champs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .b-urgent{background:#fdecea;color:#b3261e}
+  .partage{display:block;text-align:center;font-size:.85rem;color:var(--vert);font-weight:600;text-decoration:none;padding:10px 0 2px}
+  .surligne{animation:flash 2.6s ease}
+  @keyframes flash{0%,100%{box-shadow:0 8px 24px rgba(8,69,42,.08)}25%,60%{box-shadow:0 0 0 5px var(--jaune)}}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -172,7 +179,7 @@
   #fab-haut.on{opacity:1;pointer-events:auto}
   #fab-wa{bottom:80px;background:#128c4a;color:#fff}
 
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}}
 </style>
 </head>
 <body>
@@ -269,6 +276,16 @@
       </select>
       <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
       <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
+      <label class="etiq" for="quand">Quand la mission doit-elle être faite ?</label>
+      <select id="quand">
+        <option value="flexible">Flexible (pas de date précise)</option>
+        <option value="urgent">Urgent (aujourd'hui)</option>
+        <option value="date">À une date précise</option>
+      </select>
+      <div id="bloc-date" class="duo-champs cache">
+        <input id="date-exec" type="date" aria-label="Date souhaitée">
+        <input id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)">
+      </div>
       <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
       <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
       <button id="publier">Publier</button>
@@ -310,6 +327,7 @@
 <footer>
   <a href="confidentialite.html">Confidentialité et conditions d'utilisation</a>
   <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
+  <p><a id="lien-partage" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a></p>
   <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
 
@@ -490,6 +508,44 @@
     return t && t.toMillis ? t.toMillis() : 0;
   };
   const dateTexte = ms => ms ? new Date(ms).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
+
+  const aujourdhui = () => {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  };
+  function quandTexte(m){
+    if (m.quand === "urgent") return { texte: "Urgent (aujourd'hui)", urgent: true };
+    if (m.quand === "date" && m.dateExec){
+      const d = new Date(m.dateExec + "T00:00:00");
+      let t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+      if (m.heureExec) t += " à " + String(m.heureExec).replace(":", "h");
+      return { texte: t, depasse: m.dateExec < aujourdhui() };
+    }
+    if (m.quand === "flexible") return { texte: "Flexible" };
+    return null;
+  }
+  const urlSite = () => location.href.split("#")[0];
+  const lienPartageMission = m => "https://wa.me/?text=" + encodeURIComponent(
+    "🔎 Mission à " + m.ville + " : « " + m.titre + " » (" + fcfa(m.prix) + ")\nVoir sur Bohicon Jobs : " + urlSite() + "#mission=" + m.id);
+
+  let lienTraite = false;
+  function ouvrirLienDirect(){
+    if (lienTraite) return;
+    lienTraite = true;
+    const id = new URLSearchParams(location.hash.slice(1)).get("mission");
+    if (!id) return;
+    const m = missions.find(x => x.id === id);
+    if (!m){ afficherMessage("Cette mission n'existe plus ou n'est plus disponible.", "info"); return; }
+    $("filtre-statut").value = "toutes";
+    $("filtre").value = "";
+    afficher();
+    const cible = document.querySelector('[data-id="' + id.replace(/[^A-Za-z0-9]/g, "") + '"]');
+    if (cible){
+      cible.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
+      cible.classList.add("surligne");
+      setTimeout(() => cible.classList.remove("surligne"), 3000);
+    }
+  }
 
   function remplir(p, d){
     ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
@@ -760,6 +816,12 @@
     const statut = st(m);
     const c = el("div", "card job s-" + statut);
     c.dataset.id = m.id;
+    const ajouterPartage = () => {
+      if (statut !== "disponible") return;
+      const p = el("a", "partage", "📲 Partager sur WhatsApp");
+      p.href = lienPartageMission(m); p.target = "_blank"; p.rel = "noopener";
+      c.appendChild(p);
+    };
 
     const h = el("h3", "", m.titre);
     h.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
@@ -772,6 +834,11 @@
     }
     c.append(h, meta);
     if (m.lieu) c.appendChild(el("div", "meta", user ? "📌 Lieu : " + m.lieu : "📌 Lieu visible après connexion"));
+    const q = quandTexte(m);
+    if (q){
+      c.appendChild(el("div", "meta", "🗓️ " + q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
+      if (q.urgent && statut === "disponible") h.appendChild(el("span", "badge b-urgent", "Urgent"));
+    }
     c.appendChild(el("div", "", m.desc || ""));
 
     if (statut !== "disponible" && m.workerNom){
@@ -782,6 +849,7 @@
 
     if (!user){
       c.appendChild(el("div", "verrou", "🔒 Connecte-toi pour participer"));
+      ajouterPartage();
       return c;
     }
 
@@ -908,6 +976,7 @@
     }
 
     if (actions.childNodes.length) c.appendChild(actions);
+    ajouterPartage();
     return c;
   }
 
@@ -936,6 +1005,7 @@
     charges.missions = true;
     afficher();
     majNotifs();
+    ouvrirLienDirect();
   }, err => {
     console.error(err);
     afficherMessage("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
@@ -1027,6 +1097,9 @@
     const desc = $("desc").value.trim();
     const lieu = $("lieu").value.trim();
     const adressePrecise = $("adresse-precise").value.trim();
+    const quand = $("quand").value;
+    const dateExec = $("date-exec").value;
+    const heureExec = $("heure-exec").value;
 
     if (!titre || !prix || prix < 0){
       alert("Remplis au moins le titre et le prix.");
@@ -1036,19 +1109,28 @@
       alert("Indique le lieu d'exécution de la mission (quartier ou repère).");
       return;
     }
+    if (quand === "date" && (!dateExec || dateExec < aujourdhui())){
+      alert("Choisis une date valide (aujourd'hui ou plus tard).");
+      return;
+    }
 
     const btn = $("publier");
     btn.disabled = true; btn.textContent = "Publication…";
     try {
       const ref = await addDoc(missionsRef, {
-        titre, ville, lieu, prix, desc,
+        titre, ville, lieu, quand,
+        dateExec: quand === "date" ? dateExec : "",
+        heureExec: quand === "date" ? heureExec : "",
+        prix, desc,
         tel: profil.tel,
         auteur: nomCourt(profil),
         uid: user.uid,
         statut: "disponible",
         createdAt: serverTimestamp()
       });
-      ["titre","lieu","adresse-precise","prix","desc"].forEach(id => $(id).value = "");
+      ["titre","lieu","adresse-precise","prix","desc","date-exec","heure-exec"].forEach(id => $(id).value = "");
+      $("quand").value = "flexible";
+      $("bloc-date").classList.add("cache");
       afficherMessage("");
       if (adressePrecise){
         try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
@@ -1214,6 +1296,12 @@
     if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
+
+  // ---------- Date souhaitée et invitation ----------
+  $("date-exec").min = aujourdhui();
+  $("quand").addEventListener("change", () => $("bloc-date").classList.toggle("cache", $("quand").value !== "date"));
+  $("lien-partage").href = "https://wa.me/?text=" + encodeURIComponent(
+    "Découvre Bohicon Jobs : trouve ou publie de petits jobs à Bohicon 👉 " + urlSite());
 
   // ---------- Navigation et boutons flottants ----------
   const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
