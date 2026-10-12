@@ -127,6 +127,9 @@
   .avis-ligne{padding:10px 0;border-bottom:1px solid var(--trait)}
   .avis-ligne:last-child{border-bottom:0}
 
+  .sig{margin-top:6px;text-align:right}
+  .sig .lien{width:auto;font-size:.78rem;color:var(--gris)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -403,6 +406,8 @@
   const adressesVues = {};
   const brouillons = {};
   let avisTous = [];
+  let mesSignalements = new Set();
+  const brouillonsSig = {};
   const $ = id => document.getElementById(id);
   const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -619,6 +624,49 @@
     return zone;
   }
 
+  const MOTIFS = [
+    ["arnaque", "Arnaque ou demande d'argent"], ["inapproprie", "Contenu inapproprié"],
+    ["harcelement", "Harcèlement ou menaces"], ["faux_profil", "Faux profil"],
+    ["dangereux", "Service dangereux ou illégal"], ["autre", "Autre"]
+  ];
+
+  function formSignalement(type, cibleId, cibleTitre, cibleUid){
+    const cle = type + "_" + cibleId;
+    if (mesSignalements.has(cle)){
+      const d = el("div", "sig");
+      d.appendChild(el("span", "h-sous", "🚩 Signalé, merci."));
+      return d;
+    }
+    const b = brouillonsSig[cle] || (brouillonsSig[cle] = { ouvert: false, motif: "arnaque", texte: "" });
+    if (!b.ouvert){
+      const d = el("div", "sig");
+      d.appendChild(bouton("🚩 Signaler", "lien", async () => { b.ouvert = true; rafraichir(); }));
+      return d;
+    }
+    const zone = el("div", "avis-form");
+    zone.appendChild(el("div", "h-sous", type === "mission" ? "Pourquoi signales-tu cette mission ?" : "Pourquoi signales-tu " + cibleTitre + " ?"));
+    const sel = document.createElement("select");
+    MOTIFS.forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sel.appendChild(o); });
+    sel.value = b.motif;
+    sel.addEventListener("change", () => { b.motif = sel.value; });
+    zone.appendChild(sel);
+    const ta = document.createElement("textarea");
+    ta.rows = 2; ta.maxLength = 300; ta.placeholder = "Détails (facultatif)"; ta.value = b.texte;
+    ta.addEventListener("input", () => { b.texte = ta.value; });
+    zone.appendChild(ta);
+    zone.appendChild(bouton("Envoyer le signalement", "danger mini", async () => {
+      await setDoc(doc(db, "signalements", cle + "_" + user.uid), {
+        type, cibleId, cibleTitre: String(cibleTitre || "").slice(0, 100), cibleUid,
+        motif: b.motif, details: b.texte.trim(), de: user.uid, deNom: nomCourt(profil),
+        statut: "ouvert", createdAt: serverTimestamp()
+      });
+      delete brouillonsSig[cle];
+      afficherMessage("Merci, ton signalement a été transmis à l'administrateur.", "info");
+    }));
+    zone.appendChild(bouton("Annuler", "lien", async () => { b.ouvert = false; rafraichir(); }));
+    return zone;
+  }
+
   function remplir(p, d){
     ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
     $(p + "ville").value = d.ville || "";
@@ -795,6 +843,7 @@
     suiviUid = null;
     charges.pub = charges.real = charges.cand = charges.recu = charges.avis = false;
     avisTous = [];
+    mesSignalements = new Set();
     vuInit = false;
     vues = new Set();
     dernieresCles = new Set();
@@ -814,6 +863,8 @@
       snap => { candidaturesRecues = lire(snap); charges.recu = true; afficher(); majTableau(); }, erreur));
     suivis.push(onSnapshot(query(collection(db, "avis"), orderBy("createdAt", "desc"), limit(500)),
       snap => { avisTous = lire(snap); charges.avis = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(collection(db, "signalements"), where("de", "==", user.uid)),
+      snap => { mesSignalements = new Set(snap.docs.map(d => d.data().type + "_" + d.data().cibleId)); afficher(); majTableau(); }, erreur));
   }
 
   function majUI(){
@@ -898,6 +949,7 @@
         }
         ligne.appendChild(rangee);
       }
+      ligne.appendChild(formSignalement("utilisateur", c.uid, c.nom, c.uid));
       zone.appendChild(ligne);
     });
   }
@@ -1119,6 +1171,7 @@
 
     if (actions.childNodes.length) c.appendChild(actions);
     ajouterPartage();
+    if (m.uid !== user.uid && profilOk()) c.appendChild(formSignalement("mission", m.id, m.titre, m.uid));
     return c;
   }
 

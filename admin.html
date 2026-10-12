@@ -44,7 +44,7 @@
   button:focus-visible,a:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
 
   .onglets{display:flex;gap:6px;background:#fff;border-radius:999px;padding:4px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
-  .onglet{flex:1;width:auto;margin:0;padding:10px 6px;background:transparent;color:var(--gris);font-size:.88rem}
+  .onglet{flex:1;width:auto;margin:0;padding:10px 4px;background:transparent;color:var(--gris);font-size:.78rem}
   .onglet.on{background:var(--vert);color:#fff}
 
   .tuiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -112,6 +112,7 @@
       <button class="onglet on" data-t="apercu" type="button">Aperçu</button>
       <button class="onglet" data-t="users" type="button">Utilisateurs</button>
       <button class="onglet" data-t="missions" type="button">Missions</button>
+      <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
     </div>
 
     <div id="t-apercu" class="card"></div>
@@ -132,6 +133,15 @@
       </select>
       <input id="q-missions" type="search" placeholder="Rechercher (titre, ville, auteur)">
       <div id="liste-missions"></div>
+    </div>
+
+    <div id="t-signalements" class="card cache">
+      <select id="f-sig">
+        <option value="ouvert">À traiter</option>
+        <option value="traite">Traités</option>
+        <option value="tous">Tous</option>
+      </select>
+      <div id="liste-sig"></div>
     </div>
 
     <p class="note">Les données sont lues en direct, dans la limite de 500 éléments par rubrique.</p>
@@ -171,7 +181,7 @@
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
   const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
 
-  let users = [], missions = [], cands = [], unsubs = [], moi = null;
+  let users = [], missions = [], cands = [], signalements = [], unsubs = [], moi = null;
 
   function message(texte, type){
     const z = $("message");
@@ -218,7 +228,8 @@
       tuile(terminees.length, "Terminées"),
       tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Valeur des missions terminées"),
       tuile(cands.length, "Candidatures"),
-      tuile(cands.filter(c => c.statut === "en_attente").length, "Candidatures en attente")
+      tuile(cands.filter(c => c.statut === "en_attente").length, "Candidatures en attente"),
+      tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter")
     );
     z.appendChild(g);
     z.appendChild(listeCompte("Utilisateurs par type d'usage", compter(users, u => u.role), 5));
@@ -310,7 +321,80 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); }
+  // ---------- Signalements ----------
+  const MOTIFS = { arnaque: "Arnaque ou demande d'argent", inapproprie: "Contenu inapproprié", harcelement: "Harcèlement ou menaces",
+                   faux_profil: "Faux profil", dangereux: "Service dangereux ou illégal", autre: "Autre" };
+
+  function bouton(texte, cls, action){
+    const b = el("button", cls, texte);
+    b.type = "button";
+    b.addEventListener("click", async () => {
+      try { await action(); }
+      catch (e) { console.error(e); message("Action impossible. Vérifie les règles Firestore."); }
+    });
+    return b;
+  }
+
+  async function marquerCible(s, statut){
+    const lot = writeBatch(db);
+    signalements.filter(x => x.type === s.type && x.cibleId === s.cibleId && (x.statut || "ouvert") !== statut)
+      .forEach(x => lot.update(doc(db, "signalements", x.id), { statut }));
+    await lot.commit();
+  }
+
+  function rendreSignalements(){
+    const zone = $("liste-sig");
+    zone.innerHTML = "";
+    const f = $("f-sig").value;
+    const ouverts = signalements.filter(s => s.statut !== "traite").length;
+    $("onglet-sig").textContent = "Signalements" + (ouverts ? " (" + ouverts + ")" : "");
+    const items = signalements
+      .filter(s => f === "tous" || (f === "traite" ? s.statut === "traite" : s.statut !== "traite"))
+      .sort((x, y) => ms(y) - ms(x));
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucun signalement.")); return; }
+    items.forEach(s => {
+      const nb = signalements.filter(x => x.type === s.type && x.cibleId === s.cibleId).length;
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", (s.type === "mission" ? "📋 Mission : " : "👤 Utilisateur : ") + (s.cibleTitre || s.cibleId));
+      if (nb > 1) titre.appendChild(el("span", "badge b-susp", nb + " signalements"));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", "Motif : " + (MOTIFS[s.motif] || s.motif)));
+      if (s.details) g.appendChild(el("div", "h-sous", s.details));
+      g.appendChild(el("div", "h-sous", "Signalé par " + (s.deNom || "—") + " · " + dateTexte(ms(s))));
+
+      const btns = el("div", "btns");
+      if (s.statut !== "traite"){
+        if (s.type === "mission" && missions.some(m => m.id === s.cibleId)){
+          btns.appendChild(bouton("Supprimer la mission", "danger mini", async () => {
+            if (!confirm("Supprimer définitivement cette mission et ses candidatures ?")) return;
+            const lot = writeBatch(db);
+            lot.delete(doc(db, "missions", s.cibleId));
+            cands.filter(c => c.missionId === s.cibleId).forEach(c => lot.delete(doc(db, "candidatures", c.id)));
+            await lot.commit();
+            await marquerCible(s, "traite");
+          }));
+        }
+        if (s.type === "utilisateur"){
+          const u = users.find(x => x.id === s.cibleId);
+          if (u && !u.suspendu){
+            btns.appendChild(bouton("Suspendre", "danger mini", async () => {
+              if (!confirm("Suspendre " + (u.prenom || "") + " " + (u.nom || "") + " ?")) return;
+              await updateDoc(doc(db, "users", u.id), { suspendu: true });
+              await marquerCible(s, "traite");
+            }));
+          }
+        }
+        btns.appendChild(bouton("Marquer traité", "sec mini", () => marquerCible(s, "traite")));
+      } else {
+        btns.appendChild(bouton("Rouvrir", "sec mini", () => marquerCible(s, "ouvert")));
+      }
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -330,13 +414,14 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
     unsubs.push(onSnapshot(query(collection(db, "users"), limit(500)), s => { users = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "missions"), limit(500)), s => { missions = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => { cands = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
   }
 
   // ---------- Accès ----------
@@ -381,11 +466,12 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "missions", "signalements"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-missions").addEventListener("input", rendreMissions);
   $("f-statut").addEventListener("change", rendreMissions);
+  $("f-sig").addEventListener("change", rendreSignalements);
 </script>
 </body>
 </html>
