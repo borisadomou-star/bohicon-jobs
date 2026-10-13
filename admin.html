@@ -122,6 +122,7 @@
       <button class="onglet" data-t="missions" type="button">Missions</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
+      <button class="onglet" data-t="retours" type="button" id="onglet-retours">Retours</button>
     </div>
 
     <div id="t-apercu" class="card"></div>
@@ -151,6 +152,26 @@
         <option value="tous">Tous</option>
       </select>
       <div id="liste-sig"></div>
+    </div>
+
+    <div id="t-retours" class="card cache">
+      <h2>Retours des utilisateurs</h2>
+      <div class="duo-champs">
+        <select id="f-retours">
+          <option value="nouveau">À lire</option>
+          <option value="lu">Lus</option>
+          <option value="traite">Traités</option>
+          <option value="tous">Tous</option>
+        </select>
+        <select id="f-retours-type">
+          <option value="tous">Tous les types</option>
+          <option value="bug">🐞 Bugs</option>
+          <option value="idee">💡 Idées</option>
+          <option value="avis">⭐ Avis</option>
+        </select>
+      </div>
+      <button class="sec" id="btn-export-retours" type="button">⬇️ Exporter les retours (CSV)</button>
+      <div id="liste-retours"></div>
     </div>
 
     <div id="t-bannieres" class="card cache">
@@ -219,7 +240,7 @@
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
   const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
 
-  let users = [], missions = [], cands = [], signalements = [], bannieres = [], unsubs = [], moi = null;
+  let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], unsubs = [], moi = null;
   let editionId = null;
 
   function message(texte, type){
@@ -269,7 +290,12 @@
       tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Valeur des missions terminées"),
       tuile(cands.length, "Candidatures"),
       tuile(cands.filter(c => c.statut === "en_attente").length, "Candidatures en attente"),
-      tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter")
+      tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter"),
+      tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
+      tuile((() => {
+        const n = retours.filter(r => r.note);
+        return n.length ? (n.reduce((s, r) => s + r.note, 0) / n.length).toFixed(1).replace(".", ",") + " / 5" : "—";
+      })(), "Note moyenne du site")
     );
     z.appendChild(g);
     z.appendChild(listeCompte("Utilisateurs par type d'usage", compter(users, u => u.role), 5));
@@ -453,6 +479,61 @@
     });
   }
 
+  // ---------- Retours ----------
+  const TYPES_RETOUR = { bug: "🐞 Bug", idee: "💡 Idée", avis: "⭐ Avis" };
+  function telDe(r){
+    const u = r.uid ? users.find(x => x.id === r.uid) : null;
+    const t = (u && u.tel) ? u.tel : (r.contact || "");
+    return String(t).replace(/\D/g, "").length >= 8 ? String(t) : "";
+  }
+  function rendreRetours(){
+    const zone = $("liste-retours");
+    zone.innerHTML = "";
+    const nouveaux = retours.filter(r => (r.statut || "nouveau") === "nouveau").length;
+    $("onglet-retours").textContent = "Retours" + (nouveaux ? " (" + nouveaux + ")" : "");
+    const f = $("f-retours").value, ft = $("f-retours-type").value;
+    const items = retours
+      .filter(r => (ft === "tous" || r.type === ft) && (f === "tous" || (r.statut || "nouveau") === f))
+      .sort((x, y) => ms(y) - ms(x));
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucun retour dans cette catégorie.")); return; }
+    items.forEach(r => {
+      const statut = r.statut || "nouveau";
+      const note = Math.max(0, Math.min(5, Number(r.note) || 0));
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", (TYPES_RETOUR[r.type] || r.type) + (note ? " · " + "★".repeat(note) + "☆".repeat(5 - note) : ""));
+      if (statut === "nouveau") titre.appendChild(el("span", "badge b-attribuee", "Nouveau"));
+      g.appendChild(titre);
+      g.appendChild(el("div", "", r.message || ""));
+      g.appendChild(el("div", "h-sous", [
+        "De : " + (r.nom || (r.uid ? "utilisateur connecté" : "visiteur non connecté")),
+        r.contact ? "Contact : " + r.contact : "", dateTexte(ms(r))
+      ].filter(Boolean).join(" · ")));
+      if (r.appareil) g.appendChild(el("div", "h-sous", "📱 " + r.appareil));
+
+      const btns = el("div", "btns");
+      const tel = telDe(r);
+      if (tel){
+        let n = tel.replace(/\D/g, "");
+        if (!n.startsWith("229")) n = "229" + n;
+        const lien = el("a", "", "Répondre (WhatsApp)");
+        lien.href = "https://wa.me/" + n + "?text=" + encodeURIComponent("Bonjour, merci pour ton retour sur Bohicon Jobs : ");
+        lien.target = "_blank"; lien.rel = "noopener";
+        btns.appendChild(lien);
+      }
+      const maj = s => () => updateDoc(doc(db, "retours", r.id), { statut: s });
+      if (statut === "nouveau") btns.appendChild(bouton("Marquer lu", "sec mini", maj("lu")));
+      if (statut !== "traite") btns.appendChild(bouton("Traité", "sec mini", maj("traite")));
+      else btns.appendChild(bouton("Rouvrir", "sec mini", maj("nouveau")));
+      btns.appendChild(bouton("Supprimer", "danger mini", async () => {
+        if (!confirm("Supprimer ce retour ?")) return;
+        await deleteDoc(doc(db, "retours", r.id));
+      }));
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
   // ---------- Bannières ----------
   const FONDS = {
     vert: "linear-gradient(135deg,#0a7d3b,#13a455)", bleu: "linear-gradient(135deg,#1a4fa0,#3b82f6)",
@@ -550,7 +631,7 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); }
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); rendreRetours(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -570,7 +651,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -579,6 +660,7 @@
     unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => { cands = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
   }
 
   // ---------- Accès ----------
@@ -623,12 +705,26 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions", "signalements", "bannieres"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "missions", "signalements", "bannieres", "retours"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-missions").addEventListener("input", rendreMissions);
   $("f-statut").addEventListener("change", rendreMissions);
   $("f-sig").addEventListener("change", rendreSignalements);
+  $("f-retours").addEventListener("change", rendreRetours);
+  $("f-retours-type").addEventListener("change", rendreRetours);
+  $("btn-export-retours").addEventListener("click", () => {
+    const entetes = ["Date", "Type", "Note", "Message", "De", "Contact", "Statut"];
+    const lignes = retours.slice().sort((x, y) => ms(y) - ms(x)).map(r => [
+      dateTexte(ms(r)), r.type, r.note || "", r.message, r.nom || (r.uid ? "connecté" : "visiteur"), r.contact || telDe(r), r.statut || "nouveau"
+    ].map(cellule).join(","));
+    const csv = "\ufeff" + [entetes.map(cellule).join(","), ...lignes].join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const lien = document.createElement("a");
+    lien.href = url; lien.download = "retours-bohicon-jobs.csv";
+    document.body.appendChild(lien); lien.click(); lien.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
 
   ["b-titre", "b-texte", "b-image", "b-fond"].forEach(id => $(id).addEventListener("input", majApercu));
   $("b-fond").addEventListener("change", majApercu);

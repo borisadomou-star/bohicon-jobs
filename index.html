@@ -136,6 +136,11 @@
   .resultats{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:.82rem;color:var(--gris)}
   .resultats .lien{width:auto;font-size:.82rem}
 
+  .retour-flottant{position:fixed;left:14px;bottom:14px;z-index:60;width:auto;margin:0;padding:11px 16px;border-radius:999px;background:#fff;color:var(--vert);border:1.5px solid var(--vert);box-shadow:0 8px 20px rgba(0,0,0,.25);font-size:.82rem}
+  .overlay{position:fixed;inset:0;background:rgba(8,40,25,.55);z-index:90;display:flex;align-items:flex-end;justify-content:center}
+  .retour-carte{background:#fff;border-radius:22px 22px 0 0;padding:18px;width:min(100%,520px);max-height:92vh;overflow:auto}
+  .piege{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -372,6 +377,31 @@
   <p><a id="lien-partage" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a></p>
   <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
+
+<button id="btn-retour" class="retour-flottant" type="button">💬 Donner mon avis</button>
+<div id="retour-overlay" class="overlay cache" role="dialog" aria-modal="true" aria-label="Donner mon avis sur le site">
+  <div class="retour-carte">
+    <div class="tete-notifs">
+      <h2>Ton avis sur le site</h2>
+      <button id="retour-fermer" class="lien" type="button">Fermer</button>
+    </div>
+    <div id="retour-ok" class="info cache">Merci ! Ton retour a bien été envoyé 🙏</div>
+    <div id="retour-erreur"></div>
+    <label class="etiq" for="retour-type">Que veux-tu nous dire ?</label>
+    <select id="retour-type">
+      <option value="probleme">🐞 J'ai rencontré un problème</option>
+      <option value="idee">💡 J'ai une idée</option>
+      <option value="compliment">👍 J'ai aimé quelque chose</option>
+      <option value="autre">💬 Autre chose</option>
+    </select>
+    <div class="etiq">Ta note du site (facultatif)</div>
+    <div id="retour-etoiles" class="etoiles"></div>
+    <textarea id="retour-message" rows="4" maxlength="600" placeholder="Explique-nous : ce que tu as fait, ce que tu as vu, ce que tu attendais…"></textarea>
+    <input id="retour-contact" placeholder="Ton prénom ou numéro WhatsApp (facultatif)" maxlength="60">
+    <input id="retour-site" class="piege" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button id="retour-envoyer" type="button">Envoyer mon retour</button>
+  </div>
+</div>
 
 <datalist id="professions">
   <option value="Étudiant(e)"><option value="Commerçant(e)"><option value="Conducteur de moto-taxi">
@@ -1596,6 +1626,82 @@
     if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
+
+  // ---------- Retours des testeurs ----------
+  const VERSION_SITE = "test-1";
+  const BOUTON_AVIS = !(window.CONFIG && window.CONFIG.BOUTON_AVIS === false);
+  (function(){
+    let note = 0;
+    const zoneEtoiles = $("retour-etoiles");
+    function dessinerEtoiles(){
+      zoneEtoiles.innerHTML = "";
+      for (let i = 1; i <= 5; i++){
+        const s = el("button", "etoile", i <= note ? "★" : "☆");
+        s.type = "button";
+        s.setAttribute("aria-label", i + " sur 5");
+        s.addEventListener("click", () => { note = (note === i ? 0 : i); dessinerEtoiles(); });
+        zoneEtoiles.appendChild(s);
+      }
+    }
+    const erreur = t => {
+      $("retour-erreur").innerHTML = "";
+      if (t) $("retour-erreur").appendChild(el("div", "erreur", t));
+    };
+    function fermer(){ $("retour-overlay").classList.add("cache"); }
+    function ouvrir(){
+      note = 0;
+      dessinerEtoiles();
+      erreur("");
+      $("retour-ok").classList.add("cache");
+      $("retour-contact").classList.toggle("cache", !!user);
+      $("retour-overlay").classList.remove("cache");
+      $("retour-message").focus();
+    }
+    $("btn-retour").classList.toggle("cache", !BOUTON_AVIS);
+    $("btn-retour").addEventListener("click", ouvrir);
+    $("retour-fermer").addEventListener("click", fermer);
+    $("retour-overlay").addEventListener("click", e => { if (e.target === $("retour-overlay")) fermer(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
+
+    $("retour-envoyer").addEventListener("click", async () => {
+      erreur("");
+      if ($("retour-site").value){ fermer(); return; }          // piège anti-robots
+      const message = $("retour-message").value.trim();
+      if (message.length < 5){ erreur("Écris au moins quelques mots pour que je comprenne."); return; }
+      let dernier = 0;
+      try { dernier = Number(localStorage.getItem("bj_dernier_retour") || 0); } catch (e) { /* ignoré */ }
+      if (Date.now() - dernier < 30000){ erreur("Patiente quelques secondes avant d'envoyer un autre retour."); return; }
+      const btn = $("retour-envoyer");
+      btn.disabled = true; btn.textContent = "Envoi…";
+      try {
+        await addDoc(collection(db, "retours"), {
+          de: user ? user.uid : "",
+          deNom: user && profil ? nomCourt(profil) : "",
+          contact: user ? "" : $("retour-contact").value.trim().slice(0, 60),
+          type: $("retour-type").value,
+          note,
+          message,
+          page: ((location.pathname.split("/").pop() || "index.html") + location.hash).slice(0, 100),
+          appareil: String(navigator.userAgent || "").slice(0, 180),
+          ecran: window.innerWidth + "x" + window.innerHeight,
+          version: VERSION_SITE,
+          connecte: !!user,
+          statut: "nouveau",
+          createdAt: serverTimestamp()
+        });
+        try { localStorage.setItem("bj_dernier_retour", String(Date.now())); } catch (e) { /* ignoré */ }
+        $("retour-message").value = "";
+        note = 0;
+        dessinerEtoiles();
+        $("retour-ok").classList.remove("cache");
+        setTimeout(() => { $("retour-ok").classList.add("cache"); fermer(); }, 1800);
+      } catch (e) {
+        console.error(e);
+        erreur("Envoi impossible pour le moment. Réessaie plus tard.");
+      }
+      btn.disabled = false; btn.textContent = "Envoyer mon retour";
+    });
+  })();
 
   // ---------- Catégories, recherche et filtres ----------
   (function(){
