@@ -389,7 +389,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, writeBatch, setDoc,
-           query, where, orderBy, limit, onSnapshot, serverTimestamp }
+           query, where, orderBy, limit, onSnapshot, serverTimestamp, increment }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
            signOut, sendPasswordResetEmail }
@@ -1078,7 +1078,7 @@
         actions.append(
           bouton("✅ Marquer comme terminée", "mini", async () => {
             if (!confirm("Tu déclares la mission terminée. " + nomT + " devra le confirmer.")) return;
-            await maj({ statut: "a_confirmer", declarePar: "auteur" });
+            await maj({ statut: "a_confirmer", declarePar: "auteur", declareeAt: serverTimestamp() });
           }),
           bouton("↩️ Remettre disponible", "sec mini", async () => {
             if (!confirm("Remettre la mission en disponible ?")) return;
@@ -1104,10 +1104,10 @@
               if (!confirm("Confirmer que la mission est bien terminée ?")) return;
               await maj({ statut: "terminee", termineeAt: serverTimestamp() });
             }),
-            bouton("↩️ Pas encore terminée", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() }))
+            bouton("↩️ Pas encore terminée", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))
           );
         } else {
-          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() })));
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() })));
         }
       }
 
@@ -1189,7 +1189,7 @@
         }
         actions.appendChild(bouton("✅ J'ai terminé la mission", "mini", async () => {
           if (!confirm("Tu déclares avoir terminé la mission. " + auteurNom + " devra le confirmer.")) return;
-          await maj({ statut: "a_confirmer", declarePar: "travailleur" });
+          await maj({ statut: "a_confirmer", declarePar: "travailleur", declareeAt: serverTimestamp() });
         }));
       } else if (statut === "a_confirmer"){
         const parA = m.declarePar === "auteur";
@@ -1204,10 +1204,10 @@
               if (!confirm("Confirmer que la mission est terminée ?")) return;
               await maj({ statut: "terminee", termineeAt: serverTimestamp() });
             }),
-            bouton("❌ Ce n'est pas terminé", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() }))
+            bouton("❌ Ce n'est pas terminé", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))
           );
         } else {
-          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField() })));
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() })));
         }
       } else if (statut === "terminee"){
         const o = el("div", "info", "✔️ Tu as réalisé cette mission.");
@@ -1642,27 +1642,62 @@
   }
   $("annee").textContent = new Date().getFullYear();
 
-  // ---------- Bannières ----------
-  const BANNIERES = [
-    { titre:"Publie ta mission gratuitement", texte:"Ménage, livraison, jardinage… trouve de l'aide près de chez toi.", image:"promo1.jpg", fond:"linear-gradient(135deg,#0a7d3b,#13a455)" },
-    { titre:"Besoin d'un revenu en plus ?", texte:"Choisis des missions autour de toi et fais-toi payer directement.", image:"promo2.jpg", fond:"linear-gradient(135deg,#1a4fa0,#3b82f6)" },
-    { titre:"Ton commerce ici", texte:"Espace publicitaire disponible. Contacte-nous sur WhatsApp.", image:"promo3.jpg", fond:"linear-gradient(135deg,#8a5a00,#f59e0b)", lien: NUMERO_WA ? "https://wa.me/" + NUMERO_WA : "" }
+  // ---------- Bannières (modifiables depuis l'espace administrateur) ----------
+  const FONDS = {
+    vert: "linear-gradient(135deg,#0a7d3b,#13a455)", bleu: "linear-gradient(135deg,#1a4fa0,#3b82f6)",
+    orange: "linear-gradient(135deg,#8a5a00,#f59e0b)", violet: "linear-gradient(135deg,#5b2a86,#9b59b6)",
+    rouge: "linear-gradient(135deg,#a3121f,#e8112d)"
+  };
+  const BANNIERES_DEFAUT = [
+    { titre: "Publie ta mission gratuitement", texte: "Ménage, livraison, jardinage… trouve de l'aide près de chez toi.", image: "promo1.jpg", fond: "vert" },
+    { titre: "Besoin d'un revenu en plus ?", texte: "Choisis des missions autour de toi et fais-toi payer directement.", image: "promo2.jpg", fond: "bleu" },
+    { titre: "Ton commerce ici", texte: "Espace publicitaire disponible. Contacte-nous sur WhatsApp.", image: "promo3.jpg", fond: "orange",
+      lien: NUMERO_WA ? "https://wa.me/" + NUMERO_WA : "" }
   ];
+  let bannieresDB = [];
+  let bannieresChargees = false;
+  let minuteurSlider = null;
+  const lienSur = u => /^https:\/\/\S+$/.test(String(u || "").trim()) ? String(u).trim() : "";
+  const imageSure = u => { u = String(u || "").trim(); return /^(https:\/\/[^\s'"()]+|[A-Za-z0-9._-]+)$/.test(u) ? u : ""; };
 
-  (function(){
+  function bannieresActives(){
+    if (!bannieresDB.length) return BANNIERES_DEFAUT;
+    const auj = aujourdhui();
+    return bannieresDB
+      .filter(b => b.actif !== false && (!b.debut || b.debut <= auj) && (!b.fin || b.fin >= auj))
+      .sort((x, y) => Number(x.ordre || 0) - Number(y.ordre || 0));
+  }
+
+  function compterClic(b){
+    if (!b.id) return;
+    try {
+      if (sessionStorage.getItem("bj_clic_" + b.id)) return;
+      sessionStorage.setItem("bj_clic_" + b.id, "1");
+    } catch (e) { /* stockage indisponible */ }
+    updateDoc(doc(db, "bannieres", b.id), { clics: increment(1) }).catch(() => {});
+  }
+
+  function construireSlider(liste){
     const zone = $("slider");
-    const piste = document.createElement("div"); piste.className = "piste";
-    const points = document.createElement("div"); points.className = "points";
-    BANNIERES.forEach((b, i) => {
-      const s = document.createElement(b.lien ? "a" : "div");
+    zone.innerHTML = "";
+    clearInterval(minuteurSlider);
+    if (!liste.length) return;
+    const piste = el("div", "piste");
+    const points = el("div", "points");
+    liste.forEach((b, i) => {
+      const lien = lienSur(b.lien);
+      const s = document.createElement(lien ? "a" : "div");
       s.className = "slide";
-      if (b.lien){ s.href = b.lien; s.target = "_blank"; s.rel = "noopener"; }
-      s.style.background = b.image
-        ? "linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,.18)), url('" + b.image + "') center/cover, " + b.fond
-        : b.fond;
-      const h = document.createElement("h3"); h.textContent = b.titre;
-      const p = document.createElement("p"); p.textContent = b.texte;
-      s.append(h, p);
+      if (lien){
+        s.href = lien; s.target = "_blank"; s.rel = "noopener sponsored";
+        s.addEventListener("click", () => compterClic(b));
+      }
+      const fond = FONDS[b.fond] || FONDS.vert;
+      const img = imageSure(b.image);
+      s.style.background = img
+        ? "linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,.18)), url('" + encodeURI(img) + "') center/cover, " + fond
+        : fond;
+      s.append(el("h3", "", b.titre || ""), el("p", "", b.texte || ""));
       piste.appendChild(s);
       const pt = document.createElement("i");
       if (i === 0) pt.className = "on";
@@ -1676,13 +1711,24 @@
       idx = Math.round(piste.scrollLeft / largeur());
       Array.from(points.children).forEach((pt, i) => pt.classList.toggle("on", i === idx));
     });
-    if (!reduit){
-      const minuteur = setInterval(() => {
-        piste.scrollTo({ left: ((idx + 1) % BANNIERES.length) * largeur(), behavior: "smooth" });
+    if (!reduit && liste.length > 1){
+      minuteurSlider = setInterval(() => {
+        piste.scrollTo({ left: ((idx + 1) % liste.length) * largeur(), behavior: "smooth" });
       }, 5000);
-      piste.addEventListener("touchstart", () => clearInterval(minuteur), { once: true });
+      piste.addEventListener("touchstart", () => clearInterval(minuteurSlider), { once: true });
     }
-  })();
+  }
+
+  onSnapshot(query(collection(db, "bannieres"), limit(30)), snap => {
+    bannieresDB = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    bannieresChargees = true;
+    construireSlider(bannieresActives());
+  }, err => {
+    console.error(err);
+    bannieresChargees = true;
+    construireSlider(BANNIERES_DEFAUT);
+  });
+  setTimeout(() => { if (!bannieresChargees) construireSlider(BANNIERES_DEFAUT); }, 3000);
 </script>
 </body>
 </html>

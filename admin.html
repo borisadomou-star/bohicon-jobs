@@ -43,8 +43,8 @@
   a{color:var(--vert)}
   button:focus-visible,a:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
 
-  .onglets{display:flex;gap:6px;background:#fff;border-radius:999px;padding:4px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
-  .onglet{flex:1;width:auto;margin:0;padding:10px 4px;background:transparent;color:var(--gris);font-size:.78rem}
+  .onglets{display:flex;gap:6px;background:#fff;border-radius:999px;padding:4px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08);overflow-x:auto}
+  .onglet{flex:1 0 auto;width:auto;margin:0;padding:10px 12px;background:transparent;color:var(--gris);font-size:.8rem;white-space:nowrap}
   .onglet.on{background:var(--vert);color:#fff}
 
   .tuiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -69,6 +69,14 @@
   .erreur{background:#fdecea;color:#b3261e;padding:12px 14px;border-radius:14px;margin-bottom:12px}
   .info{background:#e3f4ea;color:#0a5d2c;padding:12px 14px;border-radius:14px;margin-bottom:12px}
   .note{font-size:.78rem;color:var(--gris);margin-top:10px}
+  .b-gris{background:#eceff1;color:#455a64}
+  .etiq{display:block;font-size:.8rem;color:var(--gris);margin:2px 4px 4px}
+  .duo-champs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .slide-apercu{border-radius:22px;padding:20px;color:#fff;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:12px}
+  .slide-apercu h3{margin:0 0 6px;font-size:1.1rem;color:#fff}
+  .slide-apercu p{margin:0;font-size:.88rem}
+  .check{display:flex;align-items:center;gap:10px;font-size:.9rem;margin-bottom:12px}
+  .check input{width:auto;margin:0;accent-color:var(--vert)}
 </style>
 </head>
 <body>
@@ -113,6 +121,7 @@
       <button class="onglet" data-t="users" type="button">Utilisateurs</button>
       <button class="onglet" data-t="missions" type="button">Missions</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
+      <button class="onglet" data-t="bannieres" type="button">Bannières</button>
     </div>
 
     <div id="t-apercu" class="card"></div>
@@ -144,6 +153,35 @@
       <div id="liste-sig"></div>
     </div>
 
+    <div id="t-bannieres" class="card cache">
+      <h2>Bannières de la page d'accueil</h2>
+      <div id="liste-bannieres"></div>
+      <button id="btn-nouvelle-banniere" type="button">+ Nouvelle bannière</button>
+
+      <div id="form-banniere" class="cache">
+        <h3 id="titre-form-banniere">Nouvelle bannière</h3>
+        <div id="b-apercu"></div>
+        <input id="b-annonceur" placeholder="Annonceur (pour toi seulement, ex : Pharmacie Saint-Michel)" maxlength="80">
+        <input id="b-titre" placeholder="Titre affiché" maxlength="60">
+        <input id="b-texte" placeholder="Texte affiché (court)" maxlength="120">
+        <input id="b-image" placeholder="Image : nom d'un fichier du dépôt (promo4.jpg) ou lien https://…" maxlength="300">
+        <label class="etiq" for="b-fond">Couleur de fond (visible si pas d'image)</label>
+        <select id="b-fond">
+          <option value="vert">Vert</option><option value="bleu">Bleu</option><option value="orange">Orange</option>
+          <option value="violet">Violet</option><option value="rouge">Rouge</option>
+        </select>
+        <input id="b-lien" placeholder="Lien au clic (https://…, ou https://wa.me/229… pour WhatsApp)" maxlength="300">
+        <div class="duo-champs">
+          <div><label class="etiq" for="b-debut">Début (facultatif)</label><input id="b-debut" type="date"></div>
+          <div><label class="etiq" for="b-fin">Fin (facultatif)</label><input id="b-fin" type="date"></div>
+        </div>
+        <label class="check"><input id="b-actif" type="checkbox" checked> Bannière active</label>
+        <button id="btn-sauver-banniere" type="button">Enregistrer</button>
+        <button id="btn-annuler-banniere" class="sec" type="button">Annuler</button>
+      </div>
+      <p class="note">Si aucune bannière n'est enregistrée, le site affiche ses 3 bannières par défaut. Dès que tu en crées une, seules tes bannières actives s'affichent. Les clics sont comptés une fois par visiteur et par session : ils sont indicatifs.</p>
+    </div>
+
     <p class="note">Les données sont lues en direct, dans la limite de 500 éléments par rubrique.</p>
     <button class="sec" id="btn-deco" type="button">Se déconnecter</button>
   </div>
@@ -151,7 +189,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, updateDoc, writeBatch, query, limit, onSnapshot }
+  import { getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, query, limit, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -181,7 +219,8 @@
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
   const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
 
-  let users = [], missions = [], cands = [], signalements = [], unsubs = [], moi = null;
+  let users = [], missions = [], cands = [], signalements = [], bannieres = [], unsubs = [], moi = null;
+  let editionId = null;
 
   function message(texte, type){
     const z = $("message");
@@ -225,6 +264,7 @@
       tuile(missions.filter(m => st(m) === "disponible").length, "Disponibles"),
       tuile(missions.filter(m => st(m) === "attribuee").length, "Attribuées"),
       tuile(missions.filter(m => st(m) === "a_confirmer").length, "À confirmer"),
+      tuile(missions.filter(m => st(m) === "a_confirmer" && m.declareeAt && m.declareeAt.toMillis && Date.now() - m.declareeAt.toMillis() > 3 * 86400000).length, "À confirmer depuis +3 jours"),
       tuile(terminees.length, "Terminées"),
       tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Valeur des missions terminées"),
       tuile(cands.length, "Candidatures"),
@@ -316,7 +356,26 @@
           await lot.commit();
         } catch (e) { console.error(e); message("Suppression impossible. Vérifie les règles Firestore."); }
       });
-      ligne.append(g, b);
+      const btns = el("div", "btns");
+      if (st(m) === "a_confirmer"){
+        const dj = m.declareeAt && m.declareeAt.toMillis ? Math.floor((Date.now() - m.declareeAt.toMillis()) / 86400000) : null;
+        g.appendChild(el("div", "h-sous", "⏳ À confirmer"
+          + (m.declarePar ? " (déclarée par " + (m.declarePar === "auteur" ? "l'auteur" : "le travailleur") + ")" : "")
+          + (dj !== null ? " depuis " + dj + " jour(s)" : "")));
+        btns.append(
+          bouton("Forcer : terminée", "mini", async () => {
+            if (!confirm("Valider la fin de cette mission à la place des parties ? Les points, gains et avis seront comptés.")) return;
+            await updateDoc(doc(db, "missions", m.id), { statut: "terminee", termineeAt: serverTimestamp(), forceeAdmin: true });
+          }),
+          bouton("Remettre en cours", "sec mini", async () => {
+            if (!confirm("Remettre cette mission en « Attribuée » ?")) return;
+            await updateDoc(doc(db, "missions", m.id), { statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() });
+          })
+        );
+      }
+      if (st(m) === "terminee" && m.forceeAdmin) g.appendChild(el("div", "h-sous", "✔️ Validée par l'administrateur"));
+      btns.appendChild(b);
+      ligne.append(g, btns);
       zone.appendChild(ligne);
     });
   }
@@ -394,7 +453,104 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); }
+  // ---------- Bannières ----------
+  const FONDS = {
+    vert: "linear-gradient(135deg,#0a7d3b,#13a455)", bleu: "linear-gradient(135deg,#1a4fa0,#3b82f6)",
+    orange: "linear-gradient(135deg,#8a5a00,#f59e0b)", violet: "linear-gradient(135deg,#5b2a86,#9b59b6)",
+    rouge: "linear-gradient(135deg,#a3121f,#e8112d)"
+  };
+  const lienSur = u => /^https:\/\/\S+$/.test(String(u || "").trim()) ? String(u).trim() : "";
+  const imageSure = u => { u = String(u || "").trim(); return /^(https:\/\/[^\s'"()]+|[A-Za-z0-9._-]+)$/.test(u) ? u : ""; };
+  const aujourdhui = () => {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  };
+
+  function majApercu(){
+    const z = $("b-apercu");
+    z.innerHTML = "";
+    const s = el("div", "slide-apercu");
+    const fond = FONDS[$("b-fond").value] || FONDS.vert;
+    const img = imageSure($("b-image").value);
+    s.style.background = img
+      ? "linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,.18)), url('" + encodeURI(img) + "') center/cover, " + fond
+      : fond;
+    s.append(el("h3", "", $("b-titre").value || "Titre de la bannière"), el("p", "", $("b-texte").value));
+    z.appendChild(s);
+  }
+
+  function ouvrirForm(b){
+    editionId = b ? b.id : null;
+    $("titre-form-banniere").textContent = b ? "Modifier la bannière" : "Nouvelle bannière";
+    $("b-annonceur").value = b ? (b.annonceur || "") : "";
+    $("b-titre").value = b ? (b.titre || "") : "";
+    $("b-texte").value = b ? (b.texte || "") : "";
+    $("b-image").value = b ? (b.image || "") : "";
+    $("b-fond").value = b && FONDS[b.fond] ? b.fond : "vert";
+    $("b-lien").value = b ? (b.lien || "") : "";
+    $("b-debut").value = b ? (b.debut || "") : "";
+    $("b-fin").value = b ? (b.fin || "") : "";
+    $("b-actif").checked = b ? b.actif !== false : true;
+    $("form-banniere").classList.remove("cache");
+    $("btn-nouvelle-banniere").classList.add("cache");
+    majApercu();
+    $("form-banniere").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function fermerForm(){
+    editionId = null;
+    $("form-banniere").classList.add("cache");
+    $("btn-nouvelle-banniere").classList.remove("cache");
+  }
+
+  function triees(){ return bannieres.slice().sort((x, y) => Number(x.ordre || 0) - Number(y.ordre || 0)); }
+
+  async function deplacer(i, sens){
+    const l = triees();
+    const j = i + sens;
+    if (j < 0 || j >= l.length) return;
+    [l[i], l[j]] = [l[j], l[i]];
+    const lot = writeBatch(db);
+    l.forEach((b, k) => lot.update(doc(db, "bannieres", b.id), { ordre: k * 10 }));
+    await lot.commit();
+  }
+
+  function rendreBannieres(){
+    const zone = $("liste-bannieres");
+    zone.innerHTML = "";
+    const l = triees();
+    if (!l.length){
+      zone.appendChild(el("div", "vide", "Aucune bannière enregistrée : le site affiche ses 3 bannières par défaut."));
+      return;
+    }
+    const auj = aujourdhui();
+    l.forEach((b, i) => {
+      let etat = "En ligne", cls = "b-disponible";
+      if (b.actif === false){ etat = "Désactivée"; cls = "b-gris"; }
+      else if (b.debut && b.debut > auj){ etat = "Programmée"; cls = "b-attribuee"; }
+      else if (b.fin && b.fin < auj){ etat = "Expirée"; cls = "b-gris"; }
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", b.titre || "(sans titre)");
+      titre.appendChild(el("span", "badge " + cls, etat));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", [b.annonceur, (b.debut || b.fin) ? (b.debut || "…") + " → " + (b.fin || "…") : "", (b.clics || 0) + " clic(s)"].filter(Boolean).join(" · ")));
+      const btns = el("div", "btns");
+      btns.append(
+        bouton("Modifier", "sec mini", async () => ouvrirForm(b)),
+        bouton(b.actif === false ? "Activer" : "Désactiver", "sec mini", () => updateDoc(doc(db, "bannieres", b.id), { actif: b.actif === false })),
+        bouton("↑", "sec mini", () => deplacer(i, -1)),
+        bouton("↓", "sec mini", () => deplacer(i, 1)),
+        bouton("Supprimer", "danger mini", async () => {
+          if (!confirm("Supprimer définitivement cette bannière ?")) return;
+          await deleteDoc(doc(db, "bannieres", b.id));
+        })
+      );
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -414,7 +570,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -422,6 +578,7 @@
     unsubs.push(onSnapshot(query(collection(db, "missions"), limit(500)), s => { missions = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => { cands = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
   }
 
   // ---------- Accès ----------
@@ -466,12 +623,38 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions", "signalements"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "missions", "signalements", "bannieres"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-missions").addEventListener("input", rendreMissions);
   $("f-statut").addEventListener("change", rendreMissions);
   $("f-sig").addEventListener("change", rendreSignalements);
+
+  ["b-titre", "b-texte", "b-image", "b-fond"].forEach(id => $(id).addEventListener("input", majApercu));
+  $("b-fond").addEventListener("change", majApercu);
+  $("btn-nouvelle-banniere").addEventListener("click", () => ouvrirForm(null));
+  $("btn-annuler-banniere").addEventListener("click", fermerForm);
+  $("btn-sauver-banniere").addEventListener("click", async () => {
+    message("");
+    const titre = $("b-titre").value.trim();
+    if (!titre){ message("Indique le titre de la bannière."); return; }
+    const lienBrut = $("b-lien").value.trim();
+    if (lienBrut && !lienSur(lienBrut)){ message("Le lien doit commencer par https://"); return; }
+    const imageBrute = $("b-image").value.trim();
+    if (imageBrute && !imageSure(imageBrute)){ message("Image invalide : utilise un nom de fichier simple (promo4.jpg) ou un lien https://"); return; }
+    if ($("b-debut").value && $("b-fin").value && $("b-fin").value < $("b-debut").value){ message("La date de fin est avant la date de début."); return; }
+    const data = {
+      annonceur: $("b-annonceur").value.trim(), titre, texte: $("b-texte").value.trim(),
+      image: imageBrute, fond: $("b-fond").value, lien: lienBrut,
+      debut: $("b-debut").value, fin: $("b-fin").value, actif: $("b-actif").checked
+    };
+    try {
+      if (editionId) await updateDoc(doc(db, "bannieres", editionId), data);
+      else await addDoc(collection(db, "bannieres"), { ...data, ordre: bannieres.length * 10 + 10, clics: 0, createdAt: serverTimestamp() });
+      fermerForm();
+      message("Bannière enregistrée.", "info");
+    } catch (e) { console.error(e); message("Enregistrement impossible. Vérifie les règles Firestore."); }
+  });
 </script>
 </body>
 </html>
