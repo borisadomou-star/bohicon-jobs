@@ -141,6 +141,27 @@
   .retour-carte{background:#fff;border-radius:22px 22px 0 0;padding:18px;width:min(100%,520px);max-height:92vh;overflow:auto}
   .piege{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 
+  /* Réorganisation : bannières en haut, « Mon espace » en panneau */
+  .hero{padding:22px 16px 76px}
+  .hero h1{font-size:clamp(1.3rem,5vw,1.8rem);margin:0 0 8px}
+  .hero p{margin:0 auto 14px;font-size:.92rem}
+  .stats{margin-bottom:14px}
+  .stats div{padding:8px 12px;min-width:112px}
+  .stats b{font-size:1.4rem}
+  main > .slider{margin:-50px 0 14px;position:relative;z-index:2}
+  .message-flottant{position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(92vw,520px);z-index:100;pointer-events:none}
+  .message-flottant:empty{display:none}
+  .message-flottant > div{margin:0;pointer-events:auto;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+  .vue-espace{position:fixed;left:0;right:0;bottom:0;background:var(--fond);overflow:auto;z-index:65;overscroll-behavior:contain}
+  .vue-corps{max-width:680px;margin:0 auto;padding:10px 16px 48px}
+  .vue-tete{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .vue-tete .lien{width:auto;font-size:.9rem;font-weight:600}
+  .vue-tete h2{margin:0}
+  .onglets{overflow-x:auto;scrollbar-width:none}
+  .onglets::-webkit-scrollbar{display:none}
+  .onglet{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
+  .lien-menu{display:block;padding:14px 16px;margin-bottom:8px;border:1.5px solid var(--trait);border-radius:16px;color:var(--vert-fonce);font-weight:600;text-decoration:none;background:#fff;text-align:left}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -211,16 +232,16 @@
   <a class="marque" href="#haut"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
   <div class="droite">
     <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
-    <button class="btn-espace" id="btn-mon-espace" type="button">Mon espace</button>
+    <button class="btn-espace" id="btn-mon-espace" type="button">👤 Mon espace</button>
   </div>
 </div>
 
+<div id="message" class="message-flottant" role="status" aria-live="polite"></div>
 <div id="panneau-notifs" class="panneau cache" role="dialog" aria-label="Notifications"></div>
 <div id="toast" class="toast cache" role="status" aria-live="polite"></div>
 
 <section class="hero" id="haut">
   <div class="hero-in">
-    <div class="tuile" aria-hidden="true">💼</div>
     <h1>Trouve un petit job ou la bonne personne, à Bohicon</h1>
     <p>Ménage, livraison, jardinage… publie une mission gratuitement ou propose tes services en quelques minutes.</p>
     <div class="stats">
@@ -235,97 +256,7 @@
 </section>
 
 <main>
-  <div id="espace">
-    <div id="message"></div>
-
-    <!-- Connexion -->
-    <div class="card" id="bloc-connexion">
-      <h2>Connexion</h2>
-      <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
-      <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
-      <button id="btn-connexion">Se connecter</button>
-      <button id="btn-vers-inscription" class="sec">Créer un compte</button>
-      <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
-    </div>
-
-    <!-- Inscription -->
-    <div class="card cache" id="bloc-inscription">
-      <h2>Créer un compte</h2>
-      <div id="champs-inscription"></div>
-      <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
-      <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
-      <button id="btn-inscription">S'inscrire</button>
-      <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
-    </div>
-
-    <!-- Profil à compléter -->
-    <div class="card cache" id="bloc-profil">
-      <h2>Complète ton profil</h2>
-      <div id="champs-profil"></div>
-      <button id="btn-profil">Enregistrer</button>
-      <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
-    </div>
-
-    <!-- Mon compte -->
-    <div class="card cache" id="bloc-compte">
-      <div class="onglets">
-        <button class="onglet on" data-t="resume" type="button">Résumé</button>
-        <button class="onglet" data-t="histo" type="button">Historique</button>
-        <button class="onglet" data-t="profil" type="button">Profil</button>
-      </div>
-      <div id="t-resume"></div>
-      <div id="t-histo" class="cache">
-        <select id="histo-filtre">
-          <option value="tout">Toutes mes missions</option>
-          <option value="realisee">Missions que j'ai réalisées</option>
-          <option value="publiee">Missions que j'ai publiées</option>
-        </select>
-        <div id="liste-histo"></div>
-      </div>
-      <div id="t-profil" class="cache">
-        <div id="champs-edit"></div>
-        <button id="btn-edit" type="button">Enregistrer mes informations</button>
-      </div>
-      <button id="btn-deconnexion" class="sec" style="margin:6px 0 0">Se déconnecter</button>
-    </div>
-
-    <!-- Publication -->
-    <div class="card cache" id="bloc-publier">
-      <h2>Publier une mission</h2>
-      <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
-      <select id="categorie" aria-label="Catégorie de la mission"></select>
-      <select id="ville">
-        <option>Bohicon</option><option>Abomey</option><option>Covè</option>
-        <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
-      </select>
-      <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
-      <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
-      <label class="etiq" for="quand">Quand la mission doit-elle être faite ?</label>
-      <select id="quand">
-        <option value="flexible">Flexible (pas de date précise)</option>
-        <option value="urgent">Urgent (aujourd'hui)</option>
-        <option value="date">À une date précise</option>
-      </select>
-      <div id="bloc-date" class="duo-champs cache">
-        <input id="date-exec" type="date" aria-label="Date souhaitée">
-        <input id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)">
-      </div>
-      <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
-      <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
-      <button id="publier">Publier</button>
-    </div>
-  </div>
-
   <div class="slider" id="slider"></div>
-
-  <section class="card">
-    <h2>Comment ça marche</h2>
-    <div class="etapes">
-      <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
-      <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
-      <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
-    </div>
-  </section>
 
   <section class="card" id="missions">
     <h2>Missions</h2>
@@ -377,6 +308,124 @@
   <p><a id="lien-partage" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a></p>
   <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
+
+<!-- Mon espace : panneau avec sous-menus -->
+<div id="vue-espace" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Mon espace">
+  <div class="vue-corps">
+    <div class="vue-tete">
+      <button id="btn-fermer-espace" class="lien" type="button">← Retour aux missions</button>
+    </div>
+    <div id="espace">
+
+      <!-- Connexion -->
+      <div class="card" id="bloc-connexion">
+        <h2>Connexion</h2>
+        <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
+        <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <button id="btn-connexion">Se connecter</button>
+        <button id="btn-vers-inscription" class="sec">Créer un compte</button>
+        <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+      </div>
+
+      <!-- Inscription -->
+      <div class="card cache" id="bloc-inscription">
+        <h2>Créer un compte</h2>
+        <div id="champs-inscription"></div>
+        <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
+        <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
+        <button id="btn-inscription">S'inscrire</button>
+        <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
+      </div>
+
+      <!-- Profil à compléter -->
+      <div class="card cache" id="bloc-profil">
+        <h2>Complète ton profil</h2>
+        <div id="champs-profil"></div>
+        <button id="btn-profil">Enregistrer</button>
+        <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
+      </div>
+
+      <!-- Mon compte : sous-menus -->
+      <div class="card cache" id="bloc-compte">
+        <div class="onglets">
+          <button class="onglet on" data-t="resume" type="button">📊 Résumé</button>
+          <button class="onglet" data-t="histo" type="button">🕘 Historique</button>
+          <button class="onglet" data-t="publier" type="button" id="onglet-publier">➕ Publier</button>
+          <button class="onglet" data-t="profil" type="button">👤 Profil</button>
+          <button class="onglet" data-t="aide" type="button">❓ Aide</button>
+        </div>
+
+        <div id="t-resume"></div>
+
+        <div id="t-histo" class="cache">
+          <select id="histo-filtre">
+            <option value="tout">Toutes mes missions</option>
+            <option value="realisee">Missions que j'ai réalisées</option>
+            <option value="publiee">Missions que j'ai publiées</option>
+          </select>
+          <div id="liste-histo"></div>
+        </div>
+
+        <div id="t-publier" class="cache">
+          <h2>Publier une mission</h2>
+          <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
+          <select id="categorie" aria-label="Catégorie de la mission"></select>
+          <select id="ville">
+            <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+            <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+          </select>
+          <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
+          <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
+          <label class="etiq" for="quand">Quand la mission doit-elle être faite ?</label>
+          <select id="quand">
+            <option value="flexible">Flexible (pas de date précise)</option>
+            <option value="urgent">Urgent (aujourd'hui)</option>
+            <option value="date">À une date précise</option>
+          </select>
+          <div id="bloc-date" class="duo-champs cache">
+            <input id="date-exec" type="date" aria-label="Date souhaitée">
+            <input id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)">
+          </div>
+          <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
+          <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
+          <button id="publier">Publier</button>
+        </div>
+
+        <div id="t-profil" class="cache">
+          <div id="champs-edit"></div>
+          <button id="btn-edit" type="button">Enregistrer mes informations</button>
+        </div>
+
+        <div id="t-aide" class="cache">
+          <h2>Comment ça marche</h2>
+          <div class="etapes">
+            <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
+            <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
+            <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
+          </div>
+          <div style="margin-top:16px">
+            <button id="aide-avis" class="lien-menu" type="button" style="width:100%;font-family:inherit;font-size:1rem">💬 Donner mon avis sur le site</button>
+            <a id="aide-inviter" class="lien-menu" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a>
+            <a class="lien-menu" href="confidentialite.html">📄 Confidentialité et conditions d'utilisation</a>
+            <a id="aide-admin" class="lien-menu cache" href="admin.html">⚙️ Administration</a>
+          </div>
+        </div>
+
+        <button id="btn-deconnexion" class="sec" style="margin:6px 0 0">Se déconnecter</button>
+      </div>
+
+      <!-- Comment ça marche, pour les visiteurs -->
+      <section class="card" id="aide-visiteur">
+        <h2>Comment ça marche</h2>
+        <div class="etapes">
+          <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
+          <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
+          <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
 
 <button id="btn-retour" class="retour-flottant" type="button">💬 Donner mon avis</button>
 <div id="retour-overlay" class="overlay cache" role="dialog" aria-modal="true" aria-label="Donner mon avis sur le site">
@@ -516,15 +565,18 @@
     return { prenom, nom, profession, tel, ville, adresse, role };
   }
 
+  let minuteurMessage = null;
   function afficherMessage(texte, type){
     const z = $("message");
+    clearTimeout(minuteurMessage);
     z.innerHTML = "";
     if (!texte) return;
     const e = document.createElement("div");
     e.className = type === "info" ? "info" : "erreur";
     e.textContent = texte;
+    e.addEventListener("click", () => { z.innerHTML = ""; });
     z.appendChild(e);
-    z.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, type === "info" ? 5000 : 8000);
   }
 
   function texteErreurAuth(e){
@@ -953,7 +1005,9 @@
     $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
     $("bloc-profil").classList.toggle("cache", !(connecte && !complet && !enInscription));
     $("bloc-compte").classList.toggle("cache", !(connecte && complet));
-    $("bloc-publier").classList.toggle("cache", !(connecte && complet && peutPublier()));
+    $("aide-visiteur").classList.toggle("cache", connecte);
+    $("onglet-publier").classList.toggle("cache", !peutPublier());
+    if (!peutPublier() && !$("t-publier").classList.contains("cache")) choisirOnglet("resume");
     if (connecte && !complet && !enInscription && profil && !profilRempli){ remplir("p-", profil); profilRempli = true; }
     if (!connecte) profilRempli = false;
     const uid = user ? user.uid : null;
@@ -1321,13 +1375,18 @@
       } catch (e) { console.error(e); }
     }
     $("lien-admin").classList.add("cache");
+    $("aide-admin").classList.add("cache");
     if (u){
       try {
         const a = await getDoc(doc(db, "admins", u.uid));
-        if (a.exists()) $("lien-admin").classList.remove("cache");
+        if (a.exists()){
+          $("lien-admin").classList.remove("cache");
+          $("aide-admin").classList.remove("cache");
+        }
       } catch (e) { /* pas administrateur */ }
     }
     majUI();
+    if (u && !enInscription && !profilOk()) ouvrirEspace();
   });
 
   $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
@@ -1435,7 +1494,8 @@
       $("quand").value = "flexible";
       $("categorie").value = "";
       $("bloc-date").classList.add("cache");
-      afficherMessage("");
+      afficherMessage("Mission publiée ✅ Elle apparaît dans la liste des missions.", "info");
+      choisirOnglet("histo");
       if (adressePrecise){
         try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
         catch (e) { console.error(e); afficherMessage("Mission publiée, mais l'adresse précise n'a pas pu être enregistrée."); }
@@ -1450,12 +1510,45 @@
   $("filtre").addEventListener("change", afficher);
   $("filtre-statut").addEventListener("change", afficher);
 
-  // ---------- Onglets, historique et édition du profil ----------
-  document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["resume", "histo", "profil"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
-    if (b.dataset.t === "profil" && profil) remplir("e-", profil);
-  }));
+  // ---------- « Mon espace » : panneau, sous-menus, historique et édition du profil ----------
+  let espaceOuvert = false;
+
+  function choisirOnglet(t){
+    if (t === "publier" && !peutPublier()) t = "resume";
+    document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
+    ["resume", "histo", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
+    if (t === "profil" && profil) remplir("e-", profil);
+    const actif = document.querySelector(".onglet.on");
+    if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+
+  function ouvrirEspace(onglet){
+    const v = $("vue-espace");
+    v.style.top = document.querySelector(".topbar").offsetHeight + "px";
+    v.classList.remove("cache");
+    document.body.style.overflow = "hidden";
+    if (!espaceOuvert){
+      espaceOuvert = true;
+      try { history.pushState({ espace: true }, ""); } catch (e) { /* ignoré */ }
+    }
+    if (onglet) choisirOnglet(onglet);
+    v.scrollTop = 0;
+  }
+
+  function fermerEspace(viaRetour){
+    if (!espaceOuvert) return;
+    espaceOuvert = false;
+    $("vue-espace").classList.add("cache");
+    document.body.style.overflow = "";
+    if (!viaRetour){
+      try { if (history.state && history.state.espace) history.back(); } catch (e) { /* ignoré */ }
+    }
+  }
+
+  window.addEventListener("popstate", () => { if (espaceOuvert) fermerEspace(true); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerEspace(); });
+  $("btn-fermer-espace").addEventListener("click", () => fermerEspace());
+  document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => choisirOnglet(b.dataset.t)));
   $("histo-filtre").addEventListener("change", majHisto);
   $("btn-edit").addEventListener("click", async () => {
     afficherMessage("");
@@ -1576,6 +1669,7 @@
       l.appendChild(c);
       l.addEventListener("click", () => {
         fermerPanneau();
+        if (n.type === "recu" || n.type === "carte") fermerEspace();
         if (n.type === "recu"){
           ouverts.add(n.missionId);
           afficher();
@@ -1588,11 +1682,9 @@
           const cible = document.querySelector('[data-id="' + n.missionId + '"]');
           defiler(cible || $("missions"));
         } else if (n.type === "histo"){
-          const t = document.querySelector('.onglet[data-t="histo"]');
-          if (t) t.click();
-          defiler($("espace"));
+          ouvrirEspace("histo");
         } else {
-          defiler($("espace"));
+          ouvrirEspace("resume");
         }
       });
       z.appendChild(l);
@@ -1723,21 +1815,26 @@
   // ---------- Date souhaitée et invitation ----------
   $("date-exec").min = aujourdhui();
   $("quand").addEventListener("change", () => $("bloc-date").classList.toggle("cache", $("quand").value !== "date"));
-  $("lien-partage").href = "https://wa.me/?text=" + encodeURIComponent(
+  const lienInvitation = "https://wa.me/?text=" + encodeURIComponent(
     "Découvre Bohicon Jobs : trouve ou publie de petits jobs à Bohicon 👉 " + urlSite());
+  $("lien-partage").href = lienInvitation;
+  $("aide-inviter").href = lienInvitation;
+  $("aide-avis").classList.toggle("cache", !BOUTON_AVIS);
+  $("aide-avis").addEventListener("click", () => $("btn-retour").click());
 
   // ---------- Navigation et boutons flottants ----------
   const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
-  $("btn-mon-espace").addEventListener("click", () => defiler($("espace")));
+  $("btn-mon-espace").addEventListener("click", () => { if (espaceOuvert) fermerEspace(); else ouvrirEspace(); });
   $("cta-publier").addEventListener("click", () => {
-    if (!user){ vueInscription = true; majUI(); }
+    if (!user){ vueInscription = true; majUI(); ouvrirEspace(); }
     else if (profilOk() && suspendu()){
       afficherMessage("Ton compte est suspendu : tu ne peux plus publier. Contacte l'administrateur.");
     }
     else if (profilOk() && !peutPublier()){
       afficherMessage("Ton profil est réglé pour chercher des missions. Pour en publier, change ton type d'usage dans l'onglet Profil.", "info");
+      ouvrirEspace("profil");
     }
-    defiler($("espace"));
+    else ouvrirEspace(profilOk() ? "publier" : undefined);
   });
   window.addEventListener("scroll", () => $("fab-haut").classList.toggle("on", window.scrollY > 400), { passive: true });
   $("fab-haut").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }));
