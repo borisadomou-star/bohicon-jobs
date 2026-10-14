@@ -162,6 +162,14 @@
   .onglet{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
   .lien-menu{display:block;padding:14px 16px;margin-bottom:8px;border:1.5px solid var(--trait);border-radius:16px;color:var(--vert-fonce);font-weight:600;text-decoration:none;background:#fff;text-align:left}
 
+  /* Sous-menus de « Mon espace » : toujours visibles sous l'en-tête */
+  .vue-tete{padding:8px 16px;margin:0 -16px 8px}
+  .vue-tete h2{font-size:1rem}
+  .btn-accueil{padding:8px 14px;font-size:.85rem}
+  .onglets{position:sticky;top:var(--h-tete,52px);z-index:2;background:#fff;border-radius:0;padding:8px 0;margin:0 0 12px;box-shadow:0 5px 8px -6px rgba(8,69,42,.3)}
+  .onglet{background:var(--fond);color:var(--vert-fonce)}
+  .onglet.on{background:var(--vert);color:#fff;box-shadow:none}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1525,10 +1533,16 @@
     if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
   }
 
-  function ouvrirEspace(onglet){
+  function majHauteurs(){
     const v = $("vue-espace");
     v.style.top = document.querySelector(".topbar").offsetHeight + "px";
+    v.style.setProperty("--h-tete", v.querySelector(".vue-tete").offsetHeight + "px");
+  }
+
+  function ouvrirEspace(onglet){
+    const v = $("vue-espace");
     v.classList.remove("cache");
+    majHauteurs();
     document.body.style.overflow = "hidden";
     if (!espaceOuvert){
       espaceOuvert = true;
@@ -1549,6 +1563,7 @@
   }
 
   window.addEventListener("popstate", () => { if (espaceOuvert) fermerEspace(true); });
+  window.addEventListener("resize", () => { if (espaceOuvert) majHauteurs(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerEspace(); });
   try { history.scrollRestoration = "manual"; } catch (e) { /* ignoré */ }
   function retourAccueil(){
