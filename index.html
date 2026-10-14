@@ -155,7 +155,7 @@
   .vue-espace{position:fixed;left:0;right:0;bottom:0;background:var(--fond);overflow:auto;z-index:65;overscroll-behavior:contain}
   .vue-corps{max-width:680px;margin:0 auto;padding:10px 16px 48px}
   .vue-tete{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .vue-tete .lien{width:auto;font-size:.9rem;font-weight:600}
+  .btn-accueil{width:auto;margin:0;padding:8px 14px;border-radius:999px;background:#fff;color:var(--vert);border:1.5px solid var(--vert);font-weight:600;font-size:.85rem;box-shadow:none}
   .vue-tete h2{margin:0}
   .onglets{overflow-x:auto;scrollbar-width:none}
   .onglets::-webkit-scrollbar{display:none}
@@ -313,7 +313,7 @@
 <div id="vue-espace" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Mon espace">
   <div class="vue-corps">
     <div class="vue-tete">
-      <button id="btn-fermer-espace" class="lien" type="button">← Retour aux missions</button>
+      <button id="btn-fermer-espace" class="btn-accueil" type="button">← Retour à l'accueil</button>
     </div>
     <div id="espace">
 
@@ -423,6 +423,8 @@
           <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
         </div>
       </section>
+
+      <button id="btn-retour-bas" class="sec" type="button" style="margin-top:6px">← Retour à l'accueil</button>
     </div>
   </div>
 </div>
@@ -1547,7 +1549,14 @@
 
   window.addEventListener("popstate", () => { if (espaceOuvert) fermerEspace(true); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerEspace(); });
-  $("btn-fermer-espace").addEventListener("click", () => fermerEspace());
+  try { history.scrollRestoration = "manual"; } catch (e) { /* ignoré */ }
+  function retourAccueil(){
+    fermerEspace();
+    window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
+  }
+  $("btn-fermer-espace").addEventListener("click", retourAccueil);
+  $("btn-retour-bas").addEventListener("click", retourAccueil);
+  document.querySelector(".marque").addEventListener("click", e => { if (espaceOuvert){ e.preventDefault(); retourAccueil(); } });
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => choisirOnglet(b.dataset.t)));
   $("histo-filtre").addEventListener("change", majHisto);
   $("btn-edit").addEventListener("click", async () => {
