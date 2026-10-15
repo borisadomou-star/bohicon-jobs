@@ -123,6 +123,7 @@
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
       <button class="onglet" data-t="retours" type="button" id="onglet-retours">Retours</button>
+      <button class="onglet" data-t="ambassadeurs" type="button">Ambassadeurs</button>
     </div>
 
     <div id="t-apercu" class="card"></div>
@@ -203,6 +204,18 @@
       <p class="note">Si aucune bannière n'est enregistrée, le site affiche ses 3 bannières par défaut. Dès que tu en crées une, seules tes bannières actives s'affichent. Les clics sont comptés une fois par visiteur et par session : ils sont indicatifs.</p>
     </div>
 
+    <div id="t-ambassadeurs" class="card cache">
+      <h2>Ambassadeurs</h2>
+      <p class="h-sous" id="resume-amb" style="margin-bottom:10px"></p>
+      <input id="a-nom" placeholder="Nom de l'ambassadeur (ex : Awa K.)" maxlength="60">
+      <input id="a-code" placeholder="Code du lien (automatique, modifiable)" maxlength="30">
+      <input id="a-contact" type="tel" placeholder="WhatsApp de l'ambassadeur (facultatif)" maxlength="20">
+      <button id="btn-ajouter-amb" type="button">+ Créer le lien de cet ambassadeur</button>
+      <button class="sec" id="btn-export-amb" type="button">⬇️ Exporter le bilan (CSV)</button>
+      <div id="liste-amb"></div>
+      <p class="note">Le lien ressemble à <b>…/bohicon-jobs/?ref=awa-k</b>. Une personne est comptée pour l'ambassadeur si elle s'inscrit depuis ce lien, sur le même navigateur, dans les 30 jours. « Actifs » = inscrits qui ont publié une mission ou se sont proposés. Les ambassadeurs ne voient jamais les données des inscrits : tu leur communiques seulement les totaux.</p>
+    </div>
+
     <p class="note">Les données sont lues en direct, dans la limite de 500 éléments par rubrique.</p>
     <button class="sec" id="btn-deco" type="button">Se déconnecter</button>
   </div>
@@ -210,7 +223,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, query, limit, onSnapshot }
+  import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, query, limit, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -240,7 +253,7 @@
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
   const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
 
-  let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], unsubs = [], moi = null;
+  let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
   let editionId = null;
 
   function message(texte, type){
@@ -292,6 +305,7 @@
       tuile(cands.filter(c => c.statut === "en_attente").length, "Candidatures en attente"),
       tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter"),
       tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
+      tuile(users.filter(u => u.ref).length, "Inscrits via un ambassadeur"),
       tuile((() => {
         const n = retours.filter(r => r.note);
         return n.length ? (n.reduce((s, r) => s + r.note, 0) / n.length).toFixed(1).replace(".", ",") + " / 5" : "—";
@@ -631,7 +645,69 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); rendreRetours(); }
+  // ---------- Ambassadeurs ----------
+  const slug = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24);
+  const baseSite = () => location.origin + location.pathname.replace(/[^/]*$/, "");
+  const lienAmb = code => baseSite() + "?ref=" + encodeURIComponent(code);
+  const lienWa = (tel, texte) => {
+    let n = String(tel || "").replace(/\D/g, "");
+    if (n && !n.startsWith("229")) n = "229" + n;
+    return "https://wa.me/" + n + "?text=" + encodeURIComponent(texte);
+  };
+
+  function statsAmb(code){
+    const mes = users.filter(u => u.ref === code);
+    const ids = new Set(mes.map(u => u.id));
+    const publiees = missions.filter(m => ids.has(m.uid));
+    const actifs = new Set(publiees.map(m => m.uid));
+    cands.filter(c => ids.has(c.uid)).forEach(c => actifs.add(c.uid));
+    const terminees = missions.filter(m => st(m) === "terminee" && (ids.has(m.uid) || ids.has(m.workerUid))).length;
+    return { inscrits: mes.length, actifs: actifs.size, publiees: publiees.length, terminees };
+  }
+
+  function rendreAmbassadeurs(){
+    const zone = $("liste-amb");
+    zone.innerHTML = "";
+    const avecRef = users.filter(u => u.ref);
+    $("resume-amb").textContent = avecRef.length + " inscrit(s) via un ambassadeur, sur " + users.length + " au total";
+    const liste = ambassadeurs.map(x => ({ x, s: statsAmb(x.id) }))
+      .sort((p, q) => q.s.inscrits - p.s.inscrits || q.s.actifs - p.s.actifs);
+    if (!liste.length) zone.appendChild(el("div", "vide", "Aucun ambassadeur : crée le premier ci-dessus."));
+    liste.forEach(({ x, s }) => {
+      const lien = lienAmb(x.id);
+      const ligne = el("div", "rang");
+      const g = el("div");
+      g.appendChild(el("div", "h-titre", x.nom || x.id));
+      g.appendChild(el("div", "h-sous", s.inscrits + " inscrit(s) · " + s.actifs + " actif(s) · " + s.publiees + " mission(s) publiée(s) · " + s.terminees + " terminée(s)"));
+      g.appendChild(el("div", "h-sous", lien));
+      const prenom = String(x.nom || "").split(" ")[0] || "";
+      const btns = el("div", "btns");
+      btns.append(
+        bouton("Copier le lien", "sec mini", async () => {
+          try { await navigator.clipboard.writeText(lien); message("Lien copié.", "info"); }
+          catch (e) { message("Copie impossible : sélectionne le lien affiché et copie-le à la main."); }
+        })
+      );
+      const a1 = el("a", "", "Envoyer le lien");
+      a1.href = lienWa(x.contact, "Bonjour " + prenom + ", voici ton lien d'ambassadeur Bohicon Jobs : " + lien + "\nChaque personne qui s'inscrit depuis ce lien est comptée pour toi. Merci pour ton aide 🙏");
+      a1.target = "_blank"; a1.rel = "noopener";
+      const a2 = el("a", "", "Envoyer son bilan");
+      a2.href = lienWa(x.contact, "Bonjour " + prenom + ", ton bilan Bohicon Jobs : " + s.inscrits + " inscrit(s), " + s.actifs + " actif(s), " + s.publiees + " mission(s) publiée(s), " + s.terminees + " terminée(s). Bravo et merci 🙏");
+      a2.target = "_blank"; a2.rel = "noopener";
+      btns.append(a1, a2, bouton("Supprimer", "danger mini", async () => {
+        if (!confirm("Supprimer cet ambassadeur ? Les inscrits déjà rattachés à son code resteront comptés comme « code non reconnu ».")) return;
+        await deleteDoc(doc(db, "ambassadeurs", x.id));
+      }));
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+    const connus = new Set(ambassadeurs.map(x => x.id));
+    const inconnus = compter(avecRef.filter(u => !connus.has(u.ref)), u => u.ref);
+    if (inconnus.length) zone.appendChild(listeCompte("Codes non reconnus", inconnus, 10));
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -651,7 +727,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -661,6 +737,7 @@
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "ambassadeurs"), limit(100)), s => { ambassadeurs = lire(s); rendre(); }, err));
   }
 
   // ---------- Accès ----------
@@ -705,12 +782,39 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions", "signalements", "bannieres", "retours"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "missions", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-missions").addEventListener("input", rendreMissions);
   $("f-statut").addEventListener("change", rendreMissions);
   $("f-sig").addEventListener("change", rendreSignalements);
+
+  $("a-nom").addEventListener("input", () => { if (!$("a-code").dataset.manuel) $("a-code").value = slug($("a-nom").value); });
+  $("a-code").addEventListener("input", () => { $("a-code").dataset.manuel = "1"; });
+  $("btn-ajouter-amb").addEventListener("click", async () => {
+    message("");
+    const nom = $("a-nom").value.trim();
+    const code = slug($("a-code").value);
+    if (nom.length < 2){ message("Indique le nom de l'ambassadeur."); return; }
+    if (!/^[a-z0-9-]{2,30}$/.test(code)){ message("Le code doit contenir 2 à 30 lettres minuscules, chiffres ou tirets."); return; }
+    if (ambassadeurs.some(x => x.id === code)){ message("Ce code existe déjà : choisis-en un autre."); return; }
+    try {
+      await setDoc(doc(db, "ambassadeurs", code), { nom, code, contact: $("a-contact").value.trim(), createdAt: serverTimestamp() });
+      ["a-nom", "a-code", "a-contact"].forEach(id => { $(id).value = ""; });
+      delete $("a-code").dataset.manuel;
+      message("Lien créé. Tu peux le copier ou l'envoyer sur WhatsApp.", "info");
+    } catch (e) { console.error(e); message("Création impossible. Vérifie les règles Firestore."); }
+  });
+  $("btn-export-amb").addEventListener("click", () => {
+    const entetes = ["Nom", "Code", "Lien", "Inscrits", "Actifs", "Missions publiées", "Missions terminées"];
+    const lignes = ambassadeurs.map(x => { const s = statsAmb(x.id); return [x.nom, x.id, lienAmb(x.id), s.inscrits, s.actifs, s.publiees, s.terminees].map(cellule).join(","); });
+    const csv = "\ufeff" + [entetes.map(cellule).join(","), ...lignes].join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a4 = document.createElement("a");
+    a4.href = url; a4.download = "ambassadeurs-bohicon-jobs.csv";
+    document.body.appendChild(a4); a4.click(); a4.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
   $("f-retours").addEventListener("change", rendreRetours);
   $("f-retours-type").addEventListener("change", rendreRetours);
   $("btn-export-retours").addEventListener("click", () => {

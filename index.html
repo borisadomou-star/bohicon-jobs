@@ -654,7 +654,7 @@
     if (m.quand === "flexible") return { texte: "Flexible" };
     return null;
   }
-  const urlSite = () => location.href.split("#")[0];
+  const urlSite = () => location.href.split("#")[0].split("?")[0];
   const lienPartageMission = m => "https://wa.me/?text=" + encodeURIComponent(
     "🔎 Mission à " + m.ville + " : « " + m.titre + " » (" + fcfa(m.prix) + ")\nVoir sur Bohicon Jobs : " + urlSite() + "#mission=" + m.id);
 
@@ -1411,7 +1411,7 @@
     enInscription = true;
     try {
       const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
-      await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp() });
+      await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { parrain: codeParrain() } : {}) });
       profil = data;
       $("i-mdp").value = "";
     } catch (e) {
@@ -1820,6 +1820,27 @@
   $("f-prix").addEventListener("change", afficher);
   $("f-tri").addEventListener("change", afficher);
   $("btn-reset-filtres").addEventListener("click", () => { reinitialiserFiltres(); afficher(); });
+
+  // ---------- Lien d'ambassadeur (?ref=CODE) ----------
+  const REF_CLE = "bj_ref";
+  const REF_DUREE = 30 * 24 * 3600 * 1000;   // 30 jours
+  function codeParrain(){
+    try {
+      const a = JSON.parse(localStorage.getItem(REF_CLE) || "null");
+      return a && a.code && Date.now() - a.ts < REF_DUREE ? a.code : "";
+    } catch (e) { return ""; }
+  }
+  (function memoriserParrain(){
+    try {
+      const code = String(new URLSearchParams(location.search).get("ref") || "").trim().toUpperCase();
+      if (!/^[A-Z0-9]{3,20}$/.test(code)) return;
+      if (!codeParrain()) localStorage.setItem(REF_CLE, JSON.stringify({ code, ts: Date.now() }));
+      if (!sessionStorage.getItem("bj_ref_vu_" + code)){
+        sessionStorage.setItem("bj_ref_vu_" + code, "1");
+        updateDoc(doc(db, "ambassadeurs", code), { visites: increment(1) }).catch(() => {});
+      }
+    } catch (e) { /* stockage indisponible */ }
+  })();
 
   // ---------- Date souhaitée et invitation ----------
   $("date-exec").min = aujourdhui();
