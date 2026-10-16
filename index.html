@@ -1389,6 +1389,14 @@
     }
     majUI();
     if (u && !enInscription && !profilOk()) ouvrirEspace();
+    if (LIEN_DIRECT && !lienDirectFait){
+      lienDirectFait = true;
+      if (!u){
+        vueInscription = LIEN_DIRECT === "inscription";
+        majUI();
+        ouvrirEspace();
+      }
+    }
   });
 
   $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
@@ -1414,6 +1422,8 @@
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
       profil = data;
       $("i-mdp").value = "";
+      afficherMessage("Bienvenue sur Bohicon Jobs ! Ton compte est créé 🎉", "info");
+      choisirOnglet("resume");
     } catch (e) {
       console.error(e);
       afficherMessage(e.code ? texteErreurAuth(e) : "Compte créé, mais le profil n'a pas pu être enregistré. Complète-le ci-dessous.");
@@ -1830,6 +1840,17 @@
       return a && a.code && Date.now() - a.ts < REF_DUREE ? a.code : "";
     } catch (e) { return ""; }
   }
+  // Les liens d'ambassadeur (?ref=code) ouvrent directement l'inscription ; ?page=connexion ou ?page=inscription ouvre le formulaire voulu.
+  const LIEN_DIRECT = (function(){
+    try {
+      const p = new URLSearchParams(location.search);
+      const page = String(p.get("page") || "").toLowerCase();
+      if (page === "connexion" || page === "inscription") return page;
+      return /^[a-z0-9-]{2,30}$/.test(String(p.get("ref") || "").trim().toLowerCase()) ? "inscription" : "";
+    } catch (e) { return ""; }
+  })();
+  let lienDirectFait = false;
+
   (function memoriserParrain(){
     try {
       const code = String(new URLSearchParams(location.search).get("ref") || "").trim().toLowerCase();
