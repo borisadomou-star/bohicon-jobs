@@ -1037,18 +1037,15 @@
       ].filter(Boolean).join(" · ")));
 
       const prenomC = String(c.nom || "").split(" ")[0];
-      if (c.statut !== "refusee"){
-        const texte = choisi
-          ? "Bonjour " + prenomC + ", bonne nouvelle : vous êtes retenu(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?"
-          : "Bonjour " + prenomC + ", je vous contacte au sujet de la mission « " + m.titre + " ».";
-        const a = el("a", "wa petit", choisi ? "💬 Prévenir sur WhatsApp : retenu(e)" : "Contacter sur WhatsApp");
-        a.href = lienWhatsAppMsg(c.tel, texte); a.target = "_blank"; a.rel = "noopener";
-        ligne.appendChild(a);
-      } else {
-        const a = el("a", "wa petit gris", "💬 Prévenir sur WhatsApp : refus");
-        a.href = lienWhatsAppMsg(c.tel, "Bonjour " + prenomC + ", merci pour votre intérêt pour la mission « " + m.titre + " ». Malheureusement, je ne peux pas donner suite cette fois. Bonne continuation !");
-        a.target = "_blank"; a.rel = "noopener";
-        ligne.appendChild(a);
+      if (choisi){
+        if (c.confirmee){
+          const a = el("a", "wa petit", "💬 Écrire à " + prenomC + " sur WhatsApp");
+          a.href = lienWhatsAppMsg(c.tel, "Bonjour " + prenomC + ", nous avons tous les deux confirmé la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+          a.target = "_blank"; a.rel = "noopener";
+          ligne.appendChild(a);
+        } else {
+          ligne.appendChild(el("div", "h-sous", "⏳ En attente de la confirmation de " + prenomC + " : WhatsApp sera disponible ensuite."));
+        }
       }
 
       if (dispo){
@@ -1161,17 +1158,30 @@
       }
 
       if (statut === "attribuee"){
+        const candT = candidaturesRecues.find(x => x.id === m.id + "_" + m.workerUid);
+        const confirmeeT = !!(candT && candT.confirmee);
+        if (!confirmeeT){
+          const o = el("div", "info", "⏳ En attente de la confirmation de " + nomT + ". Vous pourrez ensuite vous écrire sur WhatsApp.");
+          o.style.marginBottom = "0";
+          actions.appendChild(o);
+        } else {
+          const w = el("a", "wa", "💬 Écrire à " + nomT + " sur WhatsApp");
+          w.style.marginTop = "0";
+          w.href = lienWhatsAppMsg(candT.tel, "Bonjour " + String(nomT).split(" ")[0] + ", nous avons tous les deux confirmé la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+          w.target = "_blank"; w.rel = "noopener";
+          actions.appendChild(w);
+        }
         actions.append(
-          bouton("✅ Marquer comme terminée", "mini", async () => {
+          ...(confirmeeT ? [bouton("✅ Marquer comme terminée", "mini", async () => {
             if (!confirm("Tu déclares la mission terminée. " + nomT + " devra le confirmer.")) return;
             await maj({ statut: "a_confirmer", declarePar: "auteur", declareeAt: serverTimestamp() });
-          }),
+          })] : []),
           bouton("↩️ Remettre disponible", "sec mini", async () => {
             if (!confirm("Remettre la mission en disponible ?")) return;
             const lot = writeBatch(db);
             lot.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
             const idCand = m.id + "_" + m.workerUid;
-            if (candidaturesRecues.some(x => x.id === idCand)) lot.update(doc(db, "candidatures", idCand), { statut: "en_attente" });
+            if (candidaturesRecues.some(x => x.id === idCand)) lot.update(doc(db, "candidatures", idCand), { statut: "en_attente", confirmee: false });
             await lot.commit();
           })
         );
@@ -1241,10 +1251,6 @@
             });
             actions.appendChild(bInt);
           }
-          const a = el("a", "wa", "Contacter sur WhatsApp");
-          a.style.marginTop = "0";
-          a.href = lienWhatsApp(m.tel, m.titre); a.target = "_blank"; a.rel = "noopener";
-          actions.appendChild(a);
         }
       }
 
@@ -1253,8 +1259,18 @@
       const maj = champs => updateDoc(doc(db, "missions", m.id), champs);
       const auteurNom = m.auteur || "L'auteur";
 
-      if (statut === "attribuee"){
-        const o = el("div", "info", "🎉 Tu as été choisi(e) pour cette mission !");
+      const maCandT = mesCandidatures.find(x => x.missionId === m.id);
+      const confirmeeMoi = !!(maCandT && maCandT.confirmee);
+      if (statut === "attribuee" && !confirmeeMoi){
+        const o = el("div", "info", "🎉 Tu as été choisi(e) pour cette mission ! Confirme-la pour pouvoir échanger avec l'auteur sur WhatsApp.");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        actions.appendChild(bouton("✅ Je confirme la mission", "mini", async () => {
+          await updateDoc(doc(db, "candidatures", m.id + "_" + user.uid), { confirmee: true });
+          afficherMessage("Mission confirmée ✅ Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
+        }));
+      } else if (statut === "attribuee"){
+        const o = el("div", "info", "✅ Mission confirmée : tu peux échanger avec l'auteur.");
         o.style.marginBottom = "0";
         actions.appendChild(o);
         const w = el("a", "wa", "💬 Écrire à l'auteur sur WhatsApp");
@@ -1604,7 +1620,7 @@
     }));
     mesCandidatures.forEach(c => {
       const e = etatCandidature(c);
-      if (e.startsWith("Retenue")) liste.push({ cle: "ret:" + c.id, ms: 0, type: "moi", texte: "🎉 Tu as été choisi(e) pour « " + c.titre + " »" });
+      if (e.startsWith("Retenue")) liste.push({ cle: "ret:" + c.id, ms: 0, type: "carte", missionId: c.missionId, texte: c.confirmee ? "✅ Mission « " + c.titre + " » confirmée : tu peux écrire à l'auteur sur WhatsApp." : "🎉 Tu as été choisi(e) pour « " + c.titre + " » : confirme la mission pour pouvoir échanger sur WhatsApp." });
       else if (e === "Refusée") liste.push({ cle: "ref:" + c.id, ms: 0, type: "moi", texte: "❌ Ta candidature pour « " + c.titre + " » n'a pas été retenue" });
       else if (e === "Non retenue") liste.push({ cle: "non:" + c.id, ms: 0, type: "moi", texte: "La mission « " + c.titre + " » a été attribuée à quelqu'un d'autre" });
     });
@@ -1628,6 +1644,10 @@
       const cible = cibleAvis(m);
       if (cible) liste.push({ cle: "noter:" + m.id, ms: dateMs(m), type: "histo", texte: "⭐ Mission terminée : laisse un avis à " + cible.nom + "." });
     });
+    candidaturesRecues.filter(c => c.confirmee && c.statut === "acceptee").forEach(c => liste.push({
+      cle: "conf2:" + c.id, ms: 0, type: "carte", missionId: c.missionId,
+      texte: "✅ " + c.nom + " a confirmé la mission « " + c.titre + " » : vous pouvez vous écrire sur WhatsApp."
+    }));
     return liste.sort((a, b) => b.ms - a.ms);
   }
 
