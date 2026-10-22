@@ -168,6 +168,14 @@
 
   .b-gris{background:#eceff1;color:#455a64}
 
+  .annonce{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#fff;font-size:.88rem;font-weight:600}
+  .annonce.info{background:#1a4fa0}
+  .annonce.important{background:#b3261e}
+  .annonce.succes{background:#0a7d3b}
+  .annonce span{flex:1}
+  .annonce a{color:#fff;text-decoration:underline;white-space:nowrap}
+  .annonce button{width:auto;margin:0;padding:2px 8px;background:none;color:#fff;box-shadow:none;font-size:1.1rem;line-height:1}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -245,6 +253,8 @@
 <div id="message" class="message-flottant" role="status" aria-live="polite"></div>
 <div id="panneau-notifs" class="panneau cache" role="dialog" aria-label="Notifications"></div>
 <div id="toast" class="toast cache" role="status" aria-live="polite"></div>
+
+<div id="annonce" class="annonce cache" role="status"></div>
 
 <section class="hero" id="haut">
   <div class="hero-in">
@@ -2048,6 +2058,37 @@
     construireSlider(BANNIERES_DEFAUT);
   });
   setTimeout(() => { if (!bannieresChargees) construireSlider(BANNIERES_DEFAUT); }, 3000);
+
+  // ---------- Annonce en haut du site (publiée depuis l'espace administrateur) ----------
+  let annonceDB = null;
+  function afficherAnnonce(){
+    const z = $("annonce");
+    z.innerHTML = "";
+    const a = annonceDB;
+    const texte = a ? String(a.texte || "").trim() : "";
+    if (!a || a.actif === false || !texte || (a.fin && a.fin < aujourdhui())){ z.className = "annonce cache"; return; }
+    const cle = texte + "@" + (a.maj && a.maj.toMillis ? a.maj.toMillis() : "");
+    let fermee = "";
+    try { fermee = localStorage.getItem("bj_annonce_fermee") || ""; } catch (e) { /* ignoré */ }
+    if (fermee === cle){ z.className = "annonce cache"; return; }
+    z.className = "annonce " + (["info", "important", "succes"].includes(a.type) ? a.type : "info");
+    z.appendChild(el("span", "", texte));
+    const lien = lienSur(a.lien);
+    if (lien){
+      const l = el("a", "", String(a.libelle || "").trim() || "En savoir plus");
+      l.href = lien; l.target = "_blank"; l.rel = "noopener";
+      z.appendChild(l);
+    }
+    const x = el("button", "", "✕");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer l'annonce");
+    x.addEventListener("click", () => {
+      try { localStorage.setItem("bj_annonce_fermee", cle); } catch (e) { /* ignoré */ }
+      z.className = "annonce cache";
+    });
+    z.appendChild(x);
+  }
+  onSnapshot(doc(db, "config", "annonce"), s => { annonceDB = s.exists() ? s.data() : null; afficherAnnonce(); }, err => console.error(err));
 </script>
 </body>
 </html>
