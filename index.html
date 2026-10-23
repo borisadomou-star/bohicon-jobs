@@ -172,7 +172,11 @@
   .annonce.info{background:#1a4fa0}
   .annonce.important{background:#b3261e}
   .annonce.succes{background:#0a7d3b}
-  .annonce span{flex:1}
+  .annonce .defile{flex:1;min-width:0;overflow:hidden;white-space:nowrap}
+  .annonce .defile-texte{display:inline-block;padding-left:100%;animation:defile 14s linear infinite}
+  .annonce .icone{animation:clignote 1.2s ease-in-out infinite}
+  @keyframes defile{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  @keyframes clignote{0%,100%{opacity:1}50%{opacity:.25}}
   .annonce a{color:#fff;text-decoration:underline;white-space:nowrap}
   .annonce button{width:auto;margin:0;padding:2px 8px;background:none;color:#fff;box-shadow:none;font-size:1.1rem;line-height:1}
 
@@ -237,7 +241,7 @@
   #fab-haut.on{opacity:1;pointer-events:auto}
   #fab-wa{bottom:80px;background:#128c4a;color:#fff}
 
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}.annonce .defile{white-space:normal}.annonce .defile-texte{animation:none;padding-left:0}.annonce .icone{animation:none}}
 </style>
 </head>
 <body>
@@ -2096,7 +2100,12 @@
     try { fermee = localStorage.getItem("bj_annonce_fermee") || ""; } catch (e) { /* ignoré */ }
     if (fermee === cle){ z.className = "annonce cache"; return; }
     z.className = "annonce " + (["info", "important", "succes"].includes(a.type) ? a.type : "info");
-    z.appendChild(el("span", "", texte));
+    z.appendChild(el("span", "icone", "📢"));
+    const zoneTexte = el("div", "defile");
+    const defilant = el("span", "defile-texte", texte);
+    defilant.style.animationDuration = Math.max(10, Math.round(texte.length * 0.22)) + "s";
+    zoneTexte.appendChild(defilant);
+    z.appendChild(zoneTexte);
     const lien = lienSur(a.lien);
     if (lien){
       const l = el("a", "", String(a.libelle || "").trim() || "En savoir plus");
