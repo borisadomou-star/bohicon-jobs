@@ -533,6 +533,7 @@
   let dernieresCles = new Set();
   let minuteurToast = null;
   const adressesVues = {};
+  let estAdminUtilisateur = false;
   const brouillons = {};
   let avisTous = [];
   let mesSignalements = new Set();
@@ -682,7 +683,7 @@
     lienTraite = true;
     const id = new URLSearchParams(location.hash.slice(1)).get("mission");
     if (!id) return;
-    const m = missions.find(x => x.id === id);
+    const m = missions.find(x => x.id === id && visible(x));
     if (!m){ afficherMessage("Cette mission n'existe plus ou n'est plus disponible.", "info"); return; }
     reinitialiserFiltres();
     $("filtre-statut").value = "toutes";
@@ -713,6 +714,10 @@
     $("f-tri").value = "recentes";
     $("filtre-statut").value = "disponible";
   }
+
+  // Une mission en attente de validation (valide === false) n'est visible que par son auteur.
+  // Les anciennes missions, sans ce champ, restent visibles.
+  const visible = m => m.valide !== false || !!(user && m.uid === user.uid);
 
   // Une mission disponible est « expirée » si sa date est passée, ou si une mission « urgente » date d'un jour précédent
   function estExpiree(m){
@@ -1128,7 +1133,7 @@
     fav.addEventListener("click", () => basculerFavori(m.id));
     c.appendChild(fav);
     const ajouterPartage = () => {
-      if (statut !== "disponible" || estExpiree(m)) return;
+      if (statut !== "disponible" || estExpiree(m) || m.valide === false) return;
       const p = el("a", "partage", "📲 Partager sur WhatsApp");
       p.href = lienPartageMission(m); p.target = "_blank"; p.rel = "noopener";
       c.appendChild(p);
@@ -1156,6 +1161,13 @@
       if (q.urgent && statut === "disponible") h.appendChild(el("span", "badge b-urgent", "Urgent"));
     }
     c.appendChild(el("div", "", m.desc || ""));
+    if (m.valide === false){
+      const nv = el("div", m.refusMotif ? "erreur" : "info", m.refusMotif
+        ? "❌ Mission refusée : " + m.refusMotif + ". Tu peux la supprimer et en publier une autre."
+        : "⏳ En attente de validation par l'administrateur : elle sera visible par tous après vérification.");
+      nv.style.margin = "8px 0 0";
+      c.appendChild(nv);
+    }
 
     if (statut !== "disponible" && m.workerNom){
       const w = el("div", "meta", "Attribuée à " + m.workerNom);
@@ -1372,7 +1384,7 @@
     const f = $("filtre").value;
     const fs = $("filtre-statut").value;
     const cpt = compteurs();
-    $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible" && !estExpiree(m)).length;
+    $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible" && !estExpiree(m) && m.valide !== false).length;
     $("stat-fin").textContent = missions.filter(m => st(m) === "terminee").length;
 
     const liste = $("liste");
@@ -1397,7 +1409,8 @@
       return st(m) === fs;
     };
     let items = missions.filter(m =>
-      (!f || m.ville === f)
+      visible(m)
+      && (!f || m.ville === f)
       && okStatut(m)
       && (!cat || m.categorie === cat)
       && dansPrix(m.prix)
@@ -1443,10 +1456,12 @@
     }
     $("lien-admin").classList.add("cache");
     $("aide-admin").classList.add("cache");
+    estAdminUtilisateur = false;
     if (u){
       try {
         const a = await getDoc(doc(db, "admins", u.uid));
         if (a.exists()){
+          estAdminUtilisateur = true;
           $("lien-admin").classList.remove("cache");
           $("aide-admin").classList.remove("cache");
         }
@@ -1565,13 +1580,14 @@
         auteur: nomCourt(profil),
         uid: user.uid,
         statut: "disponible",
+        valide: estAdminUtilisateur,
         createdAt: serverTimestamp()
       });
       ["titre","lieu","adresse-precise","prix","desc","date-exec","heure-exec"].forEach(id => $(id).value = "");
       $("quand").value = "flexible";
       $("categorie").value = "";
       $("bloc-date").classList.add("cache");
-      afficherMessage("Mission publiée ✅ Elle apparaît dans la liste des missions.", "info");
+      afficherMessage(estAdminUtilisateur ? "Mission publiée ✅ Elle apparaît dans la liste des missions." : "Mission envoyée ✅ Elle sera visible par tous après validation par l'administrateur.", "info");
       choisirOnglet("histo");
       if (adressePrecise){
         try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
@@ -1696,6 +1712,14 @@
     candidaturesRecues.filter(c => c.confirmee && c.statut === "acceptee").forEach(c => liste.push({
       cle: "conf2:" + c.id, ms: 0, type: "carte", missionId: c.missionId,
       texte: "✅ " + c.nom + " a confirmé la mission « " + c.titre + " » : vous pouvez vous écrire sur WhatsApp."
+    }));
+    mesPubliees.filter(m => m.valide === true && m.valideLe).forEach(m => liste.push({
+      cle: "val:" + m.id, ms: dateMs(m), type: "carte", missionId: m.id,
+      texte: "✅ Ta mission « " + m.titre + " » a été validée : elle est visible par tous."
+    }));
+    mesPubliees.filter(m => m.valide === false && m.refusMotif).forEach(m => liste.push({
+      cle: "refus:" + m.id, ms: 0, type: "carte", missionId: m.id,
+      texte: "❌ Ta mission « " + m.titre + " » a été refusée : " + m.refusMotif
     }));
     return liste.sort((a, b) => b.ms - a.ms);
   }

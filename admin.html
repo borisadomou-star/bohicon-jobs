@@ -76,6 +76,8 @@
   .slide-apercu h3{margin:0 0 6px;font-size:1.1rem;color:#fff}
   .slide-apercu p{margin:0;font-size:.88rem}
   .check{display:flex;align-items:center;gap:10px;font-size:.9rem;margin-bottom:12px}
+  .annonce-apercu{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;color:#fff;font-size:.88rem;margin-bottom:10px}
+  .annonce-apercu span{flex:1}
   .check input{width:auto;margin:0;accent-color:var(--vert)}
 </style>
 </head>
@@ -120,6 +122,7 @@
       <button class="onglet on" data-t="apercu" type="button">Aperçu</button>
       <button class="onglet" data-t="users" type="button">Utilisateurs</button>
       <button class="onglet" data-t="missions" type="button">Missions</button>
+      <button class="onglet" data-t="validation" type="button" id="onglet-validation">À valider</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
       <button class="onglet" data-t="retours" type="button" id="onglet-retours">Retours</button>
@@ -144,6 +147,12 @@
       </select>
       <input id="q-missions" type="search" placeholder="Rechercher (titre, ville, auteur)">
       <div id="liste-missions"></div>
+    </div>
+
+    <div id="t-validation" class="card cache">
+      <h2>Missions à valider</h2>
+      <p class="h-sous" style="margin-bottom:6px">Une mission publiée par un utilisateur n'est visible par les autres qu'après ta validation. Tes propres missions sont validées automatiquement.</p>
+      <div id="liste-validation"></div>
     </div>
 
     <div id="t-signalements" class="card cache">
@@ -176,6 +185,23 @@
     </div>
 
     <div id="t-bannieres" class="card cache">
+      <h2>Annonce en haut du site</h2>
+      <div id="an-apercu"></div>
+      <input id="an-texte" placeholder="Texte de l'annonce (ex : Nouveau : les missions expirées sont masquées !)" maxlength="200">
+      <label class="etiq" for="an-type">Style</label>
+      <select id="an-type">
+        <option value="info">Information (bleu)</option>
+        <option value="important">Important (rouge)</option>
+        <option value="succes">Bonne nouvelle (vert)</option>
+      </select>
+      <input id="an-lien" placeholder="Lien (facultatif, https://…)" maxlength="300">
+      <input id="an-libelle" placeholder="Texte du lien (ex : En savoir plus)" maxlength="30">
+      <label class="etiq" for="an-fin">Masquer automatiquement après le (facultatif)</label>
+      <input id="an-fin" type="date">
+      <label class="check"><input id="an-actif" type="checkbox" checked> Annonce active</label>
+      <button id="btn-sauver-annonce" type="button">Publier l'annonce</button>
+      <button id="btn-retirer-annonce" class="sec" type="button">Retirer l'annonce</button>
+      <hr style="border:0;border-top:1px solid var(--trait);margin:20px 0">
       <h2>Bannières de la page d'accueil</h2>
       <div id="liste-bannieres"></div>
       <button id="btn-nouvelle-banniere" type="button">+ Nouvelle bannière</button>
@@ -255,6 +281,7 @@
 
   let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
   let editionId = null;
+  let annonceAdmin = null, annonceRemplie = false;
 
   function message(texte, type){
     const z = $("message");
@@ -306,6 +333,7 @@
       tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter"),
       tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
       tuile(users.filter(u => u.ref).length, "Inscrits via un ambassadeur"),
+      tuile(missions.filter(m => m.valide === false && !m.refusMotif).length, "Missions à valider"),
       tuile((() => {
         const n = retours.filter(r => r.note);
         return n.length ? (n.reduce((s, r) => s + r.note, 0) / n.length).toFixed(1).replace(".", ",") + " / 5" : "—";
@@ -380,6 +408,7 @@
       const g = el("div");
       const titre = el("div", "h-titre", m.titre || "(sans titre)");
       titre.appendChild(el("span", "badge b-" + st(m), LIB[st(m)]));
+      if (m.valide === false) titre.appendChild(el("span", "badge b-attribuee", m.refusMotif ? "Refusée" : "À valider"));
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", ["📍 " + (m.ville || "—"), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
       if (m.desc) g.appendChild(el("div", "h-sous", m.desc));
@@ -707,7 +736,59 @@
     if (inconnus.length) zone.appendChild(listeCompte("Codes non reconnus", inconnus, 10));
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
+  // ---------- Annonce en haut du site ----------
+  const COULEURS_ANN = { info: "#1a4fa0", important: "#b3261e", succes: "#0a7d3b" };
+
+  function majApercuAnnonce(){
+    const z = $("an-apercu");
+    z.innerHTML = "";
+    const d = el("div", "annonce-apercu");
+    d.style.background = COULEURS_ANN[$("an-type").value] || COULEURS_ANN.info;
+    d.appendChild(el("span", "", $("an-texte").value || "Texte de l'annonce"));
+    if ($("an-lien").value.trim()) d.appendChild(el("b", "", $("an-libelle").value.trim() || "En savoir plus"));
+    z.appendChild(d);
+  }
+
+  function remplirAnnonce(){
+    const x = annonceAdmin;
+    $("an-texte").value = x ? (x.texte || "") : "";
+    $("an-type").value = x && COULEURS_ANN[x.type] ? x.type : "info";
+    $("an-lien").value = x ? (x.lien || "") : "";
+    $("an-libelle").value = x ? (x.libelle || "") : "";
+    $("an-fin").value = x ? (x.fin || "") : "";
+    $("an-actif").checked = x ? x.actif !== false : true;
+    majApercuAnnonce();
+  }
+
+  // ---------- Validation des missions ----------
+  function rendreValidation(){
+    const zone = $("liste-validation");
+    zone.innerHTML = "";
+    const attente = missions.filter(m => m.valide === false && !m.refusMotif).sort((x, y) => ms(x) - ms(y));
+    $("onglet-validation").textContent = "À valider" + (attente.length ? " (" + attente.length + ")" : "");
+    if (!attente.length){ zone.appendChild(el("div", "vide", "Aucune mission en attente de validation. 🎉")); return; }
+    attente.forEach(m => {
+      const ligne = el("div", "rang");
+      const g = el("div");
+      g.appendChild(el("div", "h-titre", m.titre || "(sans titre)"));
+      g.appendChild(el("div", "h-sous", ["📍 " + (m.ville || "—") + (m.lieu ? " · " + m.lieu : ""), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
+      if (m.categorie) g.appendChild(el("div", "h-sous", "Catégorie : " + m.categorie));
+      if (m.desc) g.appendChild(el("div", "h-sous", m.desc));
+      const btns = el("div", "btns");
+      btns.append(
+        bouton("✅ Valider", "mini", () => updateDoc(doc(db, "missions", m.id), { valide: true, valideLe: serverTimestamp() })),
+        bouton("❌ Refuser", "danger mini", async () => {
+          const motif = (prompt("Motif du refus (visible par l'auteur) :", "Annonce non conforme") || "").trim();
+          if (!motif) return;
+          await updateDoc(doc(db, "missions", m.id), { refusMotif: motif.slice(0, 120) });
+        })
+      );
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -727,7 +808,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -737,6 +818,10 @@
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
+      annonceAdmin = s.exists() ? s.data() : null;
+      if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
+    }, err));
     unsubs.push(onSnapshot(query(collection(db, "ambassadeurs"), limit(100)), s => { ambassadeurs = lire(s); rendre(); }, err));
   }
 
@@ -782,7 +867,7 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-missions").addEventListener("input", rendreMissions);
@@ -832,6 +917,30 @@
 
   ["b-titre", "b-texte", "b-image", "b-fond"].forEach(id => $(id).addEventListener("input", majApercu));
   $("b-fond").addEventListener("change", majApercu);
+  ["an-texte", "an-lien", "an-libelle"].forEach(id => $(id).addEventListener("input", majApercuAnnonce));
+  $("an-type").addEventListener("change", majApercuAnnonce);
+  $("btn-sauver-annonce").addEventListener("click", async () => {
+    message("");
+    const texte = $("an-texte").value.trim();
+    if (!texte){ message("Écris le texte de l'annonce."); return; }
+    const lienBrut = $("an-lien").value.trim();
+    if (lienBrut && !lienSur(lienBrut)){ message("Le lien doit commencer par https://"); return; }
+    try {
+      await setDoc(doc(db, "config", "annonce"), {
+        texte, type: $("an-type").value, lien: lienBrut, libelle: $("an-libelle").value.trim(),
+        fin: $("an-fin").value, actif: $("an-actif").checked, maj: serverTimestamp()
+      });
+      message("Annonce publiée : elle s'affiche en haut du site.", "info");
+    } catch (e) { console.error(e); message("Publication impossible. Vérifie les règles Firestore."); }
+  });
+  $("btn-retirer-annonce").addEventListener("click", async () => {
+    if (!confirm("Retirer l'annonce du site ?")) return;
+    try {
+      await setDoc(doc(db, "config", "annonce"), { actif: false, maj: serverTimestamp() }, { merge: true });
+      $("an-actif").checked = false;
+      message("Annonce retirée.", "info");
+    } catch (e) { console.error(e); message("Action impossible. Vérifie les règles Firestore."); }
+  });
   $("btn-nouvelle-banniere").addEventListener("click", () => ouvrirForm(null));
   $("btn-annuler-banniere").addEventListener("click", fermerForm);
   $("btn-sauver-banniere").addEventListener("click", async () => {
