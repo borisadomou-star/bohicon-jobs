@@ -389,7 +389,7 @@
         </div>
 
         <div id="t-publier" class="cache">
-          <h2>Publier une mission</h2>
+          <h2 id="t-publier-titre">Publier une mission</h2>
           <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
           <select id="categorie" aria-label="Catégorie de la mission"></select>
           <select id="ville">
@@ -411,6 +411,7 @@
           <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
           <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
           <button id="publier">Publier</button>
+          <button id="annuler-edition" class="lien cache" type="button">Annuler la modification</button>
         </div>
 
         <div id="t-profil" class="cache">
@@ -1265,6 +1266,10 @@
         if (cible) actions.appendChild(formAvis(m, cible.uid, cible.nom));
       }
 
+      if (statut === "disponible"){
+        actions.appendChild(bouton("✏️ Modifier la mission", "sec mini", async () => demarrerEdition(m)));
+      }
+
       if (statut === "disponible" || statut === "attribuee"){
         actions.appendChild(bouton("Supprimer ma mission", "danger mini", async () => {
           if (!confirm("Supprimer cette mission ?")) return;
@@ -1569,6 +1574,32 @@
     }
     if (quand === "date" && (!dateExec || dateExec < aujourdhui())){
       alert("Choisis une date valide (aujourd'hui ou plus tard).");
+      return;
+    }
+
+    if (missionEnEdition){
+      const btnE = $("publier");
+      btnE.disabled = true; btnE.textContent = "Enregistrement…";
+      try {
+        const champs = {
+          titre, ville, lieu, categorie, quand,
+          dateExec: quand === "date" ? dateExec : "",
+          heureExec: quand === "date" ? heureExec : "",
+          prix, desc, modifieeLe: serverTimestamp()
+        };
+        if (!estAdminUtilisateur){ champs.valide = false; champs.valideLe = deleteField(); champs.refusMotif = deleteField(); }
+        await updateDoc(doc(db, "missions", missionEnEdition), champs);
+        finirEdition();
+        afficherMessage(estAdminUtilisateur
+          ? "Mission modifiée ✅"
+          : "Mission modifiée ✅ Elle sera de nouveau visible après validation par l'administrateur.", "info");
+        choisirOnglet("histo");
+      } catch (e) {
+        console.error(e);
+        afficherMessage("Modification impossible. Réessaie.");
+        btnE.textContent = "Enregistrer les modifications";
+      }
+      btnE.disabled = false;
       return;
     }
 
@@ -1910,6 +1941,40 @@
       btn.disabled = false; btn.textContent = "Envoyer mon retour";
     });
   })();
+
+  // ---------- Modifier une mission publiée ----------
+  let missionEnEdition = null;
+  function demarrerEdition(m){
+    if (!peutPublier()){ afficherMessage("Ton profil ne permet pas de modifier des missions. Change ton type d'usage dans l'onglet Profil."); return; }
+    missionEnEdition = m.id;
+    $("titre").value = m.titre || "";
+    $("categorie").value = m.categorie || "";
+    $("ville").value = m.ville || "Bohicon";
+    $("lieu").value = m.lieu || "";
+    $("quand").value = ["flexible", "urgent", "date"].includes(m.quand) ? m.quand : "flexible";
+    $("date-exec").value = m.dateExec || "";
+    $("heure-exec").value = m.heureExec || "";
+    $("bloc-date").classList.toggle("cache", $("quand").value !== "date");
+    $("prix").value = m.prix || "";
+    $("desc").value = m.desc || "";
+    $("adresse-precise").classList.add("cache");
+    $("t-publier-titre").textContent = "Modifier la mission";
+    $("publier").textContent = "Enregistrer les modifications";
+    $("annuler-edition").classList.remove("cache");
+    ouvrirEspace("publier");
+  }
+  function finirEdition(){
+    missionEnEdition = null;
+    ["titre", "lieu", "adresse-precise", "prix", "desc", "date-exec", "heure-exec"].forEach(id => { $(id).value = ""; });
+    $("quand").value = "flexible";
+    $("categorie").value = "";
+    $("bloc-date").classList.add("cache");
+    $("adresse-precise").classList.remove("cache");
+    $("t-publier-titre").textContent = "Publier une mission";
+    $("publier").textContent = "Publier";
+    $("annuler-edition").classList.add("cache");
+  }
+  $("annuler-edition").addEventListener("click", finirEdition);
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
