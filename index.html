@@ -344,6 +344,7 @@
         <h2>Connexion</h2>
         <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
         <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
         <button id="btn-connexion">Se connecter</button>
         <button id="btn-vers-inscription" class="sec">Créer un compte</button>
         <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
@@ -355,6 +356,7 @@
         <div id="champs-inscription"></div>
         <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
         <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
+        <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
         <button id="btn-inscription">S'inscrire</button>
         <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
       </div>
@@ -1975,6 +1977,10 @@
     $("annuler-edition").classList.add("cache");
   }
   $("annuler-edition").addEventListener("click", finirEdition);
+
+  // ---------- Afficher / masquer le mot de passe ----------
+  $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
+  $("voir-i-mdp").addEventListener("change", e => { $("i-mdp").type = e.target.checked ? "text" : "password"; });
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
