@@ -180,6 +180,8 @@
   .annonce a{color:#fff;text-decoration:underline;white-space:nowrap}
   .annonce button{width:auto;margin:0;padding:2px 8px;background:none;color:#fff;box-shadow:none;font-size:1.1rem;line-height:1}
 
+  .invalide{border-color:#b3261e!important;background:#fdecea!important}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1562,20 +1564,21 @@
     const heureExec = $("heure-exec").value;
     const categorie = $("categorie").value;
 
-    if (!titre || !prix || prix < 0){
-      alert("Remplis au moins le titre et le prix.");
-      return;
-    }
-    if (!categorie){
-      alert("Choisis la catégorie de la mission.");
-      return;
-    }
-    if (lieu.length < 3){
-      alert("Indique le lieu d'exécution de la mission (quartier ou repère).");
-      return;
-    }
-    if (quand === "date" && (!dateExec || dateExec < aujourdhui())){
-      alert("Choisis une date valide (aujourd'hui ou plus tard).");
+    const champsRequis = [
+      ["titre", titre.length < 3, "le titre"],
+      ["categorie", !categorie, "la catégorie"],
+      ["ville", !ville, "la ville"],
+      ["lieu", lieu.length < 3, "le lieu d'exécution"],
+      ["date-exec", quand === "date" && (!dateExec || dateExec < aujourdhui()), "une date valide (aujourd'hui ou plus tard)"],
+      ["prix", !(prix > 0), "le prix"],
+      ["desc", desc.length < 10, "la description (10 caractères minimum)"]
+    ];
+    champsRequis.forEach(([id]) => $(id).classList.remove("invalide"));
+    const manquants = champsRequis.filter(c => c[1]);
+    if (manquants.length){
+      manquants.forEach(([id]) => $(id).classList.add("invalide"));
+      $(manquants[0][0]).focus();
+      afficherMessage("Publication refusée : renseigne " + manquants.map(c => c[2]).join(", ") + ".");
       return;
     }
 
@@ -1981,6 +1984,12 @@
   // ---------- Afficher / masquer le mot de passe ----------
   $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
   $("voir-i-mdp").addEventListener("change", e => { $("i-mdp").type = e.target.checked ? "text" : "password"; });
+
+  // Retire le surlignage rouge dès que le champ est corrigé
+  ["titre", "categorie", "ville", "lieu", "date-exec", "prix", "desc"].forEach(id => {
+    $(id).addEventListener("input", () => $(id).classList.remove("invalide"));
+    $(id).addEventListener("change", () => $(id).classList.remove("invalide"));
+  });
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
