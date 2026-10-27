@@ -204,6 +204,38 @@
   .c-prix small{font-size:.68rem;font-weight:600;color:var(--gris)}
   .card.job .actions{margin-top:12px}
 
+  /* Accueil : style premium */
+  .hero{position:relative;overflow:hidden;text-align:left;padding:28px 18px 92px;
+    background:radial-gradient(120% 90% at 88% 0%,rgba(252,209,22,.18) 0%,rgba(252,209,22,0) 46%),linear-gradient(165deg,#062f1b 0%,#0a5a32 55%,#0f7a45 100%)}
+  .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:250px;height:250px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 36px rgba(255,255,255,.04),0 0 0 76px rgba(255,255,255,.03);pointer-events:none}
+  .hero-in{position:relative;z-index:1;max-width:680px;margin:0 auto}
+  .sur-titre{display:inline-block;margin-bottom:12px;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--jaune)}
+  .hero h1{max-width:520px;margin:0 0 12px;font-size:clamp(1.6rem,6.2vw,2.15rem);font-weight:700;line-height:1.2;letter-spacing:-.02em}
+  .hero h1 em{font-style:normal;color:var(--jaune)}
+  .hero p{max-width:470px;margin:0 0 20px;font-size:.95rem;line-height:1.6;opacity:.88}
+  .cta-ligne{justify-content:flex-start;align-items:center;gap:18px}
+  button.cta{padding:14px 26px;font-weight:700;box-shadow:0 10px 24px -8px rgba(0,0,0,.45)}
+  .cta-sec{border:0;padding:0;font-weight:600;color:#fff;opacity:.92}
+  .stats{display:inline-flex;gap:0;margin:24px 0 0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;backdrop-filter:blur(6px)}
+  .stats div{min-width:0;padding:10px 20px;background:none;border:0;border-radius:0;text-align:left}
+  .stats div+div{border-left:1px solid rgba(255,255,255,.16)}
+  .stats b{font-size:1.4rem}
+  .stats span{font-size:.72rem}
+
+  main > .slider{margin:-60px 0 20px}
+  .slide{min-height:170px;padding:22px;border-radius:22px;box-shadow:0 20px 40px -20px rgba(6,47,27,.6)}
+  .slide h3{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
+  .slide p{font-size:.9rem;opacity:.93}
+  .points{margin-top:12px}
+
+  section#missions.card{background:none;box-shadow:none;padding:0;margin-bottom:12px}
+  #missions h2{margin:4px 2px 12px;font-size:1.3rem;color:var(--encre);letter-spacing:-.01em}
+  #recherche{padding:14px 20px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;box-shadow:0 8px 20px -14px rgba(8,69,42,.45)}
+  .filtres select{padding:12px 16px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;font-size:.9rem;font-weight:500}
+  .plus summary{padding:10px 4px 2px}
+  .resultats{margin-top:12px;padding:0 4px}
+  #liste .card.job{margin-bottom:16px}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -286,15 +318,16 @@
 
 <section class="hero" id="haut">
   <div class="hero-in">
-    <h1>Trouve un petit job ou la bonne personne, à Bohicon</h1>
-    <p>Ménage, livraison, jardinage… publie une mission gratuitement ou propose tes services en quelques minutes.</p>
+    <span class="sur-titre">Petits jobs · Bohicon et environs</span>
+    <h1>Trouve un petit job ou <em>la bonne personne</em>, près de chez toi</h1>
+    <p>Publie une mission gratuitement ou propose tes services en quelques minutes, directement depuis ton téléphone.</p>
+    <div class="cta-ligne">
+      <button class="cta" id="cta-publier" type="button">Publier une mission</button>
+      <a class="cta-sec" href="#missions">Voir les missions →</a>
+    </div>
     <div class="stats">
       <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
       <div><b id="stat-fin">0</b><span>missions terminées</span></div>
-    </div>
-    <div class="cta-ligne">
-      <button class="cta" id="cta-publier" type="button">Publier une mission</button>
-      <a class="cta-sec" href="#missions">Voir les missions</a>
     </div>
   </div>
 </section>
