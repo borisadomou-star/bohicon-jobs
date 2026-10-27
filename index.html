@@ -182,6 +182,28 @@
 
   .invalide{border-color:#b3261e!important;background:#fdecea!important}
 
+  /* Cartes de missions : style premium */
+  .card.job{border:1px solid #e4ede7;border-left:4px solid var(--vert2);border-radius:20px;padding:16px 16px 14px;box-shadow:0 1px 2px rgba(8,69,42,.05),0 14px 30px -16px rgba(8,69,42,.28)}
+  .card.job.s-attribuee,.card.job.s-a_confirmer{border-left-color:#f5a623}
+  .card.job.s-terminee{border-left-color:#3b6fd4}
+  .favori{top:10px;right:10px}
+  .c-haut{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-right:40px;margin-bottom:10px}
+  .c-haut .badge{margin-left:0}
+  .chip-cat{background:#eef6f1;color:var(--vert-fonce);font-size:.74rem;font-weight:600;padding:4px 10px;border-radius:999px}
+  .job h3.c-titre{margin:0 0 8px;padding-right:0;font-size:1.1rem;font-weight:700;line-height:1.3;letter-spacing:-.01em;color:var(--encre)}
+  .c-infos{display:flex;flex-direction:column;gap:3px;font-size:.84rem;color:var(--gris);margin-bottom:10px}
+  .c-desc{margin:0 0 4px;font-size:.9rem;line-height:1.55;color:#33463b;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .c-desc.ouverte{display:block}
+  .c-plus{width:auto;margin:0 0 10px;padding:2px 0;background:none;color:var(--vert);box-shadow:none;font-size:.8rem;font-weight:600;text-decoration:underline}
+  .c-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #edf3ef}
+  .c-auteur{display:flex;align-items:center;gap:9px;min-width:0}
+  .avatar{flex:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+  .c-auteur b{display:block;font-size:.86rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .c-auteur small{display:block;color:var(--gris);font-size:.72rem;line-height:1.3}
+  .c-prix{flex:none;margin-left:auto;font-size:1.3rem;font-weight:700;color:var(--vert);line-height:1;white-space:nowrap}
+  .c-prix small{font-size:.68rem;font-weight:600;color:var(--gris)}
+  .card.job .actions{margin-top:12px}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -543,6 +565,7 @@
   let minuteurToast = null;
   const adressesVues = {};
   let estAdminUtilisateur = false;
+  const descOuvertes = new Set();
   const brouillons = {};
   let avisTous = [];
   let mesSignalements = new Set();
@@ -1148,40 +1171,68 @@
       c.appendChild(p);
     };
 
-    const h = el("h3", "", m.titre);
-    h.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
-    if (estExpiree(m)) h.appendChild(el("span", "badge b-gris", "Expirée"));
-
-    const meta = el("div", "meta", "📍 " + m.ville + " · ");
-    meta.appendChild(el("span", "prix", fcfa(m.prix)));
-    if (m.auteur){
-      const n = cpt.parAuteur[m.uid] || 0;
-      meta.appendChild(document.createTextNode(" · par " + m.auteur + (n ? " (✔️ " + pluriel(n, "mission") + " terminée" + (n > 1 ? "s" : "") + ")" : "")));
-      const nr = notesPour(m.uid);
-      if (nr) meta.appendChild(document.createTextNode(" · " + etoilesTxt(nr)));
-    }
-    c.append(h, meta);
+    // ----- en-tête : catégorie, statut, urgence -----
+    const haut = el("div", "c-haut");
     const cat = catInfo(m.categorie);
-    if (cat) c.appendChild(el("div", "meta", cat[1] + " " + cat[2]));
-    if (m.lieu) c.appendChild(el("div", "meta", user ? "📌 Lieu : " + m.lieu : "📌 Lieu visible après connexion"));
+    if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
+    haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
+    if (estExpiree(m)) haut.appendChild(el("span", "badge b-gris", "Expirée"));
     const q = quandTexte(m);
-    if (q){
-      c.appendChild(el("div", "meta", "🗓️ " + q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
-      if (q.urgent && statut === "disponible") h.appendChild(el("span", "badge b-urgent", "Urgent"));
+    if (q && q.urgent && statut === "disponible") haut.appendChild(el("span", "badge b-urgent", "Urgent"));
+    c.appendChild(haut);
+
+    c.appendChild(el("h3", "c-titre", m.titre));
+
+    // ----- informations pratiques -----
+    const infos = el("div", "c-infos");
+    infos.appendChild(el("span", "", "📍 " + (m.ville || "") + (m.lieu && user ? " · " + m.lieu : "")));
+    if (m.lieu && !user) infos.appendChild(el("span", "", "🔒 Lieu précis visible après connexion"));
+    if (q) infos.appendChild(el("span", "", "🗓️ " + q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
+    if (statut !== "disponible" && m.workerNom) infos.appendChild(el("span", "", "👤 Attribuée à " + m.workerNom));
+    c.appendChild(infos);
+
+    // ----- description repliable -----
+    const texteDesc = String(m.desc || "");
+    if (texteDesc){
+      const d = el("p", "c-desc" + (descOuvertes.has(m.id) ? " ouverte" : ""), texteDesc);
+      c.appendChild(d);
+      if (texteDesc.length > 110){
+        const plus = el("button", "c-plus", descOuvertes.has(m.id) ? "Réduire" : "Lire la suite");
+        plus.type = "button";
+        plus.addEventListener("click", () => {
+          const ouvert = d.classList.toggle("ouverte");
+          if (ouvert) descOuvertes.add(m.id); else descOuvertes.delete(m.id);
+          plus.textContent = ouvert ? "Réduire" : "Lire la suite";
+        });
+        c.appendChild(plus);
+      }
     }
-    c.appendChild(el("div", "", m.desc || ""));
+
+    // ----- auteur et prix -----
+    const bas = el("div", "c-bas");
+    if (m.auteur){
+      const nbTerminees = cpt.parAuteur[m.uid] || 0;
+      const nr = notesPour(m.uid);
+      const aut = el("div", "c-auteur");
+      aut.appendChild(el("span", "avatar", String(m.auteur).trim().charAt(0).toUpperCase()));
+      const t = el("div");
+      t.appendChild(el("b", "", m.auteur));
+      const sous = [nr ? etoilesTxt(nr) : "", nbTerminees ? "✔️ " + pluriel(nbTerminees, "mission") + " terminée" + (nbTerminees > 1 ? "s" : "") : ""].filter(Boolean).join(" · ");
+      t.appendChild(el("small", "", sous || "Nouveau membre"));
+      aut.appendChild(t);
+      bas.appendChild(aut);
+    }
+    const prix = el("div", "c-prix", Number(m.prix || 0).toLocaleString("fr-FR"));
+    prix.appendChild(el("small", "", " FCFA"));
+    bas.appendChild(prix);
+    c.appendChild(bas);
+
     if (m.valide === false){
       const nv = el("div", m.refusMotif ? "erreur" : "info", m.refusMotif
         ? "❌ Mission refusée : " + m.refusMotif + ". Tu peux la supprimer et en publier une autre."
         : "⏳ En attente de validation par l'administrateur : elle sera visible par tous après vérification.");
-      nv.style.margin = "8px 0 0";
+      nv.style.margin = "10px 0 0";
       c.appendChild(nv);
-    }
-
-    if (statut !== "disponible" && m.workerNom){
-      const w = el("div", "meta", "Attribuée à " + m.workerNom);
-      w.style.marginTop = "6px";
-      c.appendChild(w);
     }
 
     if (!user){
