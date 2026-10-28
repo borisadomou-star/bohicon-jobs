@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
 <script src="config.js"></script>
 <title>Bohicon Jobs</title>
@@ -236,6 +236,37 @@
   .resultats{margin-top:12px;padding:0 4px}
   #liste .card.job{margin-bottom:16px}
 
+  /* Accueil : contenu centré, comme l'ancienne version */
+  .hero{text-align:center}
+  .hero h1{margin:0 auto 12px}
+  .hero p{margin:0 auto 20px}
+  .cta-ligne{justify-content:center}
+  .stats div{text-align:center}
+
+  /* Navigation mobile : barre fixe en bas */
+  .droite{display:none}
+  .nav-bas{position:fixed;left:0;right:0;bottom:0;z-index:62;display:flex;align-items:flex-end;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e4ede7;box-shadow:0 -10px 28px -16px rgba(8,69,42,.4);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .nav-item{position:relative;flex:1;width:auto;margin:0;padding:6px 2px 2px;background:none;color:var(--gris);box-shadow:none;border-radius:12px;font-size:.68rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .nav-ico{font-size:1.3rem;line-height:1}
+  .nav-item.actif{color:var(--vert)}
+  .nav-item.pub{color:var(--vert-fonce)}
+  .nav-item.pub .nav-ico{width:46px;height:46px;margin-top:-24px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:400;box-shadow:0 10px 20px -8px rgba(11,107,58,.85)}
+  .nav-badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--rouge);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .vue-espace{bottom:calc(68px + env(safe-area-inset-bottom))}
+  #fab-haut{bottom:calc(82px + env(safe-area-inset-bottom))}
+  #fab-wa{bottom:calc(146px + env(safe-area-inset-bottom))}
+  .retour-flottant{bottom:calc(82px + env(safe-area-inset-bottom))}
+  @media (min-width:721px){
+    .droite{display:flex}
+    .nav-bas{display:none}
+    body{padding-bottom:0}
+    .vue-espace{bottom:0}
+    #fab-haut{bottom:16px}
+    #fab-wa{bottom:80px}
+    .retour-flottant{bottom:14px}
+  }
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -387,6 +418,14 @@
   <p><a id="lien-partage" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a></p>
   <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
+
+<nav class="nav-bas" aria-label="Navigation principale">
+  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico">🏠</span>Accueil</button>
+  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico">🔍</span>Missions</button>
+  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico">+</span>Publier</button>
+  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico">🔔</span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
+  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico">👤</span>Mon espace</button>
+</nav>
 
 <!-- Mon espace : panneau avec sous-menus -->
 <div id="vue-espace" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Mon espace">
@@ -1750,6 +1789,12 @@
     }
     if (onglet) choisirOnglet(onglet);
     v.scrollTop = 0;
+    majNav();
+  }
+
+  function majNav(){
+    $("nav-espace").classList.toggle("actif", espaceOuvert);
+    $("nav-accueil").classList.toggle("actif", !espaceOuvert);
   }
 
   function fermerEspace(viaRetour){
@@ -1757,6 +1802,7 @@
     espaceOuvert = false;
     $("vue-espace").classList.add("cache");
     document.body.style.overflow = "";
+    majNav();
     if (!viaRetour){
       try { if (history.state && history.state.espace) history.back(); } catch (e) { /* ignoré */ }
     }
@@ -1861,6 +1907,7 @@
     const actif = !!user && profilOk();
     $("btn-cloche").classList.toggle("cache", !actif);
     if (!actif){
+      $("nav-badge").classList.add("cache");
       document.title = TITRE_BASE;
       $("panneau-notifs").classList.add("cache");
       return;
@@ -1880,6 +1927,8 @@
     const p = $("cloche-n");
     p.textContent = nonLus.length > 9 ? "9+" : String(nonLus.length);
     p.classList.toggle("cache", !nonLus.length);
+    $("nav-badge").textContent = p.textContent;
+    $("nav-badge").classList.toggle("cache", !nonLus.length);
     document.title = nonLus.length ? "(" + nonLus.length + ") " + TITRE_BASE : TITRE_BASE;
     if (!$("panneau-notifs").classList.contains("cache")) rendrePanneau(liste);
   }
@@ -2064,6 +2113,16 @@
     $("annuler-edition").classList.add("cache");
   }
   $("annuler-edition").addEventListener("click", finirEdition);
+
+  // ---------- Barre de navigation du bas (mobile) ----------
+  $("nav-accueil").addEventListener("click", () => retourAccueil());
+  $("nav-missions").addEventListener("click", () => { fermerEspace(); defiler($("missions")); });
+  $("nav-publier").addEventListener("click", () => $("cta-publier").click());
+  $("nav-alertes").addEventListener("click", e => {
+    e.stopPropagation();
+    if (!user) ouvrirEspace(); else $("btn-cloche").click();
+  });
+  $("nav-espace").addEventListener("click", () => ouvrirEspace());
 
   // ---------- Afficher / masquer le mot de passe ----------
   $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
