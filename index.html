@@ -1582,6 +1582,12 @@
 
   // ---------- Authentification ----------
   onAuthStateChanged(auth, async u => {
+    if (u && connexionPerimee()){
+      signOut(auth).catch(() => {});
+      afficherMessage("Tu as été déconnecté(e) après une longue période d'inactivité. Reconnecte-toi pour continuer.", "info");
+      return;
+    }
+    if (u) noterActivite();
     user = u;
     profil = null;
     if (u && !enInscription){
@@ -1620,9 +1626,11 @@
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
+    noterActivite();
     try {
       await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
       $("mdp").value = "";
+      afficherMessage("Connexion réussie ✅ Bienvenue sur Bohicon Jobs !", "info");
     } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
@@ -1634,6 +1642,7 @@
     btn.disabled = true; btn.textContent = "Création du compte…";
     enInscription = true;
     try {
+      noterActivite();
       const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
       profil = data;
@@ -1670,8 +1679,9 @@
     } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
-  $("btn-deconnexion").addEventListener("click", () => signOut(auth));
-  $("btn-deco-profil").addEventListener("click", () => signOut(auth));
+  const deconnecter = () => signOut(auth).then(() => afficherMessage("Tu es déconnecté(e). À bientôt !", "info"));
+  $("btn-deconnexion").addEventListener("click", deconnecter);
+  $("btn-deco-profil").addEventListener("click", deconnecter);
 
   // ---------- Publication ----------
   $("publier").addEventListener("click", async () => {
@@ -2123,6 +2133,32 @@
     if (!user) ouvrirEspace(); else $("btn-cloche").click();
   });
   $("nav-espace").addEventListener("click", () => ouvrirEspace());
+
+  // ---------- Déconnexion automatique après une période d'inactivité ----------
+  const INACTIVITE_H = Number(window.CONFIG && window.CONFIG.INACTIVITE_HEURES) > 0 ? Number(window.CONFIG.INACTIVITE_HEURES) : 4;
+  const INACTIVITE_MS = INACTIVITE_H * 3600 * 1000;
+  const ACT_CLE = "bj_activite";
+  function noterActivite(){
+    try { localStorage.setItem(ACT_CLE, String(Date.now())); } catch (e) { /* stockage indisponible */ }
+  }
+  function connexionPerimee(){
+    try {
+      const der = Number(localStorage.getItem(ACT_CLE) || 0);
+      return der > 0 && Date.now() - der > INACTIVITE_MS;
+    } catch (e) { return false; }
+  }
+  function verifierInactivite(){
+    if (!user || !connexionPerimee()) return;
+    signOut(auth).catch(() => {});
+    afficherMessage("Tu as été déconnecté(e) après " + INACTIVITE_H + " heure(s) d'inactivité. Reconnecte-toi pour continuer.", "info");
+  }
+  let derniereNote = 0;
+  ["click", "keydown", "touchstart", "scroll", "mousemove"].forEach(ev => window.addEventListener(ev, () => {
+    const t = Date.now();
+    if (t - derniereNote > 30000){ derniereNote = t; noterActivite(); }
+  }, { passive: true }));
+  setInterval(verifierInactivite, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
 
   // ---------- Afficher / masquer le mot de passe ----------
   $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
