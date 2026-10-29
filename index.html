@@ -267,6 +267,13 @@
     .retour-flottant{bottom:14px}
   }
 
+  /* Indicateur « Missions vérifiées » */
+  .chip-verif{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 7px;border:1px solid #bfe3c4;border-radius:999px;background:#e8f6ea;color:#1b6b2f;font-size:.72rem;font-weight:700}
+  .chip-verif svg{width:14px;height:17px;flex:none}
+  .garantie{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;font-size:.78rem;line-height:1.35;color:rgba(255,255,255,.9)}
+  .garantie svg{width:16px;height:19px;flex:none}
+  .garantie b{color:var(--jaune)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -359,6 +366,10 @@
     <div class="stats">
       <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
       <div><b id="stat-fin">0</b><span>missions terminées</span></div>
+    </div>
+    <div class="garantie">
+      <span id="icone-garantie" aria-hidden="true"></span>
+      <span><b id="stat-verif">0</b> <span id="lib-verif">missions vérifiées</span> · contrôlées par notre équipe avant publication</span>
     </div>
   </div>
 </section>
@@ -751,6 +762,8 @@
     return e;
   };
   const profilOk = () => !!(profil && profil.profession);
+  // Bouclier « mission vérifiée » : une mission est vérifiée quand l'administrateur l'a validée
+  const SVG_VERIF = '<svg viewBox="0 0 100 120" aria-hidden="true" focusable="false"><path d="M50 4C35 14 18 18 6 18v42c0 28 22 46 44 58 22-12 44-30 44-58V18C82 18 65 14 50 4z" fill="#66c46f"/><path d="M50 4c15 10 32 14 44 14v42c0 28-22 46-44 58z" fill="#3bb54a"/><path d="M27 62l17 17 31-37" fill="none" stroke="#fff" stroke-width="11"/></svg>';
   const roleActuel = () => (profil && profil.role) || "les deux";
   const suspendu = () => !!(profil && profil.suspendu);
   const peutPublier = () => !suspendu() && roleActuel() !== "travailleur";
@@ -1246,6 +1259,13 @@
     // ----- en-tête : catégorie, statut, urgence -----
     const haut = el("div", "c-haut");
     const cat = catInfo(m.categorie);
+    if (m.valide === true){
+      const v = el("span", "chip-verif");
+      v.title = "Mission contrôlée par l'équipe Bohicon Jobs avant sa publication";
+      v.innerHTML = SVG_VERIF;
+      v.appendChild(document.createTextNode("Vérifiée"));
+      haut.appendChild(v);
+    }
     if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
     haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
     if (estExpiree(m)) haut.appendChild(el("span", "badge b-gris", "Expirée"));
@@ -1522,6 +1542,9 @@
     const cpt = compteurs();
     $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible" && !estExpiree(m) && m.valide !== false).length;
     $("stat-fin").textContent = missions.filter(m => st(m) === "terminee").length;
+    const nbVerifiees = missions.filter(m => m.valide === true && st(m) === "disponible" && !estExpiree(m)).length;
+    $("stat-verif").textContent = nbVerifiees;
+    $("lib-verif").textContent = nbVerifiees > 1 ? "missions vérifiées" : "mission vérifiée";
 
     const liste = $("liste");
     liste.innerHTML = "";
@@ -2159,6 +2182,8 @@
   }, { passive: true }));
   setInterval(verifierInactivite, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
+
+  $("icone-garantie").innerHTML = SVG_VERIF;
 
   // ---------- Afficher / masquer le mot de passe ----------
   $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
