@@ -323,6 +323,28 @@
   @keyframes msg-barre{from{transform:scaleX(1)}to{transform:scaleX(0)}}
   @media (prefers-reduced-motion: reduce){.msg{animation:none}.msg-barre{display:none}}
 
+  /* Statuts des missions et des candidatures : style professionnel */
+  .badge{display:inline-flex;align-items:center;gap:6px;margin-left:0;padding:4px 10px;border:1px solid transparent;border-radius:999px;font-size:.7rem;font-weight:600;letter-spacing:.02em;line-height:1.2;vertical-align:middle}
+  .badge::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:currentColor}
+  .b-disponible{background:#e7f5ed;border-color:#c9e6d6;color:#0d6b3c}
+  .b-attribuee{background:#fff3dc;border-color:#f6dfb0;color:#8f5a00}
+  .b-a_confirmer{background:#efeaff;border-color:#d9d0f7;color:#5030a8}
+  .b-terminee{background:#e6eefc;border-color:#c9d9f6;color:#1a4fa0}
+  .b-gris{background:#eef1f0;border-color:#dde3e0;color:#55655d}
+  .b-urgent,.b-refus{background:#fdecea;border-color:#f5cfcc;color:#a12a20}
+  .card.job.s-a_confirmer{border-left-color:#7a5fd6}
+
+  .info,.erreur,.verrou{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid transparent;border-radius:12px;font-size:.84rem;font-weight:500;line-height:1.4;text-align:left}
+  .info::before,.erreur::before,.verrou::before{content:"";flex:none;width:18px;height:18px;margin-top:1px;background-position:center;background-repeat:no-repeat;background-size:contain}
+  .info{background:#eaf6ef;border-color:#cfe8d9;color:#0d5a33}
+  .info::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f7a45' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8 12.5l2.7 2.7L16 9.5'/%3E%3C/svg%3E")}
+  .info.attente{background:#fff6e5;border-color:#f6dfb0;color:#8a5a00}
+  .info.attente::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b36b00' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E")}
+  .erreur{background:#fdeeed;border-color:#f5cfcc;color:#a12a20}
+  .erreur::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c0392b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5'/%3E%3Cpath d='M12 16.5h.01'/%3E%3C/svg%3E")}
+  .verrou{background:#f3f6f4;border-color:#e2eae5;color:#52645a}
+  .verrou::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352645a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -851,7 +873,9 @@
     if (cls) e.className = cls;
     if (texte !== undefined){
       const sobre = (tag === "button" && !/favori|etoile/.test(cls || "")) || /(^|\s)(info|erreur|verrou)(\s|$)/.test(cls || "");
-      e.textContent = sobre ? sansEmoji(texte) : texte;
+      const t = sobre ? sansEmoji(texte) : texte;
+      e.textContent = t;
+      if (/(^|\s)info(\s|$)/.test(cls || "") && /^en attente/i.test(String(t))) e.classList.add("attente");
     }
     return e;
   };
