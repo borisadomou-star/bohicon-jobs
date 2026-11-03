@@ -307,6 +307,22 @@
   .bandeau-install .lien{width:auto;margin:0;padding:4px 8px;font-size:1rem;color:var(--gris)}
   @media (min-width:721px){.bandeau-install{display:none}}
 
+  /* Messages : design moderne */
+  .msg{--c:#0f7a45;position:relative;display:flex;align-items:flex-start;gap:12px;padding:14px 14px 17px;background:#fff;border:1px solid #e4ece7;border-left:4px solid var(--c);border-radius:14px;box-shadow:0 18px 40px -16px rgba(6,47,27,.45);overflow:hidden;animation:msg-entree .28s ease both}
+  .msg.succes{--c:#0f7a45}
+  .msg.erreur{--c:#c0392b}
+  .msg.info{--c:#1a4fa0}
+  .msg-ico{flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#eef3f0;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}
+  .msg-ico svg{width:20px;height:20px}
+  .msg-corps{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:1px}
+  .msg-corps b{font-size:.92rem;font-weight:700;line-height:1.25;color:var(--encre)}
+  .msg-corps span{font-size:.84rem;line-height:1.4;color:#4a5b52}
+  .msg-x{width:auto;margin:0;padding:0 4px;background:none;color:var(--gris);box-shadow:none;font-size:1.3rem;line-height:1}
+  .msg-barre{position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--c);opacity:.55;transform-origin:left;animation:msg-barre linear forwards}
+  @keyframes msg-entree{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes msg-barre{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  @media (prefers-reduced-motion: reduce){.msg{animation:none}.msg-barre{display:none}}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -743,18 +759,51 @@
     return { prenom, nom, profession, tel, ville, adresse, role };
   }
 
+  // Supprime les émojis des messages affichés (style plus sobre et professionnel)
+  function sansEmoji(s){
+    return String(s == null ? "" : s)
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+
+  const ICONES_MSG = {
+    succes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>',
+    erreur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.5h.01"/></svg>'
+  };
+  const MOTS_SUCCES = /réussie|publiée|envoy(é|ée)|modifiée|confirmée|acceptée|enregistrée|ajouté|mis à jour|installée|créé|copié|supprimée|merci|bienvenue/i;
   let minuteurMessage = null;
+
+  // « Titre|Détail » : la barre verticale sépare le titre du détail (le titre est facultatif)
   function afficherMessage(texte, type){
     const z = $("message");
     clearTimeout(minuteurMessage);
     z.innerHTML = "";
     if (!texte) return;
-    const e = document.createElement("div");
-    e.className = type === "info" ? "info" : "erreur";
-    e.textContent = texte;
+    const propre = sansEmoji(texte);
+    const morceaux = propre.includes("|") ? propre.split("|").map(s => s.trim()) : ["", propre];
+    const detail = morceaux.slice(1).join(" ");
+    const genre = type === "succes" ? "succes" : (type === "info" ? (MOTS_SUCCES.test(propre) ? "succes" : "info") : "erreur");
+    const titre = morceaux[0] || (genre === "erreur" ? "Attention" : "");
+    const duree = genre === "erreur" ? 8000 : 5500;
+
+    const e = el("div", "msg " + genre);
+    e.setAttribute("role", genre === "erreur" ? "alert" : "status");
+    const ico = el("span", "msg-ico");
+    ico.innerHTML = ICONES_MSG[genre];
+    const corps = el("div", "msg-corps");
+    if (titre) corps.appendChild(el("b", "", titre));
+    if (detail) corps.appendChild(el("span", "", detail));
+    const x = el("button", "msg-x", "×");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer le message");
+    const barre = el("i", "msg-barre");
+    barre.style.animationDuration = duree + "ms";
+    e.append(ico, corps, x, barre);
     e.addEventListener("click", () => { z.innerHTML = ""; });
     z.appendChild(e);
-    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, type === "info" ? 5000 : 8000);
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, duree);
   }
 
   function texteErreurAuth(e){
@@ -800,7 +849,10 @@
   const el = (tag, cls, texte) => {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
-    if (texte !== undefined) e.textContent = texte;
+    if (texte !== undefined){
+      const sobre = (tag === "button" && !/favori|etoile/.test(cls || "")) || /(^|\s)(info|erreur|verrou)(\s|$)/.test(cls || "");
+      e.textContent = sobre ? sansEmoji(texte) : texte;
+    }
     return e;
   };
   const profilOk = () => !!(profil && profil.profession);
@@ -946,7 +998,7 @@
         note: b.note, commentaire: b.texte.trim(), titre: m.titre, createdAt: serverTimestamp()
       });
       delete brouillons[m.id];
-      afficherMessage("Merci pour ton avis !", "info");
+      afficherMessage("Avis envoyé|Merci pour ton retour.", "info");
     }));
     return zone;
   }
@@ -988,7 +1040,7 @@
         statut: "ouvert", createdAt: serverTimestamp()
       });
       delete brouillonsSig[cle];
-      afficherMessage("Merci, ton signalement a été transmis à l'administrateur.", "info");
+      afficherMessage("Signalement envoyé|Il a été transmis à l'administrateur.", "info");
     }));
     zone.appendChild(bouton("Annuler", "lien", async () => { b.ouvert = false; rafraichir(); }));
     return zone;
@@ -1008,8 +1060,8 @@
   function etatCandidature(c){
     if (c.statut === "refusee") return "Refusée";
     const m = missions.find(x => x.id === c.missionId);
-    if (m && st(m) !== "disponible") return m.workerUid === c.uid ? "Retenue ✅" : "Non retenue";
-    if (c.statut === "acceptee") return "Retenue ✅";
+    if (m && st(m) !== "disponible") return m.workerUid === c.uid ? "Retenue" : "Non retenue";
+    if (c.statut === "acceptee") return "Retenue";
     return "En attente";
   }
 
@@ -1227,7 +1279,7 @@
       ligne.appendChild(el("div", "h-sous", [
         n ? "✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
         notesPour(c.uid) ? etoilesTxt(notesPour(c.uid)) : "Pas encore d'avis",
-        choisi ? "✅ Choisi(e)" : (c.statut === "refusee" ? "❌ Refusé(e)" : "")
+        choisi ? "Choisi(e)" : (c.statut === "refusee" ? "Refusé(e)" : "")
       ].filter(Boolean).join(" · ")));
 
       const prenomC = String(c.nom || "").split(" ")[0];
@@ -1238,7 +1290,7 @@
           a.target = "_blank"; a.rel = "noopener";
           ligne.appendChild(a);
         } else {
-          ligne.appendChild(el("div", "h-sous", "⏳ En attente de la confirmation de " + prenomC + " : WhatsApp sera disponible ensuite."));
+          ligne.appendChild(el("div", "h-sous", "En attente de la confirmation de " + prenomC + " : WhatsApp sera disponible ensuite."));
         }
       }
 
@@ -1254,13 +1306,14 @@
               lot.update(doc(db, "missions", m.id), { statut: "attribuee", workerUid: c.uid, workerNom: c.nom });
               lot.update(doc(db, "candidatures", c.id), { statut: "acceptee" });
               await lot.commit();
+              afficherMessage("Candidature acceptée|Le candidat doit maintenant confirmer la mission.", "info");
             } catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
           });
           const non = el("button", "danger mini", "❌ Refuser");
           non.type = "button";
           non.addEventListener("click", async () => {
             if (!confirm("Refuser la candidature de " + c.nom + " ?")) return;
-            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "refusee" }); }
+            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "refusee" }); afficherMessage("Candidature refusée|Le candidat verra cette décision sur le site.", "info"); }
             catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
           });
           rangee.append(ok, non);
@@ -1516,7 +1569,7 @@
         actions.appendChild(o);
         actions.appendChild(bouton("✅ Je confirme la mission", "mini", async () => {
           await updateDoc(doc(db, "candidatures", m.id + "_" + user.uid), { confirmee: true });
-          afficherMessage("Mission confirmée ✅ Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
+          afficherMessage("Mission confirmée|Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
         }));
       } else if (statut === "attribuee"){
         const o = el("div", "info", "✅ Mission confirmée : tu peux échanger avec l'auteur.");
@@ -1649,7 +1702,7 @@
   onAuthStateChanged(auth, async u => {
     if (u && connexionPerimee()){
       signOut(auth).catch(() => {});
-      afficherMessage("Tu as été déconnecté(e) après une longue période d'inactivité. Reconnecte-toi pour continuer.", "info");
+      afficherMessage("Session expirée|Tu as été déconnecté(e) après une longue période d'inactivité. Reconnecte-toi pour continuer.", "info");
       return;
     }
     if (u) noterActivite();
@@ -1695,7 +1748,7 @@
     try {
       await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
       $("mdp").value = "";
-      afficherMessage("Connexion réussie ✅ Bienvenue sur Bohicon Jobs !", "info");
+      afficherMessage("Connexion réussie|Bienvenue sur Bohicon Jobs.", "info");
     } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
@@ -1712,7 +1765,7 @@
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
       profil = data;
       $("i-mdp").value = "";
-      afficherMessage("Bienvenue sur Bohicon Jobs ! Ton compte est créé 🎉", "info");
+      afficherMessage("Compte créé|Bienvenue sur Bohicon Jobs.", "info");
       choisirOnglet("resume");
     } catch (e) {
       console.error(e);
@@ -1740,11 +1793,11 @@
     if (!email){ afficherMessage("Entre ton e-mail ci-dessus, puis reclique sur « Mot de passe oublié ? »."); return; }
     try {
       await sendPasswordResetEmail(auth, email);
-      afficherMessage("E-mail envoyé. Vérifie ta boîte de réception (et les spams).", "info");
+      afficherMessage("E-mail envoyé|Vérifie ta boîte de réception et tes courriers indésirables.", "info");
     } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
-  const deconnecter = () => signOut(auth).then(() => afficherMessage("Tu es déconnecté(e). À bientôt !", "info"));
+  const deconnecter = () => signOut(auth).then(() => afficherMessage("Déconnexion réussie|À bientôt sur Bohicon Jobs.", "info"));
   $("btn-deconnexion").addEventListener("click", deconnecter);
   $("btn-deco-profil").addEventListener("click", deconnecter);
 
@@ -1794,8 +1847,8 @@
         await updateDoc(doc(db, "missions", missionEnEdition), champs);
         finirEdition();
         afficherMessage(estAdminUtilisateur
-          ? "Mission modifiée ✅"
-          : "Mission modifiée ✅ Elle sera de nouveau visible après validation par l'administrateur.", "info");
+          ? "Mission modifiée|Les changements ont été enregistrés."
+          : "Mission modifiée|Elle sera de nouveau visible après validation par l'administrateur.", "info");
         choisirOnglet("histo");
       } catch (e) {
         console.error(e);
@@ -1825,7 +1878,7 @@
       $("quand").value = "flexible";
       $("categorie").value = "";
       $("bloc-date").classList.add("cache");
-      afficherMessage(estAdminUtilisateur ? "Mission publiée ✅ Elle apparaît dans la liste des missions." : "Mission envoyée ✅ Elle sera visible par tous après validation par l'administrateur.", "info");
+      afficherMessage(estAdminUtilisateur ? "Mission publiée|Elle apparaît dans la liste des missions." : "Mission envoyée|Elle sera visible par tous après validation par l'administrateur.", "info");
       choisirOnglet("histo");
       if (adressePrecise){
         try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
@@ -1902,7 +1955,7 @@
     try {
       await setDoc(doc(db, "users", user.uid), data, { merge: true });
       profil = { ...profil, ...data };
-      afficherMessage("Profil mis à jour.", "info");
+      afficherMessage("Profil mis à jour|Tes informations ont été enregistrées.", "info");
       majUI();
     } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
   });
@@ -1971,7 +2024,7 @@
 
   function afficherToast(texte){
     const t = $("toast");
-    t.textContent = texte;
+    t.textContent = sansEmoji(texte);
     t.classList.remove("cache");
     clearTimeout(minuteurToast);
     minuteurToast = setTimeout(() => t.classList.add("cache"), 7000);
@@ -2024,7 +2077,7 @@
       const l = el("div", "notif " + (lu ? "lu" : "nonlu"));
       l.appendChild(el("span", "pt"));
       const c = el("div");
-      c.appendChild(el("div", "", n.texte));
+      c.appendChild(el("div", "", sansEmoji(n.texte)));
       if (n.ms) c.appendChild(el("small", "", dateTexte(n.ms)));
       l.appendChild(c);
       l.addEventListener("click", () => {
@@ -2215,7 +2268,7 @@
   function verifierInactivite(){
     if (!user || !connexionPerimee()) return;
     signOut(auth).catch(() => {});
-    afficherMessage("Tu as été déconnecté(e) après " + INACTIVITE_H + " heure(s) d'inactivité. Reconnecte-toi pour continuer.", "info");
+    afficherMessage("Session expirée|Tu as été déconnecté(e) après " + INACTIVITE_H + " heure(s) d'inactivité. Reconnecte-toi pour continuer.", "info");
   }
   let derniereNote = 0;
   ["click", "keydown", "touchstart", "scroll", "mousemove"].forEach(ev => window.addEventListener(ev, () => {
@@ -2269,7 +2322,7 @@
   window.addEventListener("appinstalled", () => {
     installEvt = null;
     majInstall();
-    afficherMessage("Bohicon Jobs est installée ✅ Retrouve-la sur ton écran d'accueil.", "info");
+    afficherMessage("Application installée|Retrouve Bohicon Jobs sur ton écran d'accueil.", "info");
   });
   $("aide-installer").addEventListener("click", installerApplication);
   $("lien-installer").addEventListener("click", e => { e.preventDefault(); installerApplication(); });
