@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
+<meta name="build" content="20261104-0923">
+<meta name="build-notes" content="Nouveau style des messages et des statuts de missions.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -345,6 +347,11 @@
   .verrou{background:#f3f6f4;border-color:#e2eae5;color:#52645a}
   .verrou::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352645a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
 
+  /* Mise à jour de la plateforme */
+  .bandeau-maj{z-index:64}
+  .bandeau-maj .bi-texte small{white-space:normal}
+  @media (min-width:721px){.bandeau-install.bandeau-maj{display:flex;left:auto;right:16px;bottom:16px;width:380px}}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -509,6 +516,13 @@
   <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico">🔔</span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
   <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico">👤</span>Mon espace</button>
 </nav>
+
+<div id="bandeau-maj" class="bandeau-install bandeau-maj cache" role="dialog" aria-label="Mise à jour disponible">
+  <span class="bi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0f7a45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></span>
+  <div class="bi-texte"><b>Mise à jour disponible</b><small id="maj-notes">Des améliorations ont été ajoutées à la plateforme.</small></div>
+  <button id="btn-maj" class="mini" type="button">Mettre à jour</button>
+  <button id="btn-maj-plus-tard" class="lien" type="button" aria-label="Plus tard">×</button>
+</div>
 
 <div id="bandeau-install" class="bandeau-install cache" role="dialog" aria-label="Installer l'application">
   <span class="bi-ico" aria-hidden="true">📲</span>
@@ -2303,6 +2317,55 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
 
   $("icone-garantie").innerHTML = SVG_VERIF;
+
+  // ---------- Mise à jour de la plateforme ----------
+  const BUILD_ACTUEL = (document.querySelector('meta[name="build"]') || {}).content || "";
+  let majReportee = 0;
+  let derniereVerifMaj = 0;
+  try {   // retire le paramètre technique ajouté lors d'une mise à jour
+    const p = new URL(location.href);
+    if (p.searchParams.has("maj")){ p.searchParams.delete("maj"); history.replaceState(history.state, "", p.pathname + p.search + p.hash); }
+  } catch (e) { /* ignoré */ }
+
+  function lireMeta(texte, nom){
+    const m = texte.match(new RegExp('<meta name="' + nom + '" content="([^"]*)"'));
+    return m ? m[1] : "";
+  }
+  async function verifierMiseAJour(){
+    if (!BUILD_ACTUEL || Date.now() < majReportee) return;
+    derniereVerifMaj = Date.now();
+    try {
+      const url = new URL("index.html", location.href);
+      url.searchParams.set("v", String(Date.now()));
+      const r = await fetch(url.href, { cache: "no-store", headers: { Range: "bytes=0-3999" } });
+      if (!r.ok) return;
+      const debut = (await r.text()).slice(0, 4000);
+      const nouvelle = lireMeta(debut, "build");
+      if (!nouvelle || nouvelle === BUILD_ACTUEL) return;
+      $("maj-notes").textContent = lireMeta(debut, "build-notes") || "Des améliorations ont été ajoutées à la plateforme.";
+      $("bandeau-install").classList.add("cache");
+      $("bandeau-maj").classList.remove("cache");
+    } catch (e) { /* hors connexion : nouvel essai plus tard */ }
+  }
+  function appliquerMiseAJour(){
+    const aller = () => {
+      const u = new URL(location.href);
+      u.searchParams.set("maj", String(Date.now()));
+      location.replace(u.href);
+    };
+    if ("caches" in window) caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))).then(aller, aller);
+    else aller();
+  }
+  $("btn-maj").addEventListener("click", appliquerMiseAJour);
+  $("btn-maj-plus-tard").addEventListener("click", () => {
+    $("bandeau-maj").classList.add("cache");
+    majReportee = Date.now() + 30 * 60 * 1000;
+  });
+  setTimeout(verifierMiseAJour, 20000);
+  setInterval(verifierMiseAJour, 20 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - derniereVerifMaj > 10 * 60 * 1000) verifierMiseAJour();
+  });
 
   // ---------- Installation comme application (PWA) ----------
   if ("serviceWorker" in navigator){
