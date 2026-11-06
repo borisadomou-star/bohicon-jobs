@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261104-0923">
-<meta name="build-notes" content="Nouveau style des messages et des statuts de missions.">
+<meta name="build" content="20261105-2222">
+<meta name="build-notes" content="Une seule candidature ou mission en cours à la fois, avec possibilité de retirer sa candidature.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1103,6 +1103,29 @@
     return "En attente";
   }
 
+  // Un utilisateur ne peut postuler que s'il n'a ni candidature en cours, ni mission en cours,
+  // ni travail terminé non encore confirmé sur la plateforme.
+  function blocageCandidature(){
+    if (!user) return null;
+    const enCours = mesRealisees.find(m => m.uid !== user.uid && (st(m) === "attribuee" || st(m) === "a_confirmer"));
+    if (enCours){
+      if (st(enCours) === "a_confirmer")
+        return { texte: "Postuler est indisponible : le travail « " + enCours.titre + " » doit d'abord être confirmé sur la plateforme." };
+      const cand = mesCandidatures.find(c => c.missionId === enCours.id);
+      if (cand && !cand.confirmee)
+        return { texte: "Postuler est indisponible : confirme d'abord ta mission « " + enCours.titre + " »." };
+      return { texte: "Postuler est indisponible : tu as une mission en cours (« " + enCours.titre + " »)." };
+    }
+    const attente = mesCandidatures.find(c => {
+      if (c.statut !== "en_attente") return false;
+      const m = missions.find(x => x.id === c.missionId);
+      return !!m && st(m) === "disponible" && !estExpiree(m);
+    });
+    if (attente)
+      return { texte: "Postuler est indisponible : tu as déjà une candidature en cours (« " + attente.titre + " »). Retire-la pour postuler ailleurs." };
+    return null;
+  }
+
   function statsPerso(){
     const realisees = mesRealisees.filter(m => m.uid !== user.uid);
     const faites = realisees.filter(m => st(m) === "terminee");
@@ -1570,11 +1593,22 @@
             const o = el("div", "info", "✅ Intérêt envoyé : l'auteur va te répondre.");
             o.style.marginBottom = "0";
             actions.appendChild(o);
+            if (maCand.statut === "en_attente"){
+              actions.appendChild(bouton("Retirer ma candidature", "sec mini", async () => {
+                if (!confirm("Retirer ta candidature pour cette mission ?")) return;
+                await deleteDoc(doc(db, "candidatures", maCand.id));
+                afficherMessage("Candidature retirée|Tu peux de nouveau postuler à une autre mission.", "succes");
+              }));
+            }
+          } else if (blocageCandidature()){
+            actions.appendChild(el("div", "verrou", blocageCandidature().texte));
           } else {
             const bInt = el("button", "mini", "🙋 Je suis intéressé");
             bInt.type = "button";
             bInt.addEventListener("click", async () => {
               if (!profilOk()){ afficherMessage("Complète ton profil pour te proposer."); return; }
+              const bl = blocageCandidature();
+              if (bl){ afficherMessage("Candidature impossible|" + bl.texte.replace("Postuler est indisponible : ", "")); return; }
               bInt.disabled = true;
               try {
                 await setDoc(doc(db, "candidatures", m.id + "_" + user.uid), {
