@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261107-1845">
-<meta name="build-notes" content="Nouvelles fenêtres de confirmation, plus sobres et professionnelles.">
+<meta name="build" content="20261108-1259">
+<meta name="build-notes" content="Nouveau design des formulaires de connexion, d'inscription et de publication.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -374,6 +374,57 @@
   @keyframes dlg-entree{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion: reduce){.dlg-fond,.dlg,.dlg-fond.sortie{animation:none}}
 
+
+  /* Formulaires (connexion, inscription, publication) : design moderne */
+  .form-carte{padding:22px 20px 20px;border-radius:24px}
+  .form-tete{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .form-ico{flex:none;display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#0b6b3a,#12995a);color:#fff;box-shadow:0 12px 22px -12px rgba(11,107,58,.9)}
+  .form-ico svg{width:26px;height:26px}
+  .form-tete h2{margin:0;font-size:1.3rem;letter-spacing:-.01em;color:var(--encre)}
+  .form-tete p{margin:3px 0 0;font-size:.85rem;line-height:1.4;color:var(--gris)}
+  .sect{margin-bottom:16px;padding:16px 14px 4px;border:1px solid #e8efea;border-radius:18px;background:#fafcfb}
+  .sect-titre{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--vert)}
+  .sect-num{flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--vert);color:#fff;font-size:.74rem;letter-spacing:0}
+  .champ{position:relative;display:block;margin-bottom:14px}
+  .champ > span{display:block;margin:0 2px 6px;font-size:.78rem;font-weight:600;color:#3a4d42}
+  .champ > span small{margin-left:4px;font-weight:400;color:var(--gris)}
+  .champ input,.champ select,.champ textarea{margin:0;padding:14px 16px;border:1.5px solid #dfe9e3;border-radius:14px;background-color:#fff;font-size:.98rem;transition:border-color .15s,box-shadow .15s}
+  .champ input.ic,.champ select.ic{padding-left:48px;background-repeat:no-repeat;background-position:16px center;background-size:20px}
+  .champ input:focus,.champ select:focus,.champ textarea:focus{outline:none;border-color:var(--vert2);box-shadow:0 0 0 4px rgba(18,153,90,.14)}
+  .champ input.invalide,.champ select.invalide,.champ textarea.invalide{border-color:#c0392b!important;background-color:#fdf3f2!important;box-shadow:0 0 0 4px rgba(192,57,43,.1)}
+  .champ textarea{padding-bottom:26px;resize:vertical}
+  .compteur{position:absolute;right:12px;bottom:9px;font-size:.7rem;font-style:normal;color:var(--gris)}
+  .champ-prix input{padding-right:76px}
+  .champ-prix .suffixe{position:absolute;right:16px;bottom:15px;font-size:.8rem;font-weight:700;color:var(--gris)}
+  .champ-prix input::-webkit-outer-spin-button,.champ-prix input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .champ-prix input{-moz-appearance:textfield}
+  .ou{display:flex;align-items:center;gap:12px;margin:14px 0;font-size:.78rem;color:var(--gris)}
+  .ou::before,.ou::after{content:"";flex:1;height:1px;background:#e4ece7}
+  .form-garantie{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 6px;font-size:.76rem;line-height:1.4;color:var(--gris);text-align:center}
+  .form-garantie svg{flex:none;width:16px;height:16px}
+  #btn-connexion,#btn-inscription,#publier{padding:16px 18px;font-size:1rem;font-weight:700;letter-spacing:.01em;background:linear-gradient(135deg,#0b6b3a,#12995a)}
+  .form-carte > button.sec{padding:15px 18px}
+  .verif-note{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 14px;border:1px solid #cfe8d9;border-radius:16px;background:#eef8f2;color:#0d5a33}
+  .verif-note svg{flex:none;width:24px;height:29px}
+  .verif-note b{display:block;font-size:.85rem}
+  .verif-note .vn-txt{display:block;font-size:.78rem;line-height:1.4;opacity:.9}
+  .apercu{margin:4px 0 16px}
+  .apercu-titre{margin:0 2px 8px;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
+  .apercu .card.job{margin-bottom:0}
+  .ic-user{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 4-6 8-6s8 2 8 6'/%3E%3C/svg%3E")}
+  .ic-briefcase{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='7' width='18' height='13' rx='2'/%3E%3Cpath d='M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2'/%3E%3Cpath d='M3 13h18'/%3E%3C/svg%3E")}
+  .ic-phone{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z'/%3E%3C/svg%3E")}
+  .ic-pin{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E")}
+  .ic-home{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 11l8-7 8 7'/%3E%3Cpath d='M6 10v9h12v-9'/%3E%3C/svg%3E")}
+  .ic-mail{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E")}
+  .ic-lock{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
+  .ic-tag{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12V4h8l9 9-8 8-9-9z'/%3E%3Ccircle cx='7.5' cy='8.5' r='1.2'/%3E%3C/svg%3E")}
+  .ic-text{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6h14'/%3E%3Cpath d='M12 6v13'/%3E%3Cpath d='M9 19h6'/%3E%3C/svg%3E")}
+  .ic-calendar{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3Cpath d='M8 3v4'/%3E%3Cpath d='M16 3v4'/%3E%3C/svg%3E")}
+  .ic-clock{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E")}
+  .ic-users{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5'/%3E%3Cpath d='M16 5a3.5 3.5 0 0 1 0 7'/%3E%3Cpath d='M18 14.5c2 .6 3.5 2.2 3.5 5'/%3E%3C/svg%3E")}
+  .ic-cash{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='6' width='19' height='12' rx='2'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3Cpath d='M6 9.5v.01M18 14.5v.01'/%3E%3C/svg%3E")}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -562,24 +613,36 @@
     <div id="espace">
 
       <!-- Connexion -->
-      <div class="card" id="bloc-connexion">
-        <h2>Connexion</h2>
-        <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
-        <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <div class="card form-carte" id="bloc-connexion">
+        <div class="form-tete">
+          <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+          <div><h2>Bon retour parmi nous</h2><p>Connecte-toi pour publier des missions ou te proposer.</p></div>
+        </div>
+        <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
+        <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
         <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
         <button id="btn-connexion">Se connecter</button>
-        <button id="btn-vers-inscription" class="sec">Créer un compte</button>
+        <div class="ou"><span>ou</span></div>
+        <button id="btn-vers-inscription" class="sec">Créer un compte gratuit</button>
         <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+        <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Connexion sécurisée par Google Firebase</p>
       </div>
 
       <!-- Inscription -->
-      <div class="card cache" id="bloc-inscription">
-        <h2>Créer un compte</h2>
+      <div class="card form-carte cache" id="bloc-inscription">
+        <div class="form-tete">
+          <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M2.5 20c0-4 3.5-6 7.5-6"/><path d="M18 8v6"/><path d="M15 11h6"/></svg></span>
+          <div><h2>Crée ton compte</h2><p>Gratuit, en 2 minutes. Rejoins la communauté Bohicon Jobs.</p></div>
+        </div>
+        <div class="sect">
+          <div class="sect-titre"><span class="sect-num">1</span>Accès au compte</div>
+          <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="i-email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
+          <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="i-mdp" type="password" placeholder="6 caractères minimum" autocomplete="new-password"></label>
+          <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
+        </div>
         <div id="champs-inscription"></div>
-        <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
-        <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
-        <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
-        <button id="btn-inscription">S'inscrire</button>
+        <button id="btn-inscription">Créer mon compte</button>
+        <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Tes informations sont protégées. Ton adresse n'est jamais montrée aux autres.</p>
         <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
       </div>
 
@@ -613,28 +676,52 @@
         </div>
 
         <div id="t-publier" class="cache">
-          <h2 id="t-publier-titre">Publier une mission</h2>
-          <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
-          <select id="categorie" aria-label="Catégorie de la mission"></select>
-          <select id="ville">
-            <option>Bohicon</option><option>Abomey</option><option>Covè</option>
-            <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
-          </select>
-          <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
-          <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
-          <label class="etiq" for="quand">Quand la mission doit-elle être faite ?</label>
-          <select id="quand">
-            <option value="flexible">Flexible (pas de date précise)</option>
-            <option value="urgent">Urgent (aujourd'hui)</option>
-            <option value="date">À une date précise</option>
-          </select>
-          <div id="bloc-date" class="duo-champs cache">
-            <input id="date-exec" type="date" aria-label="Date souhaitée">
-            <input id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)">
+          <div class="form-tete">
+            <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span>
+            <div><h2 id="t-publier-titre">Publier une mission</h2><p>Décris ton besoin : les personnes de ton quartier pourront se proposer.</p></div>
           </div>
-          <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
-          <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
-          <button id="publier">Publier</button>
+          <div class="verif-note">
+            <span id="icone-verif-pub" aria-hidden="true"></span>
+            <div><b>Contrôle avant publication</b><span class="vn-txt">Notre équipe vérifie chaque mission avant de la rendre visible.</span></div>
+          </div>
+
+          <div class="sect">
+            <div class="sect-titre"><span class="sect-num">1</span>Ta mission</div>
+            <label class="champ"><span>Titre</span><input class="ic ic-text" id="titre" placeholder="Ex : Laver ma moto" maxlength="60"></label>
+            <label class="champ"><span>Catégorie</span><select class="ic ic-tag" id="categorie" aria-label="Catégorie de la mission"></select></label>
+            <label class="champ"><span>Description <small>10 caractères minimum</small></span><textarea id="desc" rows="4" placeholder="Explique la tâche, le matériel nécessaire, la durée estimée…" maxlength="300"></textarea><em class="compteur" id="compteur-desc">0 / 300</em></label>
+          </div>
+
+          <div class="sect">
+            <div class="sect-titre"><span class="sect-num">2</span>Lieu et date</div>
+            <label class="champ"><span>Ville</span><select class="ic ic-pin" id="ville">
+              <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+              <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+            </select></label>
+            <label class="champ"><span>Lieu d'exécution</span><input class="ic ic-home" id="lieu" placeholder="Quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100"></label>
+            <label class="champ" id="champ-adresse"><span>Adresse précise <small>facultatif, visible seulement par la personne choisie</small></span><textarea id="adresse-precise" rows="2" placeholder="Rue, repère détaillé…" maxlength="200"></textarea></label>
+            <label class="champ"><span>Quand ?</span><select class="ic ic-calendar" id="quand">
+              <option value="flexible">Flexible (pas de date précise)</option>
+              <option value="urgent">Urgent (aujourd'hui)</option>
+              <option value="date">À une date précise</option>
+            </select></label>
+            <div id="bloc-date" class="duo-champs cache">
+              <label class="champ"><span>Date</span><input class="ic ic-calendar" id="date-exec" type="date" aria-label="Date souhaitée"></label>
+              <label class="champ"><span>Heure <small>facultatif</small></span><input class="ic ic-clock" id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)"></label>
+            </div>
+          </div>
+
+          <div class="sect">
+            <div class="sect-titre"><span class="sect-num">3</span>Rémunération</div>
+            <label class="champ champ-prix"><span>Prix proposé</span><input class="ic ic-cash" id="prix" type="number" min="0" inputmode="numeric" placeholder="Ex : 3000"><b class="suffixe">FCFA</b></label>
+          </div>
+
+          <div class="apercu">
+            <div class="apercu-titre">Aperçu de ta mission</div>
+            <div id="apercu-mission"></div>
+          </div>
+
+          <button id="publier">Publier la mission</button>
           <button id="annuler-edition" class="lien cache" type="button">Annuler la modification</button>
         </div>
 
@@ -778,25 +865,36 @@
   const pluriel = (n, mot) => n + " " + mot + (n > 1 ? "s" : "");
 
   // ---------- Champs du profil ----------
-  const champs = (p, avecOk = true) => `
-    <input id="${p}prenom" placeholder="Prénom" maxlength="40" autocomplete="given-name">
-    <input id="${p}nom" placeholder="Nom" maxlength="40" autocomplete="family-name">
-    <input id="${p}profession" list="professions" placeholder="Profession (ex : couturière, étudiant, chauffeur)" maxlength="60" autocomplete="off">
-    <input id="${p}tel" type="tel" placeholder="Numéro WhatsApp (ex : 0155000000)" autocomplete="tel">
-    <select id="${p}ville">
-      <option value="">Ville de résidence…</option>
-      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
-      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
-    </select>
-    <input id="${p}adresse" placeholder="Quartier / adresse de résidence" maxlength="100" autocomplete="street-address">
-    <select id="${p}role">
-      <option value="les deux">Je veux trouver ET publier des missions</option>
-      <option value="travailleur">Je cherche des missions à faire</option>
-      <option value="client">Je veux publier des missions</option>
-    </select>
+  const champs = (p, avecOk = true, debut = 1) => `
+    <div class="sect">
+      <div class="sect-titre"><span class="sect-num">${debut}</span>Identité</div>
+      <div class="duo-champs">
+        <label class="champ"><span>Prénom</span><input class="ic ic-user" id="${p}prenom" placeholder="Ex : Awa" maxlength="40" autocomplete="given-name"></label>
+        <label class="champ"><span>Nom</span><input class="ic ic-user" id="${p}nom" placeholder="Ex : Kossi" maxlength="40" autocomplete="family-name"></label>
+      </div>
+      <label class="champ"><span>Profession</span><input class="ic ic-briefcase" id="${p}profession" list="professions" placeholder="Couturière, étudiant, chauffeur…" maxlength="60" autocomplete="off"></label>
+    </div>
+    <div class="sect">
+      <div class="sect-titre"><span class="sect-num">${debut + 1}</span>Contact et résidence</div>
+      <label class="champ"><span>Numéro WhatsApp</span><input class="ic ic-phone" id="${p}tel" type="tel" placeholder="Ex : 0155000000" autocomplete="tel"></label>
+      <label class="champ"><span>Ville de résidence</span><select class="ic ic-pin" id="${p}ville">
+        <option value="">Choisis ta ville…</option>
+        <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+        <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+      </select></label>
+      <label class="champ"><span>Quartier ou adresse <small>jamais montré aux autres</small></span><input class="ic ic-home" id="${p}adresse" placeholder="Ex : Agbanzoun" maxlength="100" autocomplete="street-address"></label>
+    </div>
+    <div class="sect">
+      <div class="sect-titre"><span class="sect-num">${debut + 2}</span>Ton usage</div>
+      <label class="champ"><span>Je veux…</span><select class="ic ic-users" id="${p}role">
+        <option value="les deux">Trouver ET publier des missions</option>
+        <option value="travailleur">Chercher des missions à faire</option>
+        <option value="client">Publier des missions</option>
+      </select></label>
+    </div>
     ${avecOk ? `<label class="check"><input type="checkbox" id="${p}ok">
       <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>` : ""}`;
-  $("champs-inscription").innerHTML = champs("i-");
+  $("champs-inscription").innerHTML = champs("i-", true, 2);
   $("champs-profil").innerHTML = champs("p-");
   $("champs-edit").innerHTML = champs("e-", false);
 
@@ -1934,7 +2032,7 @@
     }
     enInscription = false;
     user = auth.currentUser;
-    btn.disabled = false; btn.textContent = "S'inscrire";
+    btn.disabled = false; btn.textContent = "Créer mon compte";
     majUI();
   });
 
@@ -2040,6 +2138,7 @@
       $("categorie").value = "";
       $("bloc-date").classList.add("cache");
       afficherMessage(estAdminUtilisateur ? "Mission publiée|Elle apparaît dans la liste des missions." : "Mission envoyée|Elle sera visible par tous après validation par l'administrateur.", "info");
+      majFormPublication();
       choisirOnglet("histo");
       if (adressePrecise){
         try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
@@ -2049,7 +2148,7 @@
       console.error(e);
       afficherMessage("La mission n'a pas pu être publiée. Réessaie.");
     }
-    btn.disabled = false; btn.textContent = "Publier";
+    btn.disabled = false; btn.textContent = "Publier la mission";
   });
 
   $("filtre").addEventListener("change", afficher);
@@ -2063,6 +2162,7 @@
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
     ["resume", "histo", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
     if (t === "profil" && profil) remplir("e-", profil);
+    if (t === "publier") majFormPublication();
     const actif = document.querySelector(".onglet.on");
     if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
   }
@@ -2369,6 +2469,53 @@
     });
   })();
 
+  // ---------- Formulaire de publication : compteur et aperçu en direct ----------
+  function majFormPublication(){
+    const d = $("desc");
+    $("compteur-desc").textContent = d.value.length + " / 300";
+    const z = $("apercu-mission");
+    z.innerHTML = "";
+    const c = el("div", "card job s-disponible");
+    const haut = el("div", "c-haut");
+    const cat = catInfo($("categorie").value);
+    if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
+    haut.appendChild(el("span", "badge b-disponible", "Disponible"));
+    if ($("quand").value === "urgent") haut.appendChild(el("span", "badge b-urgent", "Urgent"));
+    c.appendChild(haut);
+    c.appendChild(el("h3", "c-titre", $("titre").value.trim() || "Titre de ta mission"));
+    const infos = el("div", "c-infos");
+    const lieu = $("lieu").value.trim();
+    infos.appendChild(el("span", "", "📍 " + ($("ville").value || "Ville") + (lieu ? " · " + lieu : "")));
+    if ($("quand").value === "date" && $("date-exec").value){
+      const t = quandTexte({ quand: "date", dateExec: $("date-exec").value, heureExec: $("heure-exec").value });
+      if (t) infos.appendChild(el("span", "", "🗓️ " + t.texte));
+    } else if ($("quand").value === "urgent"){
+      infos.appendChild(el("span", "", "🗓️ Urgent (aujourd'hui)"));
+    }
+    c.appendChild(infos);
+    if (d.value.trim()) c.appendChild(el("p", "c-desc", d.value.trim()));
+    const bas = el("div", "c-bas");
+    if (profil){
+      const aut = el("div", "c-auteur");
+      aut.appendChild(el("span", "avatar", String(profil.prenom || "?").trim().charAt(0).toUpperCase()));
+      const tt = el("div");
+      tt.appendChild(el("b", "", nomCourt(profil)));
+      tt.appendChild(el("small", "", "Auteur de la mission"));
+      aut.appendChild(tt);
+      bas.appendChild(aut);
+    }
+    const prix = el("div", "c-prix", $("prix").value ? Number($("prix").value).toLocaleString("fr-FR") : "—");
+    prix.appendChild(el("small", "", " FCFA"));
+    bas.appendChild(prix);
+    c.appendChild(bas);
+    z.appendChild(c);
+  }
+  ["titre", "categorie", "ville", "lieu", "quand", "date-exec", "heure-exec", "prix", "desc"].forEach(id => {
+    $(id).addEventListener("input", majFormPublication);
+    $(id).addEventListener("change", majFormPublication);
+  });
+  $("icone-verif-pub").innerHTML = SVG_VERIF;
+
   // ---------- Modifier une mission publiée ----------
   let missionEnEdition = null;
   function demarrerEdition(m){
@@ -2384,10 +2531,11 @@
     $("bloc-date").classList.toggle("cache", $("quand").value !== "date");
     $("prix").value = m.prix || "";
     $("desc").value = m.desc || "";
-    $("adresse-precise").classList.add("cache");
+    $("champ-adresse").classList.add("cache");
     $("t-publier-titre").textContent = "Modifier la mission";
     $("publier").textContent = "Enregistrer les modifications";
     $("annuler-edition").classList.remove("cache");
+    majFormPublication();
     ouvrirEspace("publier");
   }
   function finirEdition(){
@@ -2396,10 +2544,11 @@
     $("quand").value = "flexible";
     $("categorie").value = "";
     $("bloc-date").classList.add("cache");
-    $("adresse-precise").classList.remove("cache");
+    $("champ-adresse").classList.remove("cache");
     $("t-publier-titre").textContent = "Publier une mission";
-    $("publier").textContent = "Publier";
+    $("publier").textContent = "Publier la mission";
     $("annuler-edition").classList.add("cache");
+    majFormPublication();
   }
   $("annuler-edition").addEventListener("click", finirEdition);
 
