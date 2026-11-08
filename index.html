@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261105-2222">
-<meta name="build-notes" content="Une seule candidature ou mission en cours à la fois, avec possibilité de retirer sa candidature.">
+<meta name="build" content="20261107-1845">
+<meta name="build-notes" content="Nouvelles fenêtres de confirmation, plus sobres et professionnelles.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -351,6 +351,28 @@
   .bandeau-maj{z-index:64}
   .bandeau-maj .bi-texte small{white-space:normal}
   @media (min-width:721px){.bandeau-install.bandeau-maj{display:flex;left:auto;right:16px;bottom:16px;width:380px}}
+
+
+  /* Fenêtres de confirmation : style sobre et professionnel (remplacent celles du navigateur) */
+  .dlg-fond{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,30,19,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .dlg-fond.sortie{animation:dlg-sortie .14s ease both}
+  .dlg{width:min(100%,400px);padding:24px 22px 18px;border-radius:22px;background:#fff;box-shadow:0 30px 70px -20px rgba(6,30,19,.65);text-align:center;animation:dlg-entree .22s cubic-bezier(.2,.9,.3,1.15) both}
+  .dlg-ico{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:#e7f5ed;color:#0f7a45}
+  .dlg.danger .dlg-ico{background:#fdecea;color:#c0392b}
+  .dlg-ico svg{width:26px;height:26px}
+  .dlg-titre{margin:0 0 8px;font-size:1.1rem;font-weight:700;line-height:1.3;color:#12261b}
+  .dlg-msg{margin:0 0 18px;font-size:.92rem;line-height:1.55;color:#52645a}
+  .dlg-champ{width:100%;margin:0 0 16px;padding:12px 14px;border:1.5px solid #dfe9e3;border-radius:12px;background:#fff;font:inherit;font-size:.95rem;color:#12261b}
+  .dlg-champ:focus{outline:none;border-color:#0b6b3a}
+  .dlg-actions{display:flex;gap:10px}
+  .dlg-btn{flex:1;width:auto;margin:0;padding:13px 16px;border-radius:999px;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+  .dlg-btn.sec{background:#fff;color:#0b6b3a;border:1.5px solid #cfe0d6;box-shadow:none}
+  .dlg-btn.ok{background:#0b6b3a;color:#fff;border:0;box-shadow:0 8px 18px -8px rgba(11,107,58,.8)}
+  .dlg.danger .dlg-btn.ok{background:#c0392b;box-shadow:0 8px 18px -8px rgba(192,57,43,.8)}
+  @keyframes dlg-fond{from{opacity:0}to{opacity:1}}
+  @keyframes dlg-sortie{from{opacity:1}to{opacity:0}}
+  @keyframes dlg-entree{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.dlg-fond,.dlg,.dlg-fond.sortie{animation:none}}
 
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
@@ -794,6 +816,73 @@
     if (exigerOk && !$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
     return { prenom, nom, profession, tel, ville, adresse, role };
   }
+
+
+  // ---------- Fenêtres de confirmation sobres (remplacent confirm et prompt du navigateur) ----------
+  const ICONE_DIALOGUE = {
+    danger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4.5"/><path d="M12 17.5h.01"/></svg>',
+    question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.6-2.4 2-2.4 3.4"/><path d="M12 16.8h.01"/></svg>'
+  };
+  function dialogue(opts){
+    return new Promise(resolve => {
+      const o = Object.assign({ titre: "Confirmation", message: "", ok: "Confirmer", annuler: "Annuler", danger: false, champ: null }, opts);
+      const fond = document.createElement("div");
+      fond.className = "dlg-fond";
+      const boite = document.createElement("div");
+      boite.className = "dlg" + (o.danger ? " danger" : "");
+      boite.setAttribute("role", "alertdialog");
+      boite.setAttribute("aria-modal", "true");
+      const ico = document.createElement("span");
+      ico.className = "dlg-ico";
+      ico.innerHTML = o.danger ? ICONE_DIALOGUE.danger : ICONE_DIALOGUE.question;
+      const t = document.createElement("h3");
+      t.className = "dlg-titre";
+      t.textContent = o.titre;
+      const m = document.createElement("p");
+      m.className = "dlg-msg";
+      m.textContent = o.message;
+      boite.append(ico, t, m);
+      let champ = null;
+      if (o.champ){
+        champ = document.createElement("input");
+        champ.className = "dlg-champ";
+        champ.type = "text";
+        champ.maxLength = o.champ.max || 120;
+        champ.placeholder = o.champ.placeholder || "";
+        champ.value = o.champ.valeur || "";
+        boite.appendChild(champ);
+      }
+      const rang = document.createElement("div");
+      rang.className = "dlg-actions";
+      const bAnn = document.createElement("button");
+      bAnn.type = "button"; bAnn.className = "dlg-btn sec"; bAnn.textContent = o.annuler;
+      const bOk = document.createElement("button");
+      bOk.type = "button"; bOk.className = "dlg-btn ok"; bOk.textContent = o.ok;
+      rang.append(bAnn, bOk);
+      boite.appendChild(rang);
+      fond.appendChild(boite);
+      document.body.appendChild(fond);
+      const precedent = document.activeElement;
+      const touche = e => {
+        if (e.key === "Escape"){ e.stopPropagation(); fermer(champ ? null : false); }
+        else if (e.key === "Enter" && champ){ e.preventDefault(); valider(); }
+      };
+      const fermer = valeur => {
+        document.removeEventListener("keydown", touche, true);
+        fond.classList.add("sortie");
+        setTimeout(() => { fond.remove(); if (precedent && precedent.focus){ try { precedent.focus(); } catch (e) { /* ignoré */ } } }, 140);
+        resolve(valeur);
+      };
+      const valider = () => fermer(champ ? champ.value.trim() : true);
+      document.addEventListener("keydown", touche, true);
+      bOk.addEventListener("click", valider);
+      bAnn.addEventListener("click", () => fermer(champ ? null : false));
+      fond.addEventListener("click", e => { if (e.target === fond) fermer(champ ? null : false); });
+      (champ || bOk).focus();
+    });
+  }
+  const confirmer = (message, opts) => dialogue(Object.assign({ message }, opts));
+  const demander = (message, opts) => dialogue(Object.assign({ message, champ: {} }, opts));
 
   // Supprime les émojis des messages affichés (style plus sobre et professionnel)
   function sansEmoji(s){
@@ -1361,7 +1450,7 @@
           const ok = el("button", "mini", "✅ Accepter");
           ok.type = "button";
           ok.addEventListener("click", async () => {
-            if (!confirm("Attribuer la mission à " + c.nom + " ? Les autres candidats verront qu'elle est attribuée.")) return;
+            if (!(await confirmer("Attribuer la mission à " + c.nom + " ? Les autres candidats verront qu'elle est attribuée.", { titre: "Accepter la candidature", ok: "Accepter" }))) return;
             try {
               const lot = writeBatch(db);
               lot.update(doc(db, "missions", m.id), { statut: "attribuee", workerUid: c.uid, workerNom: c.nom });
@@ -1373,7 +1462,7 @@
           const non = el("button", "danger mini", "❌ Refuser");
           non.type = "button";
           non.addEventListener("click", async () => {
-            if (!confirm("Refuser la candidature de " + c.nom + " ?")) return;
+            if (!(await confirmer("Refuser la candidature de " + c.nom + " ?", { titre: "Refuser la candidature", ok: "Refuser", danger: true }))) return;
             try { await updateDoc(doc(db, "candidatures", c.id), { statut: "refusee" }); afficherMessage("Candidature refusée|Le candidat verra cette décision sur le site.", "info"); }
             catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
           });
@@ -1530,11 +1619,11 @@
         }
         actions.append(
           ...(confirmeeT ? [bouton("✅ Marquer comme terminée", "mini", async () => {
-            if (!confirm("Tu déclares la mission terminée. " + nomT + " devra le confirmer.")) return;
+            if (!(await confirmer("Tu déclares la mission terminée. " + nomT + " devra le confirmer.", { titre: "Déclarer la mission terminée", ok: "Déclarer" }))) return;
             await maj({ statut: "a_confirmer", declarePar: "auteur", declareeAt: serverTimestamp() });
           })] : []),
           bouton("↩️ Remettre disponible", "sec mini", async () => {
-            if (!confirm("Remettre la mission en disponible ?")) return;
+            if (!(await confirmer("Remettre la mission en disponible ?", { titre: "Remettre en disponible", ok: "Remettre" }))) return;
             const lot = writeBatch(db);
             lot.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
             const idCand = m.id + "_" + m.workerUid;
@@ -1554,7 +1643,7 @@
         if (parT){
           actions.append(
             bouton("✅ Confirmer la fin de la mission", "mini", async () => {
-              if (!confirm("Confirmer que la mission est bien terminée ?")) return;
+              if (!(await confirmer("Confirmer que la mission est bien terminée ?", { titre: "Confirmer la fin de la mission", ok: "Confirmer" }))) return;
               await maj({ statut: "terminee", termineeAt: serverTimestamp() });
             }),
             bouton("↩️ Pas encore terminée", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))
@@ -1575,7 +1664,7 @@
 
       if (statut === "disponible" || statut === "attribuee"){
         actions.appendChild(bouton("Supprimer ma mission", "danger mini", async () => {
-          if (!confirm("Supprimer cette mission ?")) return;
+          if (!(await confirmer("Supprimer cette mission ?", { titre: "Supprimer la mission", ok: "Supprimer", danger: true }))) return;
           await deleteDoc(doc(db, "missions", m.id));
         }));
       }
@@ -1595,7 +1684,7 @@
             actions.appendChild(o);
             if (maCand.statut === "en_attente"){
               actions.appendChild(bouton("Retirer ma candidature", "sec mini", async () => {
-                if (!confirm("Retirer ta candidature pour cette mission ?")) return;
+                if (!(await confirmer("Retirer ta candidature pour cette mission ?", { titre: "Retirer ma candidature", ok: "Retirer", danger: true }))) return;
                 await deleteDoc(doc(db, "candidatures", maCand.id));
                 afficherMessage("Candidature retirée|Tu peux de nouveau postuler à une autre mission.", "succes");
               }));
@@ -1664,7 +1753,7 @@
           }));
         }
         actions.appendChild(bouton("✅ J'ai terminé la mission", "mini", async () => {
-          if (!confirm("Tu déclares avoir terminé la mission. " + auteurNom + " devra le confirmer.")) return;
+          if (!(await confirmer("Tu déclares avoir terminé la mission. " + auteurNom + " devra le confirmer.", { titre: "Déclarer la mission terminée", ok: "Déclarer" }))) return;
           await maj({ statut: "a_confirmer", declarePar: "travailleur", declareeAt: serverTimestamp() });
         }));
       } else if (statut === "a_confirmer"){
@@ -1677,7 +1766,7 @@
         if (parA){
           actions.append(
             bouton("✅ Je confirme", "mini", async () => {
-              if (!confirm("Confirmer que la mission est terminée ?")) return;
+              if (!(await confirmer("Confirmer que la mission est terminée ?", { titre: "Confirmer la fin de la mission", ok: "Confirmer" }))) return;
               await maj({ statut: "terminee", termineeAt: serverTimestamp() });
             }),
             bouton("❌ Ce n'est pas terminé", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))

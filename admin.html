@@ -79,6 +79,27 @@
   .annonce-apercu{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;color:#fff;font-size:.88rem;margin-bottom:10px}
   .annonce-apercu span{flex:1}
   .check input{width:auto;margin:0;accent-color:var(--vert)}
+
+  /* Fenêtres de confirmation : style sobre et professionnel (remplacent celles du navigateur) */
+  .dlg-fond{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,30,19,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .dlg-fond.sortie{animation:dlg-sortie .14s ease both}
+  .dlg{width:min(100%,400px);padding:24px 22px 18px;border-radius:22px;background:#fff;box-shadow:0 30px 70px -20px rgba(6,30,19,.65);text-align:center;animation:dlg-entree .22s cubic-bezier(.2,.9,.3,1.15) both}
+  .dlg-ico{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:#e7f5ed;color:#0f7a45}
+  .dlg.danger .dlg-ico{background:#fdecea;color:#c0392b}
+  .dlg-ico svg{width:26px;height:26px}
+  .dlg-titre{margin:0 0 8px;font-size:1.1rem;font-weight:700;line-height:1.3;color:#12261b}
+  .dlg-msg{margin:0 0 18px;font-size:.92rem;line-height:1.55;color:#52645a}
+  .dlg-champ{width:100%;margin:0 0 16px;padding:12px 14px;border:1.5px solid #dfe9e3;border-radius:12px;background:#fff;font:inherit;font-size:.95rem;color:#12261b}
+  .dlg-champ:focus{outline:none;border-color:#0b6b3a}
+  .dlg-actions{display:flex;gap:10px}
+  .dlg-btn{flex:1;width:auto;margin:0;padding:13px 16px;border-radius:999px;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+  .dlg-btn.sec{background:#fff;color:#0b6b3a;border:1.5px solid #cfe0d6;box-shadow:none}
+  .dlg-btn.ok{background:#0b6b3a;color:#fff;border:0;box-shadow:0 8px 18px -8px rgba(11,107,58,.8)}
+  .dlg.danger .dlg-btn.ok{background:#c0392b;box-shadow:0 8px 18px -8px rgba(192,57,43,.8)}
+  @keyframes dlg-fond{from{opacity:0}to{opacity:1}}
+  @keyframes dlg-sortie{from{opacity:1}to{opacity:0}}
+  @keyframes dlg-entree{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.dlg-fond,.dlg,.dlg-fond.sortie{animation:none}}
 </style>
 </head>
 <body>
@@ -279,6 +300,73 @@
   const ms = x => (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
   const dateTexte = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
 
+
+  // ---------- Fenêtres de confirmation sobres (remplacent confirm et prompt du navigateur) ----------
+  const ICONE_DIALOGUE = {
+    danger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4.5"/><path d="M12 17.5h.01"/></svg>',
+    question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.6-2.4 2-2.4 3.4"/><path d="M12 16.8h.01"/></svg>'
+  };
+  function dialogue(opts){
+    return new Promise(resolve => {
+      const o = Object.assign({ titre: "Confirmation", message: "", ok: "Confirmer", annuler: "Annuler", danger: false, champ: null }, opts);
+      const fond = document.createElement("div");
+      fond.className = "dlg-fond";
+      const boite = document.createElement("div");
+      boite.className = "dlg" + (o.danger ? " danger" : "");
+      boite.setAttribute("role", "alertdialog");
+      boite.setAttribute("aria-modal", "true");
+      const ico = document.createElement("span");
+      ico.className = "dlg-ico";
+      ico.innerHTML = o.danger ? ICONE_DIALOGUE.danger : ICONE_DIALOGUE.question;
+      const t = document.createElement("h3");
+      t.className = "dlg-titre";
+      t.textContent = o.titre;
+      const m = document.createElement("p");
+      m.className = "dlg-msg";
+      m.textContent = o.message;
+      boite.append(ico, t, m);
+      let champ = null;
+      if (o.champ){
+        champ = document.createElement("input");
+        champ.className = "dlg-champ";
+        champ.type = "text";
+        champ.maxLength = o.champ.max || 120;
+        champ.placeholder = o.champ.placeholder || "";
+        champ.value = o.champ.valeur || "";
+        boite.appendChild(champ);
+      }
+      const rang = document.createElement("div");
+      rang.className = "dlg-actions";
+      const bAnn = document.createElement("button");
+      bAnn.type = "button"; bAnn.className = "dlg-btn sec"; bAnn.textContent = o.annuler;
+      const bOk = document.createElement("button");
+      bOk.type = "button"; bOk.className = "dlg-btn ok"; bOk.textContent = o.ok;
+      rang.append(bAnn, bOk);
+      boite.appendChild(rang);
+      fond.appendChild(boite);
+      document.body.appendChild(fond);
+      const precedent = document.activeElement;
+      const touche = e => {
+        if (e.key === "Escape"){ e.stopPropagation(); fermer(champ ? null : false); }
+        else if (e.key === "Enter" && champ){ e.preventDefault(); valider(); }
+      };
+      const fermer = valeur => {
+        document.removeEventListener("keydown", touche, true);
+        fond.classList.add("sortie");
+        setTimeout(() => { fond.remove(); if (precedent && precedent.focus){ try { precedent.focus(); } catch (e) { /* ignoré */ } } }, 140);
+        resolve(valeur);
+      };
+      const valider = () => fermer(champ ? champ.value.trim() : true);
+      document.addEventListener("keydown", touche, true);
+      bOk.addEventListener("click", valider);
+      bAnn.addEventListener("click", () => fermer(champ ? null : false));
+      fond.addEventListener("click", e => { if (e.target === fond) fermer(champ ? null : false); });
+      (champ || bOk).focus();
+    });
+  }
+  const confirmer = (message, opts) => dialogue(Object.assign({ message }, opts));
+  const demander = (message, opts) => dialogue(Object.assign({ message, champ: {} }, opts));
+
   let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
@@ -382,7 +470,7 @@
           const txt = u.suspendu
             ? "Réactiver le compte de " + u.prenom + " " + u.nom + " ?"
             : "Suspendre " + u.prenom + " " + u.nom + " ? Cette personne ne pourra plus publier ni se proposer.";
-          if (!confirm(txt)) return;
+          if (!(await confirmer(txt, { titre: u.suspendu ? "Réactiver le compte" : "Suspendre le compte", ok: u.suspendu ? "Réactiver" : "Suspendre", danger: !u.suspendu }))) return;
           try { await updateDoc(doc(db, "users", u.id), { suspendu: !u.suspendu }); }
           catch (e) { console.error(e); message("Action impossible. Vérifie les règles Firestore."); }
         });
@@ -417,7 +505,7 @@
       const b = el("button", "danger mini", "Supprimer");
       b.type = "button";
       b.addEventListener("click", async () => {
-        if (!confirm("Supprimer définitivement cette mission et ses candidatures ?")) return;
+        if (!(await confirmer("Supprimer définitivement cette mission et ses candidatures ?", { titre: "Supprimer la mission", ok: "Supprimer", danger: true }))) return;
         try {
           const lot = writeBatch(db);
           lot.delete(doc(db, "missions", m.id));
@@ -433,11 +521,11 @@
           + (dj !== null ? " depuis " + dj + " jour(s)" : "")));
         btns.append(
           bouton("Forcer : terminée", "mini", async () => {
-            if (!confirm("Valider la fin de cette mission à la place des parties ? Les points, gains et avis seront comptés.")) return;
+            if (!(await confirmer("Valider la fin de cette mission à la place des parties ? Les points, gains et avis seront comptés.", { titre: "Valider la fin de la mission", ok: "Valider" }))) return;
             await updateDoc(doc(db, "missions", m.id), { statut: "terminee", termineeAt: serverTimestamp(), forceeAdmin: true });
           }),
           bouton("Remettre en cours", "sec mini", async () => {
-            if (!confirm("Remettre cette mission en « Attribuée » ?")) return;
+            if (!(await confirmer("Remettre cette mission en « Attribuée » ?", { titre: "Remettre la mission en cours", ok: "Remettre" }))) return;
             await updateDoc(doc(db, "missions", m.id), { statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() });
           })
         );
@@ -495,7 +583,7 @@
       if (s.statut !== "traite"){
         if (s.type === "mission" && missions.some(m => m.id === s.cibleId)){
           btns.appendChild(bouton("Supprimer la mission", "danger mini", async () => {
-            if (!confirm("Supprimer définitivement cette mission et ses candidatures ?")) return;
+            if (!(await confirmer("Supprimer définitivement cette mission et ses candidatures ?", { titre: "Supprimer la mission", ok: "Supprimer", danger: true }))) return;
             const lot = writeBatch(db);
             lot.delete(doc(db, "missions", s.cibleId));
             cands.filter(c => c.missionId === s.cibleId).forEach(c => lot.delete(doc(db, "candidatures", c.id)));
@@ -507,7 +595,7 @@
           const u = users.find(x => x.id === s.cibleId);
           if (u && !u.suspendu){
             btns.appendChild(bouton("Suspendre", "danger mini", async () => {
-              if (!confirm("Suspendre " + (u.prenom || "") + " " + (u.nom || "") + " ?")) return;
+              if (!(await confirmer("Suspendre " + (u.prenom || "") + " " + (u.nom || "") + " ?", { titre: "Suspendre le compte", ok: "Suspendre", danger: true }))) return;
               await updateDoc(doc(db, "users", u.id), { suspendu: true });
               await marquerCible(s, "traite");
             }));
@@ -569,7 +657,7 @@
       if (statut !== "traite") btns.appendChild(bouton("Traité", "sec mini", maj("traite")));
       else btns.appendChild(bouton("Rouvrir", "sec mini", maj("nouveau")));
       btns.appendChild(bouton("Supprimer", "danger mini", async () => {
-        if (!confirm("Supprimer ce retour ?")) return;
+        if (!(await confirmer("Supprimer ce retour ?", { titre: "Supprimer le retour", ok: "Supprimer", danger: true }))) return;
         await deleteDoc(doc(db, "retours", r.id));
       }));
       ligne.append(g, btns);
@@ -665,7 +753,7 @@
         bouton("↑", "sec mini", () => deplacer(i, -1)),
         bouton("↓", "sec mini", () => deplacer(i, 1)),
         bouton("Supprimer", "danger mini", async () => {
-          if (!confirm("Supprimer définitivement cette bannière ?")) return;
+          if (!(await confirmer("Supprimer définitivement cette bannière ?", { titre: "Supprimer la bannière", ok: "Supprimer", danger: true }))) return;
           await deleteDoc(doc(db, "bannieres", b.id));
         })
       );
@@ -725,7 +813,7 @@
       a2.href = lienWa(x.contact, "Bonjour " + prenom + ", ton bilan Bohicon Jobs : " + s.inscrits + " inscrit(s), " + s.actifs + " actif(s), " + s.publiees + " mission(s) publiée(s), " + s.terminees + " terminée(s). Bravo et merci 🙏");
       a2.target = "_blank"; a2.rel = "noopener";
       btns.append(a1, a2, bouton("Supprimer", "danger mini", async () => {
-        if (!confirm("Supprimer cet ambassadeur ? Les inscrits déjà rattachés à son code resteront comptés comme « code non reconnu ».")) return;
+        if (!(await confirmer("Supprimer cet ambassadeur ? Les inscrits déjà rattachés à son code resteront comptés comme « code non reconnu ».", { titre: "Supprimer l'ambassadeur", ok: "Supprimer", danger: true }))) return;
         await deleteDoc(doc(db, "ambassadeurs", x.id));
       }));
       ligne.append(g, btns);
@@ -778,7 +866,7 @@
       btns.append(
         bouton("✅ Valider", "mini", () => updateDoc(doc(db, "missions", m.id), { valide: true, valideLe: serverTimestamp() })),
         bouton("❌ Refuser", "danger mini", async () => {
-          const motif = (prompt("Motif du refus (visible par l'auteur) :", "Annonce non conforme") || "").trim();
+          const motif = ((await demander("Ce motif sera visible par l'auteur de la mission.", { titre: "Refuser la mission", ok: "Refuser", danger: true, champ: { placeholder: "Motif du refus", valeur: "Annonce non conforme", max: 120 } })) || "").trim();
           if (!motif) return;
           await updateDoc(doc(db, "missions", m.id), { refusMotif: motif.slice(0, 120) });
         })
@@ -934,7 +1022,7 @@
     } catch (e) { console.error(e); message("Publication impossible. Vérifie les règles Firestore."); }
   });
   $("btn-retirer-annonce").addEventListener("click", async () => {
-    if (!confirm("Retirer l'annonce du site ?")) return;
+    if (!(await confirmer("Retirer l'annonce du site ?", { titre: "Retirer l'annonce", ok: "Retirer", danger: true }))) return;
     try {
       await setDoc(doc(db, "config", "annonce"), { actif: false, maj: serverTimestamp() }, { merge: true });
       $("an-actif").checked = false;
