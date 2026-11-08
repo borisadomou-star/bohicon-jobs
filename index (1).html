@@ -1,0 +1,2770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b6b3a">
+<meta name="build" content="20261107-1845">
+<meta name="build-notes" content="Nouvelles fenêtres de confirmation, plus sobres et professionnelles.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bohicon Jobs">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="config.js"></script>
+<title>Bohicon Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vert:#0b6b3a; --vert2:#12995a; --vert-fonce:#08452a; --jaune:#fcd116; --rouge:#e8112d;
+    --fond:#f1f5f2; --encre:#12261b; --gris:#5b6b62; --trait:#dbe7df;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Poppins',system-ui,sans-serif;background:var(--fond);color:var(--encre);line-height:1.5}
+  .cache{display:none!important}
+
+  /* Barre du haut */
+  .topbar{position:sticky;top:0;z-index:50;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;box-shadow:0 2px 10px rgba(8,69,42,.12)}
+  .marque{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--vert-fonce);font-weight:700;font-size:1.05rem}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95rem;letter-spacing:.5px}
+
+  /* Bandeau d'accueil */
+  .hero{
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.10' stroke-width='2'%3E%3Ccircle cx='320' cy='110' r='40'/%3E%3Ccircle cx='320' cy='110' r='80'/%3E%3Ccircle cx='320' cy='110' r='120'/%3E%3Ccircle cx='320' cy='110' r='160'/%3E%3Ccircle cx='320' cy='110' r='200'/%3E%3C/g%3E%3C/svg%3E") right top / 420px no-repeat,
+      linear-gradient(160deg,#08572f 0%,#0b7a42 60%,#12995a 100%);
+    color:#fff;text-align:center;padding:32px 16px 88px}
+  .hero-in{max-width:680px;margin:0 auto}
+  .tuile{width:76px;height:76px;margin:0 auto 14px;border-radius:22px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+  .hero h1{font-size:clamp(1.45rem,5.5vw,2.1rem);line-height:1.25;margin:0 0 10px;font-weight:700}
+  .hero p{margin:0 auto 18px;max-width:480px;opacity:.95;font-size:.98rem}
+  .stats{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
+  .stats div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px;min-width:132px}
+  .stats b{display:block;font-size:1.7rem;line-height:1.1}
+  .stats span{font-size:.78rem;opacity:.92}
+  .cta-ligne{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+  button.cta{width:auto;margin:0;padding:14px 26px;background:var(--jaune);color:#1a1a1a;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+  .cta-sec{display:inline-block;color:#fff;border:1.5px solid rgba(255,255,255,.75);border-radius:999px;padding:12.5px 24px;text-decoration:none;font-weight:600}
+
+  /* Mise en page */
+  main{max-width:680px;margin:0 auto;padding:0 16px 8px}
+  #espace{position:relative;z-index:2;margin-top:-56px;scroll-margin-top:72px}
+  #missions{scroll-margin-top:72px}
+  .card{background:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(8,69,42,.08)}
+  h2{font-size:1.15rem;margin:0 0 12px;color:var(--vert-fonce);font-weight:700}
+
+  /* Champs et boutons */
+  input,select,textarea{width:100%;padding:13px 14px;margin-bottom:10px;border:1.5px solid transparent;background:var(--fond);border-radius:14px;font-size:1rem;font-family:inherit;color:var(--encre)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--vert);background:#fff}
+  button{width:100%;padding:14px 18px;margin-bottom:10px;border:0;border-radius:999px;background:var(--vert);color:#fff;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:0 6px 14px rgba(11,107,58,.25)}
+  button:active{transform:scale(.98)}
+  button.sec{background:#fff;color:var(--vert);border:1.5px solid var(--vert);box-shadow:none}
+  button.danger{background:#fff;color:#b3261e;border:1.5px solid #b3261e;box-shadow:none}
+  button.mini{padding:10px 14px;margin:0;font-size:.9rem}
+  button:disabled{opacity:.6}
+  .lien{background:none;border:0;color:var(--vert);text-decoration:underline;font-weight:400;padding:4px;margin:0;box-shadow:none}
+  button:focus-visible,a:focus-visible{outline:3px solid var(--vert2);outline-offset:2px}
+  .btn-espace{width:auto;margin:0;padding:10px 18px;background:var(--jaune);color:#1a1a1a;box-shadow:none;font-size:.92rem;font-weight:700}
+  .check{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;margin-bottom:14px;color:var(--gris)}
+  .check input{width:auto;margin:4px 0 0;accent-color:var(--vert)}
+  .check a{color:var(--vert)}
+
+  /* Mon compte */
+  .onglets{display:flex;gap:6px;background:var(--fond);border-radius:999px;padding:4px;margin-bottom:14px}
+  .onglet{flex:1;width:auto;margin:0;padding:10px 6px;background:transparent;color:var(--gris);box-shadow:none;font-size:.88rem}
+  .onglet.on{background:#fff;color:var(--vert);box-shadow:0 2px 8px rgba(8,69,42,.14)}
+  .salut{font-size:1.1rem;font-weight:700;color:var(--vert-fonce)}
+  .prof{font-size:.85rem;color:var(--gris);margin-bottom:12px;word-break:break-word}
+  .score{background:linear-gradient(135deg,#08572f,#12995a);color:#fff;border-radius:20px;padding:16px;margin-bottom:12px}
+  .score-haut{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .score-n{font-size:2.4rem;font-weight:700;line-height:1}
+  .score-l{font-size:.8rem;opacity:.9}
+  .niveau{background:var(--jaune);color:#1a1a1a;font-weight:700;font-size:.8rem;padding:4px 12px;border-radius:999px}
+  .barre{height:8px;background:rgba(255,255,255,.25);border-radius:999px;margin:12px 0 6px;overflow:hidden}
+  .barre i{display:block;height:100%;background:var(--jaune);border-radius:999px}
+  .score-t{font-size:.78rem;opacity:.92}
+  .tuiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .tuile-s{background:var(--fond);border-radius:16px;padding:12px}
+  .tuile-s b{display:block;font-size:1.1rem;color:var(--vert-fonce);word-break:break-word}
+  .tuile-s span{font-size:.75rem;color:var(--gris)}
+  .tuile-s small{display:block;font-size:.72rem;color:var(--gris);margin-top:2px}
+  .aide{font-size:.76rem;color:var(--gris);line-height:1.45;margin:4px 0 12px}
+  .h-ligne{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--trait)}
+  .h-ligne:last-child{border-bottom:0}
+  .h-titre{font-weight:600;font-size:.93rem;word-break:break-word}
+  .h-sous{font-size:.8rem;color:var(--gris)}
+
+  .duo{display:flex;gap:8px;margin-top:2px}
+  .duo button{flex:1;width:auto}
+  .b-refus{background:#fdecea;color:#b3261e}
+
+  /* Notifications */
+  .droite{display:flex;align-items:center;gap:8px}
+  .cloche{position:relative;width:44px;height:44px;margin:0;padding:0;border-radius:50%;background:var(--fond);color:var(--vert-fonce);box-shadow:none;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+  .pastille{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--rouge);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panneau{position:fixed;top:66px;right:10px;width:min(94vw,380px);max-height:72vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 16px 40px rgba(8,69,42,.28);z-index:70;padding:14px}
+  .tete-notifs{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .tete-notifs h2{margin:0}
+  .tete-notifs .lien{width:auto;font-size:.8rem}
+  .notif{display:flex;gap:10px;padding:10px 8px;border-bottom:1px solid var(--trait);border-radius:12px;cursor:pointer;font-size:.88rem}
+  .notif:last-child{border-bottom:0}
+  .notif.nonlu{background:#eef9f2}
+  .notif .pt{flex:none;width:9px;height:9px;border-radius:50%;background:var(--rouge);margin-top:7px}
+  .notif.lu .pt{background:transparent}
+  .notif small{display:block;color:var(--gris);font-size:.74rem}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);top:72px;width:min(92vw,420px);background:var(--vert-fonce);color:#fff;border-radius:16px;padding:12px 16px;font-size:.9rem;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:80;cursor:pointer}
+  .wa.gris{background:var(--gris)}
+
+  .etiq{display:block;font-size:.8rem;color:var(--gris);margin:2px 4px 4px}
+  .duo-champs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .b-urgent{background:#fdecea;color:#b3261e}
+  .partage{display:block;text-align:center;font-size:.85rem;color:var(--vert);font-weight:600;text-decoration:none;padding:10px 0 2px}
+  .surligne{animation:flash 2.6s ease}
+  @keyframes flash{0%,100%{box-shadow:0 8px 24px rgba(8,69,42,.08)}25%,60%{box-shadow:0 0 0 5px var(--jaune)}}
+
+  .b-a_confirmer{background:#fff1d6;color:#8a5a00}
+  .job.s-a_confirmer{border-left-color:#f5a623}
+  .etoiles{display:flex;gap:2px;margin:4px 0 8px}
+  .etoile{width:auto;margin:0;padding:0 4px;background:none;color:#e0a800;box-shadow:none;font-size:1.7rem}
+  .avis-form{margin-top:8px;padding-top:8px;border-top:1px dashed var(--trait)}
+  .avis-form textarea{margin-bottom:8px}
+  .avis-ligne{padding:10px 0;border-bottom:1px solid var(--trait)}
+  .avis-ligne:last-child{border-bottom:0}
+
+  .sig{margin-top:6px;text-align:right}
+  .sig .lien{width:auto;font-size:.78rem;color:var(--gris)}
+
+  .plus{margin:10px 0 0}
+  .plus summary{cursor:pointer;color:var(--vert);font-weight:600;font-size:.88rem;padding:6px 0}
+  .plus .filtres{margin-top:8px}
+  .resultats{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:.82rem;color:var(--gris)}
+  .resultats .lien{width:auto;font-size:.82rem}
+
+  .retour-flottant{position:fixed;left:14px;bottom:14px;z-index:60;width:auto;margin:0;padding:11px 16px;border-radius:999px;background:#fff;color:var(--vert);border:1.5px solid var(--vert);box-shadow:0 8px 20px rgba(0,0,0,.25);font-size:.82rem}
+  .overlay{position:fixed;inset:0;background:rgba(8,40,25,.55);z-index:90;display:flex;align-items:flex-end;justify-content:center}
+  .retour-carte{background:#fff;border-radius:22px 22px 0 0;padding:18px;width:min(100%,520px);max-height:92vh;overflow:auto}
+  .piege{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+  /* Réorganisation : bannières en haut, « Mon espace » en panneau */
+  .hero{padding:22px 16px 76px}
+  .hero h1{font-size:clamp(1.3rem,5vw,1.8rem);margin:0 0 8px}
+  .hero p{margin:0 auto 14px;font-size:.92rem}
+  .stats{margin-bottom:14px}
+  .stats div{padding:8px 12px;min-width:112px}
+  .stats b{font-size:1.4rem}
+  main > .slider{margin:-50px 0 14px;position:relative;z-index:2}
+  .message-flottant{position:fixed;top:72px;left:50%;transform:translateX(-50%);width:min(92vw,520px);z-index:100;pointer-events:none}
+  .message-flottant:empty{display:none}
+  .message-flottant > div{margin:0;pointer-events:auto;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+  .vue-espace{position:fixed;left:0;right:0;bottom:0;background:var(--fond);overflow:auto;z-index:65;overscroll-behavior:contain}
+  .vue-corps{max-width:680px;margin:0 auto;padding:10px 16px 48px}
+  .vue-tete{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .btn-accueil{width:auto;margin:0;padding:8px 14px;border-radius:999px;background:#fff;color:var(--vert);border:1.5px solid var(--vert);font-weight:600;font-size:.85rem;box-shadow:none}
+  .vue-tete h2{margin:0}
+  .onglets{overflow-x:auto;scrollbar-width:none}
+  .onglets::-webkit-scrollbar{display:none}
+  .onglet{flex:0 0 auto;padding:10px 14px;white-space:nowrap}
+  .lien-menu{display:block;padding:14px 16px;margin-bottom:8px;border:1.5px solid var(--trait);border-radius:16px;color:var(--vert-fonce);font-weight:600;text-decoration:none;background:#fff;text-align:left}
+
+  .job{position:relative}
+  .job h3{padding-right:36px}
+  .favori{position:absolute;top:8px;right:8px;width:auto;margin:0;padding:4px 8px;background:none;color:#e0a800;box-shadow:none;font-size:1.5rem;line-height:1}
+
+  .b-gris{background:#eceff1;color:#455a64}
+
+  .annonce{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#fff;font-size:.88rem;font-weight:600}
+  .annonce.info{background:#1a4fa0}
+  .annonce.important{background:#b3261e}
+  .annonce.succes{background:#0a7d3b}
+  .annonce .defile{flex:1;min-width:0;overflow:hidden;white-space:nowrap}
+  .annonce .defile-texte{display:inline-block;padding-left:100%;animation:defile 14s linear infinite}
+  .annonce .icone{animation:clignote 1.2s ease-in-out infinite}
+  @keyframes defile{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  @keyframes clignote{0%,100%{opacity:1}50%{opacity:.25}}
+  .annonce a{color:#fff;text-decoration:underline;white-space:nowrap}
+  .annonce button{width:auto;margin:0;padding:2px 8px;background:none;color:#fff;box-shadow:none;font-size:1.1rem;line-height:1}
+
+  .invalide{border-color:#b3261e!important;background:#fdecea!important}
+
+  /* Cartes de missions : style premium */
+  .card.job{border:1px solid #e4ede7;border-left:4px solid var(--vert2);border-radius:20px;padding:16px 16px 14px;box-shadow:0 1px 2px rgba(8,69,42,.05),0 14px 30px -16px rgba(8,69,42,.28)}
+  .card.job.s-attribuee,.card.job.s-a_confirmer{border-left-color:#f5a623}
+  .card.job.s-terminee{border-left-color:#3b6fd4}
+  .favori{top:10px;right:10px}
+  .c-haut{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-right:40px;margin-bottom:10px}
+  .c-haut .badge{margin-left:0}
+  .chip-cat{background:#eef6f1;color:var(--vert-fonce);font-size:.74rem;font-weight:600;padding:4px 10px;border-radius:999px}
+  .job h3.c-titre{margin:0 0 8px;padding-right:0;font-size:1.1rem;font-weight:700;line-height:1.3;letter-spacing:-.01em;color:var(--encre)}
+  .c-infos{display:flex;flex-direction:column;gap:3px;font-size:.84rem;color:var(--gris);margin-bottom:10px}
+  .c-desc{margin:0 0 4px;font-size:.9rem;line-height:1.55;color:#33463b;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .c-desc.ouverte{display:block}
+  .c-plus{width:auto;margin:0 0 10px;padding:2px 0;background:none;color:var(--vert);box-shadow:none;font-size:.8rem;font-weight:600;text-decoration:underline}
+  .c-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #edf3ef}
+  .c-auteur{display:flex;align-items:center;gap:9px;min-width:0}
+  .avatar{flex:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+  .c-auteur b{display:block;font-size:.86rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .c-auteur small{display:block;color:var(--gris);font-size:.72rem;line-height:1.3}
+  .c-prix{flex:none;margin-left:auto;font-size:1.3rem;font-weight:700;color:var(--vert);line-height:1;white-space:nowrap}
+  .c-prix small{font-size:.68rem;font-weight:600;color:var(--gris)}
+  .card.job .actions{margin-top:12px}
+
+  /* Accueil : style premium */
+  .hero{position:relative;overflow:hidden;text-align:left;padding:28px 18px 92px;
+    background:radial-gradient(120% 90% at 88% 0%,rgba(252,209,22,.18) 0%,rgba(252,209,22,0) 46%),linear-gradient(165deg,#062f1b 0%,#0a5a32 55%,#0f7a45 100%)}
+  .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:250px;height:250px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 36px rgba(255,255,255,.04),0 0 0 76px rgba(255,255,255,.03);pointer-events:none}
+  .hero-in{position:relative;z-index:1;max-width:680px;margin:0 auto}
+  .sur-titre{display:inline-block;margin-bottom:12px;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--jaune)}
+  .hero h1{max-width:520px;margin:0 0 12px;font-size:clamp(1.6rem,6.2vw,2.15rem);font-weight:700;line-height:1.2;letter-spacing:-.02em}
+  .hero h1 em{font-style:normal;color:var(--jaune)}
+  .hero p{max-width:470px;margin:0 0 20px;font-size:.95rem;line-height:1.6;opacity:.88}
+  .cta-ligne{justify-content:flex-start;align-items:center;gap:18px}
+  button.cta{padding:14px 26px;font-weight:700;box-shadow:0 10px 24px -8px rgba(0,0,0,.45)}
+  .cta-sec{border:0;padding:0;font-weight:600;color:#fff;opacity:.92}
+  .stats{display:inline-flex;gap:0;margin:24px 0 0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:16px;backdrop-filter:blur(6px)}
+  .stats div{min-width:0;padding:10px 20px;background:none;border:0;border-radius:0;text-align:left}
+  .stats div+div{border-left:1px solid rgba(255,255,255,.16)}
+  .stats b{font-size:1.4rem}
+  .stats span{font-size:.72rem}
+
+  main > .slider{margin:-60px 0 20px}
+  .slide{min-height:170px;padding:22px;border-radius:22px;box-shadow:0 20px 40px -20px rgba(6,47,27,.6)}
+  .slide h3{font-size:1.2rem;font-weight:700;letter-spacing:-.01em}
+  .slide p{font-size:.9rem;opacity:.93}
+  .points{margin-top:12px}
+
+  section#missions.card{background:none;box-shadow:none;padding:0;margin-bottom:12px}
+  #missions h2{margin:4px 2px 12px;font-size:1.3rem;color:var(--encre);letter-spacing:-.01em}
+  #recherche{padding:14px 20px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;box-shadow:0 8px 20px -14px rgba(8,69,42,.45)}
+  .filtres select{padding:12px 16px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;font-size:.9rem;font-weight:500}
+  .plus summary{padding:10px 4px 2px}
+  .resultats{margin-top:12px;padding:0 4px}
+  #liste .card.job{margin-bottom:16px}
+
+  /* Accueil : contenu centré, comme l'ancienne version */
+  .hero{text-align:center}
+  .hero h1{margin:0 auto 12px}
+  .hero p{margin:0 auto 20px}
+  .cta-ligne{justify-content:center}
+  .stats div{text-align:center}
+
+  /* Navigation mobile : barre fixe en bas */
+  .droite{display:none}
+  .nav-bas{position:fixed;left:0;right:0;bottom:0;z-index:62;display:flex;align-items:flex-end;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e4ede7;box-shadow:0 -10px 28px -16px rgba(8,69,42,.4);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .nav-item{position:relative;flex:1;width:auto;margin:0;padding:6px 2px 2px;background:none;color:var(--gris);box-shadow:none;border-radius:12px;font-size:.68rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .nav-ico{font-size:1.3rem;line-height:1}
+  .nav-item.actif{color:var(--vert)}
+  .nav-item.pub{color:var(--vert-fonce)}
+  .nav-item.pub .nav-ico{width:46px;height:46px;margin-top:-24px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:400;box-shadow:0 10px 20px -8px rgba(11,107,58,.85)}
+  .nav-badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--rouge);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .vue-espace{bottom:calc(68px + env(safe-area-inset-bottom))}
+  #fab-haut{bottom:calc(82px + env(safe-area-inset-bottom))}
+  #fab-wa{bottom:calc(146px + env(safe-area-inset-bottom))}
+  .retour-flottant{bottom:calc(82px + env(safe-area-inset-bottom))}
+  @media (min-width:721px){
+    .droite{display:flex}
+    .nav-bas{display:none}
+    body{padding-bottom:0}
+    .vue-espace{bottom:0}
+    #fab-haut{bottom:16px}
+    #fab-wa{bottom:80px}
+    .retour-flottant{bottom:14px}
+  }
+
+  /* Indicateur « Missions vérifiées » */
+  .chip-verif{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 7px;border:1px solid #bfe3c4;border-radius:999px;background:#e8f6ea;color:#1b6b2f;font-size:.72rem;font-weight:700}
+  .chip-verif svg{width:14px;height:17px;flex:none}
+  .garantie{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;font-size:.78rem;line-height:1.35;color:rgba(255,255,255,.9)}
+  .garantie svg{width:16px;height:19px;flex:none}
+  .garantie b{color:var(--jaune)}
+
+  /* En-tête : logo, nom et slogan */
+  .marque{gap:12px}
+  .logo{width:48px;height:48px;border-radius:14px;font-size:1.05rem;font-weight:700;box-shadow:0 6px 14px -8px rgba(11,107,58,.8)}
+  .marque-texte{min-width:0}
+  .marque-texte b{display:block;font-size:1.2rem;font-weight:700;line-height:1.15;letter-spacing:-.01em;color:var(--vert)}
+  .marque-texte small{display:block;margin-top:2px;font-size:.72rem;font-weight:400;line-height:1.3;color:var(--gris);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* Slogan de l'en-tête : coloré et clignotant */
+  .marque-texte small{font-weight:600;font-size:.74rem;
+    background:linear-gradient(90deg,#0b6b3a 0%,#12995a 28%,#e0a100 55%,#12995a 80%,#0b6b3a 100%);background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+    animation:slogan-brille 4s linear infinite,slogan-clignote 1.5s ease-in-out infinite}
+  @keyframes slogan-brille{from{background-position:0% 0}to{background-position:220% 0}}
+  @keyframes slogan-clignote{0%,100%{opacity:1}50%{opacity:.4}}
+  @media (prefers-reduced-motion: reduce){.marque-texte small{animation:none}}
+
+  /* Installation comme application */
+  .bandeau-install{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:61;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid #dfe9e3;border-radius:18px;box-shadow:0 14px 34px -14px rgba(8,69,42,.55)}
+  .bi-ico{font-size:1.5rem}
+  .bi-texte{flex:1;min-width:0}
+  .bi-texte b{display:block;font-size:.9rem;color:var(--encre)}
+  .bi-texte small{display:block;font-size:.72rem;color:var(--gris)}
+  .bandeau-install .mini{width:auto;padding:9px 16px}
+  .bandeau-install .lien{width:auto;margin:0;padding:4px 8px;font-size:1rem;color:var(--gris)}
+  @media (min-width:721px){.bandeau-install{display:none}}
+
+  /* Messages : design moderne */
+  .msg{--c:#0f7a45;position:relative;display:flex;align-items:flex-start;gap:12px;padding:14px 14px 17px;background:#fff;border:1px solid #e4ece7;border-left:4px solid var(--c);border-radius:14px;box-shadow:0 18px 40px -16px rgba(6,47,27,.45);overflow:hidden;animation:msg-entree .28s ease both}
+  .msg.succes{--c:#0f7a45}
+  .msg.erreur{--c:#c0392b}
+  .msg.info{--c:#1a4fa0}
+  .msg-ico{flex:none;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#eef3f0;background:color-mix(in srgb,var(--c) 12%,#fff);color:var(--c)}
+  .msg-ico svg{width:20px;height:20px}
+  .msg-corps{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-top:1px}
+  .msg-corps b{font-size:.92rem;font-weight:700;line-height:1.25;color:var(--encre)}
+  .msg-corps span{font-size:.84rem;line-height:1.4;color:#4a5b52}
+  .msg-x{width:auto;margin:0;padding:0 4px;background:none;color:var(--gris);box-shadow:none;font-size:1.3rem;line-height:1}
+  .msg-barre{position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--c);opacity:.55;transform-origin:left;animation:msg-barre linear forwards}
+  @keyframes msg-entree{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes msg-barre{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+  @media (prefers-reduced-motion: reduce){.msg{animation:none}.msg-barre{display:none}}
+
+  /* Statuts des missions et des candidatures : style professionnel */
+  .badge{display:inline-flex;align-items:center;gap:6px;margin-left:0;padding:4px 10px;border:1px solid transparent;border-radius:999px;font-size:.7rem;font-weight:600;letter-spacing:.02em;line-height:1.2;vertical-align:middle}
+  .badge::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:currentColor}
+  .b-disponible{background:#e7f5ed;border-color:#c9e6d6;color:#0d6b3c}
+  .b-attribuee{background:#fff3dc;border-color:#f6dfb0;color:#8f5a00}
+  .b-a_confirmer{background:#efeaff;border-color:#d9d0f7;color:#5030a8}
+  .b-terminee{background:#e6eefc;border-color:#c9d9f6;color:#1a4fa0}
+  .b-gris{background:#eef1f0;border-color:#dde3e0;color:#55655d}
+  .b-urgent,.b-refus{background:#fdecea;border-color:#f5cfcc;color:#a12a20}
+  .card.job.s-a_confirmer{border-left-color:#7a5fd6}
+
+  .info,.erreur,.verrou{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid transparent;border-radius:12px;font-size:.84rem;font-weight:500;line-height:1.4;text-align:left}
+  .info::before,.erreur::before,.verrou::before{content:"";flex:none;width:18px;height:18px;margin-top:1px;background-position:center;background-repeat:no-repeat;background-size:contain}
+  .info{background:#eaf6ef;border-color:#cfe8d9;color:#0d5a33}
+  .info::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f7a45' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8 12.5l2.7 2.7L16 9.5'/%3E%3C/svg%3E")}
+  .info.attente{background:#fff6e5;border-color:#f6dfb0;color:#8a5a00}
+  .info.attente::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b36b00' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E")}
+  .erreur{background:#fdeeed;border-color:#f5cfcc;color:#a12a20}
+  .erreur::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c0392b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5v5.5'/%3E%3Cpath d='M12 16.5h.01'/%3E%3C/svg%3E")}
+  .verrou{background:#f3f6f4;border-color:#e2eae5;color:#52645a}
+  .verrou::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352645a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
+
+  /* Mise à jour de la plateforme */
+  .bandeau-maj{z-index:64}
+  .bandeau-maj .bi-texte small{white-space:normal}
+  @media (min-width:721px){.bandeau-install.bandeau-maj{display:flex;left:auto;right:16px;bottom:16px;width:380px}}
+
+
+  /* Fenêtres de confirmation : style sobre et professionnel (remplacent celles du navigateur) */
+  .dlg-fond{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,30,19,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .dlg-fond.sortie{animation:dlg-sortie .14s ease both}
+  .dlg{width:min(100%,400px);padding:24px 22px 18px;border-radius:22px;background:#fff;box-shadow:0 30px 70px -20px rgba(6,30,19,.65);text-align:center;animation:dlg-entree .22s cubic-bezier(.2,.9,.3,1.15) both}
+  .dlg-ico{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:#e7f5ed;color:#0f7a45}
+  .dlg.danger .dlg-ico{background:#fdecea;color:#c0392b}
+  .dlg-ico svg{width:26px;height:26px}
+  .dlg-titre{margin:0 0 8px;font-size:1.1rem;font-weight:700;line-height:1.3;color:#12261b}
+  .dlg-msg{margin:0 0 18px;font-size:.92rem;line-height:1.55;color:#52645a}
+  .dlg-champ{width:100%;margin:0 0 16px;padding:12px 14px;border:1.5px solid #dfe9e3;border-radius:12px;background:#fff;font:inherit;font-size:.95rem;color:#12261b}
+  .dlg-champ:focus{outline:none;border-color:#0b6b3a}
+  .dlg-actions{display:flex;gap:10px}
+  .dlg-btn{flex:1;width:auto;margin:0;padding:13px 16px;border-radius:999px;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer}
+  .dlg-btn.sec{background:#fff;color:#0b6b3a;border:1.5px solid #cfe0d6;box-shadow:none}
+  .dlg-btn.ok{background:#0b6b3a;color:#fff;border:0;box-shadow:0 8px 18px -8px rgba(11,107,58,.8)}
+  .dlg.danger .dlg-btn.ok{background:#c0392b;box-shadow:0 8px 18px -8px rgba(192,57,43,.8)}
+  @keyframes dlg-fond{from{opacity:0}to{opacity:1}}
+  @keyframes dlg-sortie{from{opacity:1}to{opacity:0}}
+  @keyframes dlg-entree{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.dlg-fond,.dlg,.dlg-fond.sortie{animation:none}}
+
+  /* Étapes */
+  .etapes{display:flex;align-items:flex-start;margin-top:4px}
+  .etape{flex:1;text-align:center;position:relative;padding:0 4px}
+  .etape:not(:last-child)::after{content:"";position:absolute;top:21px;left:calc(50% + 28px);right:calc(-50% + 28px);height:3px;border-radius:2px;background:var(--trait)}
+  .rond{width:44px;height:44px;margin:0 auto 8px;border-radius:50%;background:var(--vert);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px #dcefe3}
+  .etape:nth-child(3) .rond{background:var(--jaune);color:#1a1a1a;box-shadow:0 0 0 5px #fdf3c4}
+  .etape b{display:block;font-size:.85rem;color:var(--vert-fonce)}
+  .etape span{display:block;font-size:.76rem;color:var(--gris);line-height:1.35;margin-top:2px}
+
+  /* Missions */
+  .filtres{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .filtres select{margin:0}
+  .job{border-left:6px solid var(--vert2)}
+  .job.s-attribuee{border-left-color:#f5a623}
+  .job.s-terminee{border-left-color:#3b6fd4}
+  .job h3{margin:0 0 6px;font-size:1.05rem;font-weight:600}
+  .meta{font-size:.85rem;color:var(--gris);margin-bottom:6px}
+  .prix{display:inline-block;background:#e3f4ea;color:var(--vert);font-weight:700;padding:2px 10px;border-radius:999px}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 10px;border-radius:999px;margin-left:6px;vertical-align:middle;font-weight:600}
+  .b-disponible{background:#e3f4ea;color:#0a5d2c}
+  .b-attribuee{background:#fff1d6;color:#8a5a00}
+  .b-terminee{background:#e3ecfb;color:#1a4fa0}
+  .wa{display:block;text-align:center;background:#128c4a;color:#fff;padding:12px;border-radius:999px;text-decoration:none;font-weight:600;margin-top:8px}
+  .wa.petit{padding:9px;margin-top:0;font-size:.9rem}
+  .verrou{display:block;text-align:center;background:var(--fond);color:var(--gris);padding:12px;border-radius:999px;margin-top:8px;font-size:.88rem}
+  .actions{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .sous{background:var(--fond);border-radius:14px;padding:10px 12px;margin-top:4px;font-size:.9rem}
+  .ligne{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid var(--trait)}
+  .ligne:last-child{border-bottom:0}
+  .vide{text-align:center;color:var(--gris);padding:24px}
+  .erreur{background:#fdecea;color:#b3261e;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .info{background:#e3f4ea;color:#0a5d2c;padding:12px 14px;border-radius:14px;margin-bottom:12px}
+  .moi{font-size:.92rem;margin-bottom:12px;word-break:break-word}
+
+  /* Bannières */
+  .slider{margin:0 0 14px}
+  .piste{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;scrollbar-width:none}
+  .piste::-webkit-scrollbar{display:none}
+  .slide{flex:0 0 100%;scroll-snap-align:center;border-radius:22px;padding:20px;color:#fff;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;text-decoration:none;box-shadow:0 8px 24px rgba(8,69,42,.12)}
+  .slide h3{margin:0 0 6px;font-size:1.15rem;font-weight:700}
+  .slide p{margin:0;font-size:.88rem;opacity:.96}
+  .points{display:flex;justify-content:center;gap:6px;margin-top:10px}
+  .points i{width:8px;height:8px;border-radius:50%;background:#c3d3c9;transition:all .2s}
+  .points i.on{background:var(--vert);width:22px;border-radius:6px}
+
+  /* Pied de page */
+  .drapeau{display:flex;height:6px;margin-top:24px}
+  .drapeau span{flex:1}
+  .drapeau span:nth-child(1){background:#008751}
+  .drapeau span:nth-child(2){background:var(--jaune)}
+  .drapeau span:nth-child(3){background:var(--rouge)}
+  footer{background:var(--vert-fonce);color:#d3e5d9;text-align:center;padding:26px 16px 34px;font-size:.85rem}
+  footer a{color:var(--jaune);text-decoration:none;font-weight:600}
+  footer p{margin:6px 0 0}
+
+  /* Boutons flottants */
+  .fab{position:fixed;right:16px;width:52px;height:52px;margin:0;padding:0;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.28);z-index:60;font-size:1.35rem;text-decoration:none}
+  #fab-haut{bottom:16px;background:var(--jaune);color:#1a1a1a;opacity:0;pointer-events:none;transition:opacity .2s}
+  #fab-haut.on{opacity:1;pointer-events:auto}
+  #fab-wa{bottom:80px;background:#128c4a;color:#fff}
+
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}.annonce .defile{white-space:normal}.annonce .defile-texte{animation:none;padding-left:0}.annonce .icone{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="marque" href="#haut"><span class="logo">BJ</span><span class="marque-texte"><b>Bohicon Jobs</b><small>Les opportunités à portée de main</small></span></a>
+  <div class="droite">
+    <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
+    <button class="btn-espace" id="btn-mon-espace" type="button">👤 Mon espace</button>
+  </div>
+</div>
+
+<div id="message" class="message-flottant" role="status" aria-live="polite"></div>
+<div id="panneau-notifs" class="panneau cache" role="dialog" aria-label="Notifications"></div>
+<div id="toast" class="toast cache" role="status" aria-live="polite"></div>
+
+<div id="annonce" class="annonce cache" role="status"></div>
+
+<section class="hero" id="haut">
+  <div class="hero-in">
+    <span class="sur-titre">Petits jobs · Bohicon et environs</span>
+    <h1>Trouve un petit job ou <em>la bonne personne</em>, près de chez toi</h1>
+    <p>Publie une mission gratuitement ou propose tes services en quelques minutes, directement depuis ton téléphone.</p>
+    <div class="cta-ligne">
+      <button class="cta" id="cta-publier" type="button">Publier une mission</button>
+      <a class="cta-sec" href="#missions">Voir les missions →</a>
+    </div>
+    <div class="stats">
+      <div><b id="stat-dispo">0</b><span>missions disponibles</span></div>
+      <div><b id="stat-fin">0</b><span>missions terminées</span></div>
+    </div>
+    <div class="garantie">
+      <span id="icone-garantie" aria-hidden="true"></span>
+      <span><b id="stat-verif">0</b> <span id="lib-verif">missions vérifiées</span> · contrôlées par notre équipe avant publication</span>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="slider" id="slider"></div>
+
+  <section class="card" id="missions">
+    <h2>Missions</h2>
+    <input id="recherche" type="search" placeholder="🔍 Rechercher (titre, quartier, mot-clé…)" autocomplete="off">
+    <div class="filtres">
+      <select id="filtre-statut">
+        <option value="disponible">Disponibles</option>
+        <option value="attribuee">Attribuées</option>
+        <option value="terminee">Terminées</option>
+        <option value="expirees">🕓 Expirées</option>
+        <option value="favoris">⭐ Mes favoris</option>
+        <option value="toutes">Toutes</option>
+      </select>
+      <select id="filtre">
+        <option value="">Toutes les villes</option>
+        <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+        <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+      </select>
+    </div>
+    <details class="plus">
+      <summary>Plus de filtres</summary>
+      <div class="filtres">
+        <select id="f-cat"></select>
+        <select id="f-prix">
+          <option value="">Tous les prix</option>
+          <option value="0-2000">Jusqu'à 2 000 FCFA</option>
+          <option value="2000-5000">2 000 à 5 000 FCFA</option>
+          <option value="5000-">Plus de 5 000 FCFA</option>
+        </select>
+        <select id="f-tri">
+          <option value="recentes">Plus récentes</option>
+          <option value="urgentes">Urgentes d'abord</option>
+          <option value="prix-asc">Prix croissant</option>
+          <option value="prix-desc">Prix décroissant</option>
+        </select>
+      </div>
+    </details>
+    <div class="resultats">
+      <span id="compteur-res"></span>
+      <button id="btn-reset-filtres" class="lien cache" type="button">Réinitialiser les filtres</button>
+    </div>
+  </section>
+
+  <div id="liste"><div class="vide">Chargement…</div></div>
+</main>
+
+<div class="drapeau" aria-hidden="true"><span></span><span></span><span></span></div>
+<footer>
+  <a href="confidentialite.html">Confidentialité et conditions d'utilisation</a>
+  <p>© <span id="annee"></span> Bohicon Jobs · Bohicon, Bénin</p>
+  <p><a id="lien-installer" href="#">📲 Installer l'application</a></p>
+  <p><a id="lien-partage" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a></p>
+  <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
+</footer>
+
+<nav class="nav-bas" aria-label="Navigation principale">
+  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico">🏠</span>Accueil</button>
+  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico">🔍</span>Missions</button>
+  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico">+</span>Publier</button>
+  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico">🔔</span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
+  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico">👤</span>Mon espace</button>
+</nav>
+
+<div id="bandeau-maj" class="bandeau-install bandeau-maj cache" role="dialog" aria-label="Mise à jour disponible">
+  <span class="bi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0f7a45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></span>
+  <div class="bi-texte"><b>Mise à jour disponible</b><small id="maj-notes">Des améliorations ont été ajoutées à la plateforme.</small></div>
+  <button id="btn-maj" class="mini" type="button">Mettre à jour</button>
+  <button id="btn-maj-plus-tard" class="lien" type="button" aria-label="Plus tard">×</button>
+</div>
+
+<div id="bandeau-install" class="bandeau-install cache" role="dialog" aria-label="Installer l'application">
+  <span class="bi-ico" aria-hidden="true">📲</span>
+  <div class="bi-texte"><b>Installer Bohicon Jobs</b><small>Accès rapide depuis ton écran d'accueil</small></div>
+  <button id="btn-install-bandeau" class="mini" type="button">Installer</button>
+  <button id="btn-install-fermer" class="lien" type="button" aria-label="Fermer">✕</button>
+</div>
+
+<!-- Mon espace : panneau avec sous-menus -->
+<div id="vue-espace" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Mon espace">
+  <div class="vue-corps">
+    <div class="vue-tete">
+      <button id="btn-fermer-espace" class="btn-accueil" type="button">← Retour à l'accueil</button>
+    </div>
+    <div id="espace">
+
+      <!-- Connexion -->
+      <div class="card" id="bloc-connexion">
+        <h2>Connexion</h2>
+        <input id="email" type="email" placeholder="Ton e-mail" autocomplete="email">
+        <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
+        <button id="btn-connexion">Se connecter</button>
+        <button id="btn-vers-inscription" class="sec">Créer un compte</button>
+        <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+      </div>
+
+      <!-- Inscription -->
+      <div class="card cache" id="bloc-inscription">
+        <h2>Créer un compte</h2>
+        <div id="champs-inscription"></div>
+        <input id="i-email" type="email" placeholder="Ton e-mail" autocomplete="email">
+        <input id="i-mdp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="new-password">
+        <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
+        <button id="btn-inscription">S'inscrire</button>
+        <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
+      </div>
+
+      <!-- Profil à compléter -->
+      <div class="card cache" id="bloc-profil">
+        <h2>Complète ton profil</h2>
+        <div id="champs-profil"></div>
+        <button id="btn-profil">Enregistrer</button>
+        <button id="btn-deco-profil" class="sec" style="margin-bottom:0">Se déconnecter</button>
+      </div>
+
+      <!-- Mon compte : sous-menus -->
+      <div class="card cache" id="bloc-compte">
+        <div class="onglets">
+          <button class="onglet on" data-t="resume" type="button">📊 Résumé</button>
+          <button class="onglet" data-t="histo" type="button">🕘 Historique</button>
+          <button class="onglet" data-t="publier" type="button" id="onglet-publier">➕ Publier</button>
+          <button class="onglet" data-t="profil" type="button">👤 Profil</button>
+          <button class="onglet" data-t="aide" type="button">❓ Aide</button>
+        </div>
+
+        <div id="t-resume"></div>
+
+        <div id="t-histo" class="cache">
+          <select id="histo-filtre">
+            <option value="tout">Toutes mes missions</option>
+            <option value="realisee">Missions que j'ai réalisées</option>
+            <option value="publiee">Missions que j'ai publiées</option>
+          </select>
+          <div id="liste-histo"></div>
+        </div>
+
+        <div id="t-publier" class="cache">
+          <h2 id="t-publier-titre">Publier une mission</h2>
+          <input id="titre" placeholder="Titre (ex : Laver ma moto)" maxlength="60">
+          <select id="categorie" aria-label="Catégorie de la mission"></select>
+          <select id="ville">
+            <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+            <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+          </select>
+          <input id="lieu" placeholder="Lieu d'exécution : quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100">
+          <textarea id="adresse-precise" rows="2" placeholder="Adresse précise (facultatif) : visible seulement par la personne que tu choisis" maxlength="200"></textarea>
+          <label class="etiq" for="quand">Quand la mission doit-elle être faite ?</label>
+          <select id="quand">
+            <option value="flexible">Flexible (pas de date précise)</option>
+            <option value="urgent">Urgent (aujourd'hui)</option>
+            <option value="date">À une date précise</option>
+          </select>
+          <div id="bloc-date" class="duo-champs cache">
+            <input id="date-exec" type="date" aria-label="Date souhaitée">
+            <input id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)">
+          </div>
+          <input id="prix" type="number" placeholder="Prix proposé (FCFA)" min="0">
+          <textarea id="desc" rows="3" placeholder="Description de la mission" maxlength="300"></textarea>
+          <button id="publier">Publier</button>
+          <button id="annuler-edition" class="lien cache" type="button">Annuler la modification</button>
+        </div>
+
+        <div id="t-profil" class="cache">
+          <div id="champs-edit"></div>
+          <button id="btn-edit" type="button">Enregistrer mes informations</button>
+        </div>
+
+        <div id="t-aide" class="cache">
+          <h2>Comment ça marche</h2>
+          <div class="etapes">
+            <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
+            <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
+            <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
+          </div>
+          <div style="margin-top:16px">
+            <button id="aide-avis" class="lien-menu" type="button" style="width:100%;font-family:inherit;font-size:1rem">💬 Donner mon avis sur le site</button>
+            <button id="aide-installer" class="lien-menu" type="button" style="width:100%;font-family:inherit;font-size:1rem">📲 Installer l'application</button>
+            <a id="aide-inviter" class="lien-menu" href="#" target="_blank" rel="noopener">📲 Inviter un ami sur WhatsApp</a>
+            <a class="lien-menu" href="confidentialite.html">📄 Confidentialité et conditions d'utilisation</a>
+            <a id="aide-admin" class="lien-menu cache" href="admin.html">⚙️ Administration</a>
+          </div>
+        </div>
+
+        <button id="btn-deconnexion" class="sec" style="margin:6px 0 0">Se déconnecter</button>
+      </div>
+
+      <!-- Comment ça marche, pour les visiteurs -->
+      <section class="card" id="aide-visiteur">
+        <h2>Comment ça marche</h2>
+        <div class="etapes">
+          <div class="etape"><div class="rond">1</div><b>Crée ton compte</b><span>Gratuit, en 1 minute</span></div>
+          <div class="etape"><div class="rond">2</div><b>Publie ou propose-toi</b><span>Choisis ta mission</span></div>
+          <div class="etape"><div class="rond">3</div><b>Réalise et termine</b><span>Contact direct sur WhatsApp</span></div>
+        </div>
+      </section>
+
+      <button id="btn-retour-bas" class="sec" type="button" style="margin-top:6px">← Retour à l'accueil</button>
+    </div>
+  </div>
+</div>
+
+<button id="btn-retour" class="retour-flottant" type="button">💬 Donner mon avis</button>
+<div id="retour-overlay" class="overlay cache" role="dialog" aria-modal="true" aria-label="Donner mon avis sur le site">
+  <div class="retour-carte">
+    <div class="tete-notifs">
+      <h2>Ton avis sur le site</h2>
+      <button id="retour-fermer" class="lien" type="button">Fermer</button>
+    </div>
+    <div id="retour-ok" class="info cache">Merci ! Ton retour a bien été envoyé 🙏</div>
+    <div id="retour-erreur"></div>
+    <label class="etiq" for="retour-type">Que veux-tu nous dire ?</label>
+    <select id="retour-type">
+      <option value="probleme">🐞 J'ai rencontré un problème</option>
+      <option value="idee">💡 J'ai une idée</option>
+      <option value="compliment">👍 J'ai aimé quelque chose</option>
+      <option value="autre">💬 Autre chose</option>
+    </select>
+    <div class="etiq">Ta note du site (facultatif)</div>
+    <div id="retour-etoiles" class="etoiles"></div>
+    <textarea id="retour-message" rows="4" maxlength="600" placeholder="Explique-nous : ce que tu as fait, ce que tu as vu, ce que tu attendais…"></textarea>
+    <input id="retour-contact" placeholder="Ton prénom ou numéro WhatsApp (facultatif)" maxlength="60">
+    <input id="retour-site" class="piege" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button id="retour-envoyer" type="button">Envoyer mon retour</button>
+  </div>
+</div>
+
+<datalist id="professions">
+  <option value="Étudiant(e)"><option value="Commerçant(e)"><option value="Conducteur de moto-taxi">
+  <option value="Chauffeur"><option value="Livreur"><option value="Couturier(ère)">
+  <option value="Coiffeur(se)"><option value="Maçon"><option value="Électricien">
+  <option value="Plombier"><option value="Mécanicien"><option value="Menuisier">
+  <option value="Soudeur"><option value="Agriculteur(trice)"><option value="Enseignant(e)">
+  <option value="Infirmier(ère)"><option value="Cuisinier(ère)"><option value="Agent commercial">
+  <option value="Artisan"><option value="Autre">
+</datalist>
+
+<a id="fab-wa" class="fab cache" href="#" target="_blank" rel="noopener" aria-label="Nous écrire sur WhatsApp">💬</a>
+<button id="fab-haut" class="fab" type="button" aria-label="Revenir en haut">↑</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, writeBatch, setDoc,
+           query, where, orderBy, limit, onSnapshot, serverTimestamp, increment }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           signOut, sendPasswordResetEmail }
+    from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+  // Le numéro WhatsApp se règle dans le fichier config.js (pas ici).
+  const NUMERO_WA = (window.CONFIG && window.CONFIG.NUMERO_WA) || "";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6Wm1E1-tNSxVNJcyitA4N_3PLdZUgr7k",
+    authDomain: "bohicon-jobs.firebaseapp.com",
+    projectId: "bohicon-jobs",
+    storageBucket: "bohicon-jobs.firebasestorage.app",
+    messagingSenderId: "505683521455",
+    appId: "1:505683521455:web:d9bcf7a1b1143eeaf9895a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const missionsRef = collection(db, "missions");
+  const candRef = collection(db, "candidatures");
+
+  let missions = [];
+  let user = null;
+  let profil = null;
+  let enInscription = false;
+  let vueInscription = false;
+  let profilRempli = false;
+  let mesPubliees = [];
+  let mesRealisees = [];
+  let mesCandidatures = [];
+  let candidaturesRecues = [];
+  let suivis = [];
+  let suiviUid = null;
+  let filtreRole = "";
+  const ouverts = new Set();
+  const TITRE_BASE = document.title;
+  const charges = { pub: false, real: false, cand: false, recu: false, avis: false, missions: false };
+  let vuInit = false;
+  let vues = new Set();
+  let dernieresCles = new Set();
+  let minuteurToast = null;
+  const adressesVues = {};
+  let estAdminUtilisateur = false;
+  const descOuvertes = new Set();
+  const brouillons = {};
+  let avisTous = [];
+  let mesSignalements = new Set();
+  const brouillonsSig = {};
+  const $ = id => document.getElementById(id);
+  const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const LIBELLES = { disponible: "Disponible", attribuee: "Attribuée", a_confirmer: "À confirmer", terminee: "Terminée" };
+  const st = m => m.statut || "disponible";
+  const nomCourt = p => p.prenom + " " + p.nom.charAt(0).toUpperCase() + ".";
+  const pluriel = (n, mot) => n + " " + mot + (n > 1 ? "s" : "");
+
+  // ---------- Champs du profil ----------
+  const champs = (p, avecOk = true) => `
+    <input id="${p}prenom" placeholder="Prénom" maxlength="40" autocomplete="given-name">
+    <input id="${p}nom" placeholder="Nom" maxlength="40" autocomplete="family-name">
+    <input id="${p}profession" list="professions" placeholder="Profession (ex : couturière, étudiant, chauffeur)" maxlength="60" autocomplete="off">
+    <input id="${p}tel" type="tel" placeholder="Numéro WhatsApp (ex : 0155000000)" autocomplete="tel">
+    <select id="${p}ville">
+      <option value="">Ville de résidence…</option>
+      <option>Bohicon</option><option>Abomey</option><option>Covè</option>
+      <option>Zogbodomey</option><option>Djidja</option><option>Autre</option>
+    </select>
+    <input id="${p}adresse" placeholder="Quartier / adresse de résidence" maxlength="100" autocomplete="street-address">
+    <select id="${p}role">
+      <option value="les deux">Je veux trouver ET publier des missions</option>
+      <option value="travailleur">Je cherche des missions à faire</option>
+      <option value="client">Je veux publier des missions</option>
+    </select>
+    ${avecOk ? `<label class="check"><input type="checkbox" id="${p}ok">
+      <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>` : ""}`;
+  $("champs-inscription").innerHTML = champs("i-");
+  $("champs-profil").innerHTML = champs("p-");
+  $("champs-edit").innerHTML = champs("e-", false);
+
+  function lireProfil(p, exigerOk = true){
+    const prenom = $(p + "prenom").value.trim();
+    const nom = $(p + "nom").value.trim();
+    const profession = $(p + "profession").value.trim();
+    const tel = $(p + "tel").value.trim();
+    const ville = $(p + "ville").value;
+    const adresse = $(p + "adresse").value.trim();
+    const role = $(p + "role").value;
+    if (prenom.length < 2 || nom.length < 2){ afficherMessage("Entre ton prénom et ton nom."); return null; }
+    if (profession.length < 2){ afficherMessage("Indique ta profession."); return null; }
+    if (tel.replace(/\D/g, "").length < 8){ afficherMessage("Numéro WhatsApp invalide."); return null; }
+    if (!ville){ afficherMessage("Choisis ta ville de résidence."); return null; }
+    if (adresse.length < 3){ afficherMessage("Entre ton quartier ou adresse de résidence."); return null; }
+    if (exigerOk && !$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
+    return { prenom, nom, profession, tel, ville, adresse, role };
+  }
+
+
+  // ---------- Fenêtres de confirmation sobres (remplacent confirm et prompt du navigateur) ----------
+  const ICONE_DIALOGUE = {
+    danger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4.5"/><path d="M12 17.5h.01"/></svg>',
+    question: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.6-2.4 2-2.4 3.4"/><path d="M12 16.8h.01"/></svg>'
+  };
+  function dialogue(opts){
+    return new Promise(resolve => {
+      const o = Object.assign({ titre: "Confirmation", message: "", ok: "Confirmer", annuler: "Annuler", danger: false, champ: null }, opts);
+      const fond = document.createElement("div");
+      fond.className = "dlg-fond";
+      const boite = document.createElement("div");
+      boite.className = "dlg" + (o.danger ? " danger" : "");
+      boite.setAttribute("role", "alertdialog");
+      boite.setAttribute("aria-modal", "true");
+      const ico = document.createElement("span");
+      ico.className = "dlg-ico";
+      ico.innerHTML = o.danger ? ICONE_DIALOGUE.danger : ICONE_DIALOGUE.question;
+      const t = document.createElement("h3");
+      t.className = "dlg-titre";
+      t.textContent = o.titre;
+      const m = document.createElement("p");
+      m.className = "dlg-msg";
+      m.textContent = o.message;
+      boite.append(ico, t, m);
+      let champ = null;
+      if (o.champ){
+        champ = document.createElement("input");
+        champ.className = "dlg-champ";
+        champ.type = "text";
+        champ.maxLength = o.champ.max || 120;
+        champ.placeholder = o.champ.placeholder || "";
+        champ.value = o.champ.valeur || "";
+        boite.appendChild(champ);
+      }
+      const rang = document.createElement("div");
+      rang.className = "dlg-actions";
+      const bAnn = document.createElement("button");
+      bAnn.type = "button"; bAnn.className = "dlg-btn sec"; bAnn.textContent = o.annuler;
+      const bOk = document.createElement("button");
+      bOk.type = "button"; bOk.className = "dlg-btn ok"; bOk.textContent = o.ok;
+      rang.append(bAnn, bOk);
+      boite.appendChild(rang);
+      fond.appendChild(boite);
+      document.body.appendChild(fond);
+      const precedent = document.activeElement;
+      const touche = e => {
+        if (e.key === "Escape"){ e.stopPropagation(); fermer(champ ? null : false); }
+        else if (e.key === "Enter" && champ){ e.preventDefault(); valider(); }
+      };
+      const fermer = valeur => {
+        document.removeEventListener("keydown", touche, true);
+        fond.classList.add("sortie");
+        setTimeout(() => { fond.remove(); if (precedent && precedent.focus){ try { precedent.focus(); } catch (e) { /* ignoré */ } } }, 140);
+        resolve(valeur);
+      };
+      const valider = () => fermer(champ ? champ.value.trim() : true);
+      document.addEventListener("keydown", touche, true);
+      bOk.addEventListener("click", valider);
+      bAnn.addEventListener("click", () => fermer(champ ? null : false));
+      fond.addEventListener("click", e => { if (e.target === fond) fermer(champ ? null : false); });
+      (champ || bOk).focus();
+    });
+  }
+  const confirmer = (message, opts) => dialogue(Object.assign({ message }, opts));
+  const demander = (message, opts) => dialogue(Object.assign({ message, champ: {} }, opts));
+
+  // Supprime les émojis des messages affichés (style plus sobre et professionnel)
+  function sansEmoji(s){
+    return String(s == null ? "" : s)
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+
+  const ICONES_MSG = {
+    succes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>',
+    erreur: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.5h.01"/></svg>'
+  };
+  const MOTS_SUCCES = /réussie|publiée|envoy(é|ée)|modifiée|confirmée|acceptée|enregistrée|ajouté|mis à jour|installée|créé|copié|supprimée|merci|bienvenue/i;
+  let minuteurMessage = null;
+
+  // « Titre|Détail » : la barre verticale sépare le titre du détail (le titre est facultatif)
+  function afficherMessage(texte, type){
+    const z = $("message");
+    clearTimeout(minuteurMessage);
+    z.innerHTML = "";
+    if (!texte) return;
+    const propre = sansEmoji(texte);
+    const morceaux = propre.includes("|") ? propre.split("|").map(s => s.trim()) : ["", propre];
+    const detail = morceaux.slice(1).join(" ");
+    const genre = type === "succes" ? "succes" : (type === "info" ? (MOTS_SUCCES.test(propre) ? "succes" : "info") : "erreur");
+    const titre = morceaux[0] || (genre === "erreur" ? "Attention" : "");
+    const duree = genre === "erreur" ? 8000 : 5500;
+
+    const e = el("div", "msg " + genre);
+    e.setAttribute("role", genre === "erreur" ? "alert" : "status");
+    const ico = el("span", "msg-ico");
+    ico.innerHTML = ICONES_MSG[genre];
+    const corps = el("div", "msg-corps");
+    if (titre) corps.appendChild(el("b", "", titre));
+    if (detail) corps.appendChild(el("span", "", detail));
+    const x = el("button", "msg-x", "×");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer le message");
+    const barre = el("i", "msg-barre");
+    barre.style.animationDuration = duree + "ms";
+    e.append(ico, corps, x, barre);
+    e.addEventListener("click", () => { z.innerHTML = ""; });
+    z.appendChild(e);
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, duree);
+  }
+
+  function texteErreurAuth(e){
+    switch (e.code){
+      case "auth/invalid-email": return "Adresse e-mail invalide.";
+      case "auth/missing-password": return "Entre ton mot de passe.";
+      case "auth/weak-password": return "Mot de passe trop court (6 caractères minimum).";
+      case "auth/email-already-in-use": return "Cet e-mail a déjà un compte. Clique sur « J'ai déjà un compte ».";
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found": return "E-mail ou mot de passe incorrect.";
+      case "auth/too-many-requests": return "Trop de tentatives. Réessaie dans quelques minutes.";
+      case "auth/network-request-failed": return "Problème de connexion internet.";
+      default: return "Une erreur est survenue. Réessaie.";
+    }
+  }
+
+  function lienWhatsApp(tel, titre){
+    let n = String(tel).replace(/\D/g, "");
+    if (!n.startsWith("229")) n = "229" + n;
+    const msg = encodeURIComponent("Bonjour, je vous contacte pour la mission : " + titre);
+    return "https://wa.me/" + n + "?text=" + msg;
+  }
+
+  function lienWhatsAppMsg(tel, texte){
+    let n = String(tel).replace(/\D/g, "");
+    if (!n.startsWith("229")) n = "229" + n;
+    return "https://wa.me/" + n + "?text=" + encodeURIComponent(texte);
+  }
+
+  // ---------- Compteurs (calculés sur les missions chargées) ----------
+  function compteurs(){
+    const parAuteur = {}, parTravailleur = {};
+    missions.forEach(m => {
+      if (st(m) !== "terminee") return;
+      parAuteur[m.uid] = (parAuteur[m.uid] || 0) + 1;
+      if (m.workerUid) parTravailleur[m.workerUid] = (parTravailleur[m.workerUid] || 0) + 1;
+    });
+    return { parAuteur, parTravailleur };
+  }
+
+  // ---------- Rôles et tableau de bord personnel ----------
+  const el = (tag, cls, texte) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (texte !== undefined){
+      const sobre = (tag === "button" && !/favori|etoile/.test(cls || "")) || /(^|\s)(info|erreur|verrou)(\s|$)/.test(cls || "");
+      const t = sobre ? sansEmoji(texte) : texte;
+      e.textContent = t;
+      if (/(^|\s)info(\s|$)/.test(cls || "") && /^en attente/i.test(String(t))) e.classList.add("attente");
+    }
+    return e;
+  };
+  const profilOk = () => !!(profil && profil.profession);
+  // Bouclier « mission vérifiée » : une mission est vérifiée quand l'administrateur l'a validée
+  const SVG_VERIF = '<svg viewBox="0 0 100 120" aria-hidden="true" focusable="false"><path d="M50 4C35 14 18 18 6 18v42c0 28 22 46 44 58 22-12 44-30 44-58V18C82 18 65 14 50 4z" fill="#66c46f"/><path d="M50 4c15 10 32 14 44 14v42c0 28-22 46-44 58z" fill="#3bb54a"/><path d="M27 62l17 17 31-37" fill="none" stroke="#fff" stroke-width="11"/></svg>';
+  const roleActuel = () => (profil && profil.role) || "les deux";
+  const suspendu = () => !!(profil && profil.suspendu);
+  const peutPublier = () => !suspendu() && roleActuel() !== "travailleur";
+  const peutPostuler = () => !suspendu() && roleActuel() !== "client";
+  const fcfa = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
+  const dateMs = m => {
+    const t = m.termineeAt || m.createdAt;
+    return t && t.toMillis ? t.toMillis() : 0;
+  };
+  const dateTexte = ms => ms ? new Date(ms).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "";
+
+  const aujourdhui = () => {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  };
+  function quandTexte(m){
+    if (m.quand === "urgent") return { texte: "Urgent (aujourd'hui)", urgent: true };
+    if (m.quand === "date" && m.dateExec){
+      const d = new Date(m.dateExec + "T00:00:00");
+      let t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+      if (m.heureExec) t += " à " + String(m.heureExec).replace(":", "h");
+      return { texte: t, depasse: m.dateExec < aujourdhui() };
+    }
+    if (m.quand === "flexible") return { texte: "Flexible" };
+    return null;
+  }
+  const urlSite = () => location.href.split("#")[0].split("?")[0];
+  const lienPartageMission = m => "https://wa.me/?text=" + encodeURIComponent(
+    "🔎 Mission à " + m.ville + " : « " + m.titre + " » (" + fcfa(m.prix) + ")\nVoir sur Bohicon Jobs : " + urlSite() + "#mission=" + m.id);
+
+  let lienTraite = false;
+  function ouvrirLienDirect(){
+    if (lienTraite) return;
+    lienTraite = true;
+    const id = new URLSearchParams(location.hash.slice(1)).get("mission");
+    if (!id) return;
+    const m = missions.find(x => x.id === id && visible(x));
+    if (!m){ afficherMessage("Cette mission n'existe plus ou n'est plus disponible.", "info"); return; }
+    reinitialiserFiltres();
+    $("filtre-statut").value = "toutes";
+    afficher();
+    const cible = document.querySelector('[data-id="' + id.replace(/[^A-Za-z0-9]/g, "") + '"]');
+    if (cible){
+      cible.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
+      cible.classList.add("surligne");
+      setTimeout(() => cible.classList.remove("surligne"), 3000);
+    }
+  }
+
+  const CATEGORIES = [
+    ["menage", "🧹", "Ménage et nettoyage"], ["livraison", "🛵", "Livraison et courses"],
+    ["jardinage", "🌿", "Jardinage et extérieur"], ["bricolage", "🔧", "Bricolage et réparation"],
+    ["cuisine", "🍳", "Cuisine et événements"], ["domicile", "🏠", "Aide à domicile"],
+    ["transport", "📦", "Déménagement et transport"], ["cours", "📚", "Cours et soutien scolaire"],
+    ["informatique", "💻", "Informatique et bureautique"], ["autre", "✨", "Autre"]
+  ];
+  const catInfo = cle => CATEGORIES.find(c => c[0] === cle) || null;
+  const normaliser = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  function reinitialiserFiltres(){
+    $("recherche").value = "";
+    $("filtre").value = "";
+    $("f-cat").value = "";
+    $("f-prix").value = "";
+    $("f-tri").value = "recentes";
+    $("filtre-statut").value = "disponible";
+  }
+
+  // Une mission en attente de validation (valide === false) n'est visible que par son auteur.
+  // Les anciennes missions, sans ce champ, restent visibles.
+  const visible = m => m.valide !== false || !!(user && m.uid === user.uid);
+
+  // Une mission disponible est « expirée » si sa date est passée, ou si une mission « urgente » date d'un jour précédent
+  function estExpiree(m){
+    if (st(m) !== "disponible") return false;
+    if (m.quand === "date" && m.dateExec) return m.dateExec < aujourdhui();
+    if (m.quand === "urgent"){
+      const t = m.createdAt && m.createdAt.toMillis ? m.createdAt.toMillis() : 0;
+      const d = new Date(); d.setHours(0, 0, 0, 0);
+      return t > 0 && t < d.getTime();
+    }
+    return false;
+  }
+
+  function rafraichir(){ afficher(); majTableau(); }
+
+  function bouton(texte, cls, action){
+    const b = el("button", cls, texte);
+    b.type = "button";
+    b.addEventListener("click", async () => {
+      try { await action(); }
+      catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+    });
+    return b;
+  }
+
+  function notesPour(uid){
+    const l = avisTous.filter(a => a.pour === uid);
+    if (!l.length) return null;
+    return { moy: l.reduce((s, a) => s + Number(a.note || 0), 0) / l.length, n: l.length };
+  }
+  const etoilesTxt = r => "⭐ " + r.moy.toFixed(1).replace(".", ",") + " (" + r.n + " avis)";
+
+  // Qui puis-je noter pour cette mission terminée ? (null si déjà fait ou non concerné)
+  function cibleAvis(m){
+    if (!user || st(m) !== "terminee") return null;
+    if (avisTous.some(a => a.id === m.id + "_" + user.uid)) return null;
+    if (m.uid === user.uid && m.workerUid) return { uid: m.workerUid, nom: m.workerNom || "le travailleur" };
+    if (m.workerUid === user.uid) return { uid: m.uid, nom: m.auteur || "l'auteur" };
+    return null;
+  }
+
+  function formAvis(m, pourUid, pourNom){
+    const b = brouillons[m.id] || (brouillons[m.id] = { note: 0, texte: "", ouvert: false });
+    const zone = el("div", "avis-form");
+    if (!b.ouvert){
+      zone.appendChild(bouton("⭐ Laisser un avis à " + pourNom, "sec mini", async () => { b.ouvert = true; rafraichir(); }));
+      return zone;
+    }
+    zone.appendChild(el("div", "h-sous", "Ta note pour " + pourNom + " :"));
+    const rangee = el("div", "etoiles");
+    for (let i = 1; i <= 5; i++){
+      const s = el("button", "etoile", i <= b.note ? "★" : "☆");
+      s.type = "button";
+      s.setAttribute("aria-label", i + " sur 5");
+      s.addEventListener("click", () => { b.note = i; rafraichir(); });
+      rangee.appendChild(s);
+    }
+    zone.appendChild(rangee);
+    const ta = document.createElement("textarea");
+    ta.rows = 2; ta.maxLength = 300; ta.placeholder = "Commentaire (facultatif)"; ta.value = b.texte;
+    ta.addEventListener("input", () => { b.texte = ta.value; });
+    zone.appendChild(ta);
+    zone.appendChild(bouton("Envoyer mon avis", "mini", async () => {
+      if (b.note < 1){ afficherMessage("Choisis une note de 1 à 5 étoiles."); return; }
+      await setDoc(doc(db, "avis", m.id + "_" + user.uid), {
+        missionId: m.id, de: user.uid, deNom: nomCourt(profil), pour: pourUid,
+        note: b.note, commentaire: b.texte.trim(), titre: m.titre, createdAt: serverTimestamp()
+      });
+      delete brouillons[m.id];
+      afficherMessage("Avis envoyé|Merci pour ton retour.", "info");
+    }));
+    return zone;
+  }
+
+  const MOTIFS = [
+    ["arnaque", "Arnaque ou demande d'argent"], ["inapproprie", "Contenu inapproprié"],
+    ["harcelement", "Harcèlement ou menaces"], ["faux_profil", "Faux profil"],
+    ["dangereux", "Service dangereux ou illégal"], ["autre", "Autre"]
+  ];
+
+  function formSignalement(type, cibleId, cibleTitre, cibleUid){
+    const cle = type + "_" + cibleId;
+    if (mesSignalements.has(cle)){
+      const d = el("div", "sig");
+      d.appendChild(el("span", "h-sous", "🚩 Signalé, merci."));
+      return d;
+    }
+    const b = brouillonsSig[cle] || (brouillonsSig[cle] = { ouvert: false, motif: "arnaque", texte: "" });
+    if (!b.ouvert){
+      const d = el("div", "sig");
+      d.appendChild(bouton("🚩 Signaler", "lien", async () => { b.ouvert = true; rafraichir(); }));
+      return d;
+    }
+    const zone = el("div", "avis-form");
+    zone.appendChild(el("div", "h-sous", type === "mission" ? "Pourquoi signales-tu cette mission ?" : "Pourquoi signales-tu " + cibleTitre + " ?"));
+    const sel = document.createElement("select");
+    MOTIFS.forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sel.appendChild(o); });
+    sel.value = b.motif;
+    sel.addEventListener("change", () => { b.motif = sel.value; });
+    zone.appendChild(sel);
+    const ta = document.createElement("textarea");
+    ta.rows = 2; ta.maxLength = 300; ta.placeholder = "Détails (facultatif)"; ta.value = b.texte;
+    ta.addEventListener("input", () => { b.texte = ta.value; });
+    zone.appendChild(ta);
+    zone.appendChild(bouton("Envoyer le signalement", "danger mini", async () => {
+      await setDoc(doc(db, "signalements", cle + "_" + user.uid), {
+        type, cibleId, cibleTitre: String(cibleTitre || "").slice(0, 100), cibleUid,
+        motif: b.motif, details: b.texte.trim(), de: user.uid, deNom: nomCourt(profil),
+        statut: "ouvert", createdAt: serverTimestamp()
+      });
+      delete brouillonsSig[cle];
+      afficherMessage("Signalement envoyé|Il a été transmis à l'administrateur.", "info");
+    }));
+    zone.appendChild(bouton("Annuler", "lien", async () => { b.ouvert = false; rafraichir(); }));
+    return zone;
+  }
+
+  function remplir(p, d){
+    ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
+    $(p + "ville").value = d.ville || "";
+    $(p + "role").value = d.role || "les deux";
+  }
+
+  const NIVEAUX = [
+    { nom: "Débutant", min: 0 }, { nom: "Actif", min: 10 }, { nom: "Confirmé", min: 50 }, { nom: "Expert", min: 100 }
+  ];
+
+  // État d'une candidature, du point de vue du candidat
+  function etatCandidature(c){
+    if (c.statut === "refusee") return "Refusée";
+    const m = missions.find(x => x.id === c.missionId);
+    if (m && st(m) !== "disponible") return m.workerUid === c.uid ? "Retenue" : "Non retenue";
+    if (c.statut === "acceptee") return "Retenue";
+    return "En attente";
+  }
+
+  // Un utilisateur ne peut postuler que s'il n'a ni candidature en cours, ni mission en cours,
+  // ni travail terminé non encore confirmé sur la plateforme.
+  function blocageCandidature(){
+    if (!user) return null;
+    const enCours = mesRealisees.find(m => m.uid !== user.uid && (st(m) === "attribuee" || st(m) === "a_confirmer"));
+    if (enCours){
+      if (st(enCours) === "a_confirmer")
+        return { texte: "Postuler est indisponible : le travail « " + enCours.titre + " » doit d'abord être confirmé sur la plateforme." };
+      const cand = mesCandidatures.find(c => c.missionId === enCours.id);
+      if (cand && !cand.confirmee)
+        return { texte: "Postuler est indisponible : confirme d'abord ta mission « " + enCours.titre + " »." };
+      return { texte: "Postuler est indisponible : tu as une mission en cours (« " + enCours.titre + " »)." };
+    }
+    const attente = mesCandidatures.find(c => {
+      if (c.statut !== "en_attente") return false;
+      const m = missions.find(x => x.id === c.missionId);
+      return !!m && st(m) === "disponible" && !estExpiree(m);
+    });
+    if (attente)
+      return { texte: "Postuler est indisponible : tu as déjà une candidature en cours (« " + attente.titre + " »). Retire-la pour postuler ailleurs." };
+    return null;
+  }
+
+  function statsPerso(){
+    const realisees = mesRealisees.filter(m => m.uid !== user.uid);
+    const faites = realisees.filter(m => st(m) === "terminee");
+    const encoursTrav = realisees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length;
+    const terminees = mesPubliees.filter(m => st(m) === "terminee");
+    const encoursPub = mesPubliees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length;
+    const debut = new Date(); debut.setDate(1); debut.setHours(0, 0, 0, 0);
+    const somme = liste => liste.reduce((s, m) => s + Number(m.prix || 0), 0);
+    const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
+    const points = faites.length * 10 + terminees.length * 5;
+    let idx = 0;
+    NIVEAUX.forEach((n, i) => { if (points >= n.min) idx = i; });
+    return {
+      faites: faites.length, encoursTrav, terminees: terminees.length, encoursPub,
+      publiees: mesPubliees.length,
+      gains: somme(faites),
+      gainsMois: somme(faites.filter(m => dateMs(m) >= debut.getTime())),
+      confie: somme(terminees),
+      enAttente: mesCandidatures.filter(c => etatCandidature(c) === "En attente").length,
+      aTraiter: candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).length,
+      points, idx, note: notesPour(user.uid)
+    };
+  }
+
+  function majFiltreHisto(){
+    const cle = roleActuel();
+    if (cle === filtreRole) return;
+    filtreRole = cle;
+    const sel = $("histo-filtre");
+    const opts = [["tout", "Tout mon historique"]];
+    if (peutPostuler()) opts.push(["realisee", "Missions que j'ai réalisées"], ["candidature", "Mes candidatures"]);
+    if (peutPublier()) opts.push(["publiee", "Missions que j'ai publiées"]);
+    sel.innerHTML = "";
+    opts.forEach(([v, t]) => { const o = el("option", "", t); o.value = v; sel.appendChild(o); });
+    sel.value = "tout";
+  }
+
+  function majHisto(){
+    if (!user) return;
+    majFiltreHisto();
+    const zone = $("liste-histo");
+    zone.innerHTML = "";
+    const f = $("histo-filtre").value;
+    const items = [];
+    const ligneMission = (m, role) => ({ titre: m.titre, role, prix: m.prix, ms: dateMs(m), etat: LIBELLES[st(m)], cls: "b-" + st(m), mission: m });
+    if (peutPostuler() && (f === "tout" || f === "realisee"))
+      mesRealisees.filter(m => m.uid !== user.uid).forEach(m => items.push(ligneMission(m, "Réalisée")));
+    if (peutPublier() && (f === "tout" || f === "publiee"))
+      mesPubliees.forEach(m => items.push(ligneMission(m, "Publiée")));
+    if (peutPostuler() && (f === "tout" || f === "candidature"))
+      mesCandidatures.filter(c => !mesRealisees.some(m => m.id === c.missionId)).forEach(c => {
+        const e = etatCandidature(c);
+        items.push({ titre: c.titre, role: "Candidature", prix: c.prix, ms: dateMs(c), etat: e,
+          cls: e === "En attente" ? "b-attribuee" : (e.startsWith("Retenue") ? "b-disponible" : "b-refus") });
+      });
+    items.sort((a, b) => b.ms - a.ms);
+    if (!items.length){ zone.appendChild(el("div", "vide", "Aucune mission pour l'instant.")); return; }
+    items.forEach(i => {
+      const ligne = el("div", "h-ligne");
+      const gauche = el("div");
+      gauche.appendChild(el("div", "h-titre", i.titre));
+      gauche.appendChild(el("div", "h-sous", [i.role, fcfa(i.prix), dateTexte(i.ms)].filter(Boolean).join(" · ")));
+      ligne.append(gauche, el("span", "badge " + i.cls, i.etat));
+      zone.appendChild(ligne);
+      const cible = i.mission ? cibleAvis(i.mission) : null;
+      if (cible) zone.appendChild(formAvis(i.mission, cible.uid, cible.nom));
+    });
+  }
+
+  function majTableau(){
+    if (!user || !profilOk()) return;
+    const s = statsPerso();
+    const r = $("t-resume");
+    r.innerHTML = "";
+    r.appendChild(el("div", "salut", "Bonjour " + profil.prenom + " 👋"));
+    r.appendChild(el("div", "prof", "💼 " + profil.profession + " · 📍 " + profil.ville));
+    if (suspendu()) r.appendChild(el("div", "erreur", "⚠️ Ton compte est suspendu : tu ne peux plus publier ni te proposer. Contacte l'administrateur."));
+
+    const sc = el("div", "score");
+    const haut = el("div", "score-haut");
+    const g = el("div");
+    g.appendChild(el("div", "score-n", String(s.points)));
+    g.appendChild(el("div", "score-l", "points de score"));
+    haut.append(g, el("span", "niveau", "Niveau " + NIVEAUX[s.idx].nom));
+    sc.appendChild(haut);
+    const suivant = NIVEAUX[s.idx + 1];
+    const barre = el("div", "barre");
+    const rempli = document.createElement("i");
+    const pct = suivant ? Math.min(100, Math.round((s.points - NIVEAUX[s.idx].min) / (suivant.min - NIVEAUX[s.idx].min) * 100)) : 100;
+    rempli.style.width = pct + "%";
+    barre.appendChild(rempli);
+    sc.appendChild(barre);
+    sc.appendChild(el("div", "score-t", suivant ? (suivant.min - s.points) + " points avant le niveau " + suivant.nom : "Tu as atteint le niveau maximum 🎉"));
+    r.appendChild(sc);
+
+    const tuile = (valeur, label, sous) => {
+      const t = el("div", "tuile-s");
+      t.appendChild(el("b", "", valeur));
+      t.appendChild(el("span", "", label));
+      if (sous) t.appendChild(el("small", "", sous));
+      return t;
+    };
+    const pl = n => n > 1 ? "s" : "";
+    const tuiles = el("div", "tuiles");
+    if (peutPostuler()){
+      tuiles.append(
+        tuile(fcfa(s.gains), "Gains total"),
+        tuile(fcfa(s.gainsMois), "Gains ce mois-ci"),
+        tuile(String(s.faites), "Missions réalisées", s.encoursTrav ? s.encoursTrav + " en cours" : ""),
+        tuile(String(s.enAttente), "Candidatures en attente")
+      );
+    }
+    if (peutPublier()){
+      tuiles.append(
+        tuile(String(s.publiees), "Missions publiées", s.terminees + " terminée" + pl(s.terminees)),
+        tuile(String(s.aTraiter), "Candidatures à traiter")
+      );
+      if (!peutPostuler()) tuiles.append(
+        tuile(String(s.encoursPub), "Missions en cours"),
+        tuile(fcfa(s.confie), "Montant confié")
+      );
+    }
+    tuiles.append(tuile(s.note ? s.note.moy.toFixed(1).replace(".", ",") + " / 5" : "—", "Note moyenne", s.note ? s.note.n + " avis" : "Pas encore d'avis"));
+    r.appendChild(tuiles);
+
+    const regle = peutPostuler() && peutPublier()
+      ? "Score : +10 points par mission réalisée, +5 par mission publiée et terminée. Les gains sont indicatifs : ils additionnent le prix des missions terminées."
+      : peutPostuler()
+        ? "Score : +10 points par mission réalisée. Les gains sont indicatifs : ils additionnent le prix des missions terminées."
+        : "Score : +5 points par mission publiée et terminée. Le montant confié additionne le prix des missions terminées.";
+    r.appendChild(el("p", "aide", regle + " Les paiements se font directement entre utilisateurs."));
+    const recus = avisTous.filter(a => a.pour === user.uid).slice(0, 5);
+    if (recus.length){
+      r.appendChild(el("h3", "", "Derniers avis reçus"));
+      recus.forEach(a => {
+        const n = Math.max(1, Math.min(5, Number(a.note) || 1));
+        const l = el("div", "avis-ligne");
+        l.appendChild(el("div", "h-titre", "★".repeat(n) + "☆".repeat(5 - n) + " · " + (a.deNom || "")));
+        if (a.commentaire) l.appendChild(el("div", "h-sous", a.commentaire));
+        l.appendChild(el("div", "h-sous", "Mission : " + (a.titre || "")));
+        r.appendChild(l);
+      });
+    }
+    majHisto();
+    majNotifs();
+  }
+
+  function stopperSuivi(){
+    suivis.forEach(f => f());
+    suivis = [];
+    mesPubliees = [];
+    mesRealisees = [];
+    mesCandidatures = [];
+    candidaturesRecues = [];
+    suiviUid = null;
+    charges.pub = charges.real = charges.cand = charges.recu = charges.avis = false;
+    avisTous = [];
+    mesSignalements = new Set();
+    vuInit = false;
+    vues = new Set();
+    dernieresCles = new Set();
+  }
+
+  function suivreMesMissions(){
+    suiviUid = user.uid;
+    const lire = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const erreur = e => console.error(e);
+    suivis.push(onSnapshot(query(missionsRef, where("uid", "==", user.uid)),
+      snap => { mesPubliees = lire(snap); charges.pub = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(missionsRef, where("workerUid", "==", user.uid)),
+      snap => { mesRealisees = lire(snap); charges.real = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(candRef, where("uid", "==", user.uid)),
+      snap => { mesCandidatures = lire(snap); charges.cand = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(candRef, where("auteurUid", "==", user.uid)),
+      snap => { candidaturesRecues = lire(snap); charges.recu = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(collection(db, "avis"), orderBy("createdAt", "desc"), limit(500)),
+      snap => { avisTous = lire(snap); charges.avis = true; afficher(); majTableau(); }, erreur));
+    suivis.push(onSnapshot(query(collection(db, "signalements"), where("de", "==", user.uid)),
+      snap => { mesSignalements = new Set(snap.docs.map(d => d.data().type + "_" + d.data().cibleId)); afficher(); majTableau(); }, erreur));
+  }
+
+  function majUI(){
+    const connecte = !!user;
+    const complet = profilOk();
+    $("bloc-connexion").classList.toggle("cache", connecte || vueInscription);
+    $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
+    $("bloc-profil").classList.toggle("cache", !(connecte && !complet && !enInscription));
+    $("bloc-compte").classList.toggle("cache", !(connecte && complet));
+    $("aide-visiteur").classList.toggle("cache", connecte);
+    $("onglet-publier").classList.toggle("cache", !peutPublier());
+    if (!peutPublier() && !$("t-publier").classList.contains("cache")) choisirOnglet("resume");
+    if (connecte && !complet && !enInscription && profil && !profilRempli){ remplir("p-", profil); profilRempli = true; }
+    if (!connecte) profilRempli = false;
+    const uid = user ? user.uid : null;
+    if (uid !== suiviUid){ stopperSuivi(); if (user) suivreMesMissions(); }
+    afficher();
+    majTableau();
+    majNotifs();
+  }
+
+  // ---------- Liste des intéressés (visible par l'auteur) ----------
+  function remplirInteresses(m, zone, cpt){
+    zone.innerHTML = "";
+    const recues = candidaturesRecues.filter(c => c.missionId === m.id).sort((a, b) => dateMs(a) - dateMs(b));
+    if (!recues.length){ zone.textContent = "Personne pour l'instant."; return; }
+    const dispo = st(m) === "disponible";
+    recues.forEach(c => {
+      const ligne = el("div", "ligne");
+      const n = cpt.parTravailleur[c.uid] || 0;
+      const choisi = !dispo && m.workerUid === c.uid;
+      ligne.appendChild(el("div", "h-titre", "👤 " + c.nom + (c.profession ? " · " + c.profession : "")));
+      ligne.appendChild(el("div", "h-sous", [
+        n ? "✔️ " + pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
+        notesPour(c.uid) ? etoilesTxt(notesPour(c.uid)) : "Pas encore d'avis",
+        choisi ? "Choisi(e)" : (c.statut === "refusee" ? "Refusé(e)" : "")
+      ].filter(Boolean).join(" · ")));
+
+      const prenomC = String(c.nom || "").split(" ")[0];
+      if (choisi){
+        if (c.confirmee){
+          const a = el("a", "wa petit", "💬 Écrire à " + prenomC + " sur WhatsApp");
+          a.href = lienWhatsAppMsg(c.tel, "Bonjour " + prenomC + ", nous avons tous les deux confirmé la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+          a.target = "_blank"; a.rel = "noopener";
+          ligne.appendChild(a);
+        } else {
+          ligne.appendChild(el("div", "h-sous", "En attente de la confirmation de " + prenomC + " : WhatsApp sera disponible ensuite."));
+        }
+      }
+
+      if (dispo){
+        const rangee = el("div", "duo");
+        if (c.statut !== "refusee"){
+          const ok = el("button", "mini", "✅ Accepter");
+          ok.type = "button";
+          ok.addEventListener("click", async () => {
+            if (!(await confirmer("Attribuer la mission à " + c.nom + " ? Les autres candidats verront qu'elle est attribuée.", { titre: "Accepter la candidature", ok: "Accepter" }))) return;
+            try {
+              const lot = writeBatch(db);
+              lot.update(doc(db, "missions", m.id), { statut: "attribuee", workerUid: c.uid, workerNom: c.nom });
+              lot.update(doc(db, "candidatures", c.id), { statut: "acceptee" });
+              await lot.commit();
+              afficherMessage("Candidature acceptée|Le candidat doit maintenant confirmer la mission.", "info");
+            } catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          });
+          const non = el("button", "danger mini", "❌ Refuser");
+          non.type = "button";
+          non.addEventListener("click", async () => {
+            if (!(await confirmer("Refuser la candidature de " + c.nom + " ?", { titre: "Refuser la candidature", ok: "Refuser", danger: true }))) return;
+            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "refusee" }); afficherMessage("Candidature refusée|Le candidat verra cette décision sur le site.", "info"); }
+            catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          });
+          rangee.append(ok, non);
+        } else {
+          const annul = el("button", "sec mini", "↩️ Annuler le refus");
+          annul.type = "button";
+          annul.addEventListener("click", async () => {
+            try { await updateDoc(doc(db, "candidatures", c.id), { statut: "en_attente" }); }
+            catch (e) { console.error(e); afficherMessage("Action impossible. Réessaie."); }
+          });
+          rangee.appendChild(annul);
+        }
+        ligne.appendChild(rangee);
+      }
+      ligne.appendChild(formSignalement("utilisateur", c.uid, c.nom, c.uid));
+      zone.appendChild(ligne);
+    });
+  }
+
+  // ---------- Carte d'une mission ----------
+  function carte(m, cpt){
+    const statut = st(m);
+    const c = el("div", "card job s-" + statut);
+    c.dataset.id = m.id;
+    const estFavori = favoris.has(m.id);
+    const fav = el("button", "favori", estFavori ? "★" : "☆");
+    fav.type = "button";
+    fav.setAttribute("aria-label", estFavori ? "Retirer des favoris" : "Ajouter aux favoris");
+    fav.addEventListener("click", () => basculerFavori(m.id));
+    c.appendChild(fav);
+    const ajouterPartage = () => {
+      if (statut !== "disponible" || estExpiree(m) || m.valide === false) return;
+      const p = el("a", "partage", "📲 Partager sur WhatsApp");
+      p.href = lienPartageMission(m); p.target = "_blank"; p.rel = "noopener";
+      c.appendChild(p);
+    };
+
+    // ----- en-tête : catégorie, statut, urgence -----
+    const haut = el("div", "c-haut");
+    const cat = catInfo(m.categorie);
+    if (m.valide === true){
+      const v = el("span", "chip-verif");
+      v.title = "Mission contrôlée par l'équipe Bohicon Jobs avant sa publication";
+      v.innerHTML = SVG_VERIF;
+      v.appendChild(document.createTextNode("Vérifiée"));
+      haut.appendChild(v);
+    }
+    if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
+    haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
+    if (estExpiree(m)) haut.appendChild(el("span", "badge b-gris", "Expirée"));
+    const q = quandTexte(m);
+    if (q && q.urgent && statut === "disponible") haut.appendChild(el("span", "badge b-urgent", "Urgent"));
+    c.appendChild(haut);
+
+    c.appendChild(el("h3", "c-titre", m.titre));
+
+    // ----- informations pratiques -----
+    const infos = el("div", "c-infos");
+    infos.appendChild(el("span", "", "📍 " + (m.ville || "") + (m.lieu && user ? " · " + m.lieu : "")));
+    if (m.lieu && !user) infos.appendChild(el("span", "", "🔒 Lieu précis visible après connexion"));
+    if (q) infos.appendChild(el("span", "", "🗓️ " + q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
+    if (statut !== "disponible" && m.workerNom) infos.appendChild(el("span", "", "👤 Attribuée à " + m.workerNom));
+    c.appendChild(infos);
+
+    // ----- description repliable -----
+    const texteDesc = String(m.desc || "");
+    if (texteDesc){
+      const d = el("p", "c-desc" + (descOuvertes.has(m.id) ? " ouverte" : ""), texteDesc);
+      c.appendChild(d);
+      if (texteDesc.length > 110){
+        const plus = el("button", "c-plus", descOuvertes.has(m.id) ? "Réduire" : "Lire la suite");
+        plus.type = "button";
+        plus.addEventListener("click", () => {
+          const ouvert = d.classList.toggle("ouverte");
+          if (ouvert) descOuvertes.add(m.id); else descOuvertes.delete(m.id);
+          plus.textContent = ouvert ? "Réduire" : "Lire la suite";
+        });
+        c.appendChild(plus);
+      }
+    }
+
+    // ----- auteur et prix -----
+    const bas = el("div", "c-bas");
+    if (m.auteur){
+      const nbTerminees = cpt.parAuteur[m.uid] || 0;
+      const nr = notesPour(m.uid);
+      const aut = el("div", "c-auteur");
+      aut.appendChild(el("span", "avatar", String(m.auteur).trim().charAt(0).toUpperCase()));
+      const t = el("div");
+      t.appendChild(el("b", "", m.auteur));
+      const sous = [nr ? etoilesTxt(nr) : "", nbTerminees ? "✔️ " + pluriel(nbTerminees, "mission") + " terminée" + (nbTerminees > 1 ? "s" : "") : ""].filter(Boolean).join(" · ");
+      t.appendChild(el("small", "", sous || "Nouveau membre"));
+      aut.appendChild(t);
+      bas.appendChild(aut);
+    }
+    const prix = el("div", "c-prix", Number(m.prix || 0).toLocaleString("fr-FR"));
+    prix.appendChild(el("small", "", " FCFA"));
+    bas.appendChild(prix);
+    c.appendChild(bas);
+
+    if (m.valide === false){
+      const nv = el("div", m.refusMotif ? "erreur" : "info", m.refusMotif
+        ? "❌ Mission refusée : " + m.refusMotif + ". Tu peux la supprimer et en publier une autre."
+        : "⏳ En attente de validation par l'administrateur : elle sera visible par tous après vérification.");
+      nv.style.margin = "10px 0 0";
+      c.appendChild(nv);
+    }
+
+    if (!user){
+      c.appendChild(el("div", "verrou", "🔒 Connecte-toi pour participer"));
+      ajouterPartage();
+      return c;
+    }
+
+    const actions = el("div", "actions");
+
+    if (m.uid === user.uid){
+      // --- Actions de l'auteur ---
+      const maj = champs => updateDoc(doc(db, "missions", m.id), champs);
+      const nomT = m.workerNom || "Le travailleur";
+
+      if (statut === "disponible" || statut === "attribuee"){
+        const recues = candidaturesRecues.filter(x => x.missionId === m.id);
+        const attente = recues.filter(x => x.statut === "en_attente").length;
+        const bVoir = el("button", "sec mini",
+          "👥 Intéressés (" + recues.length + ")" + (statut === "disponible" && attente ? " · " + attente + " à traiter" : ""));
+        bVoir.type = "button";
+        bVoir.addEventListener("click", () => {
+          if (ouverts.has(m.id)) ouverts.delete(m.id); else ouverts.add(m.id);
+          afficher();
+        });
+        actions.appendChild(bVoir);
+        if (ouverts.has(m.id)){
+          const zone = el("div", "sous");
+          remplirInteresses(m, zone, cpt);
+          actions.appendChild(zone);
+        }
+      }
+
+      if (statut === "attribuee"){
+        const candT = candidaturesRecues.find(x => x.id === m.id + "_" + m.workerUid);
+        const confirmeeT = !!(candT && candT.confirmee);
+        if (!confirmeeT){
+          const o = el("div", "info", "⏳ En attente de la confirmation de " + nomT + ". Vous pourrez ensuite vous écrire sur WhatsApp.");
+          o.style.marginBottom = "0";
+          actions.appendChild(o);
+        } else {
+          const w = el("a", "wa", "💬 Écrire à " + nomT + " sur WhatsApp");
+          w.style.marginTop = "0";
+          w.href = lienWhatsAppMsg(candT.tel, "Bonjour " + String(nomT).split(" ")[0] + ", nous avons tous les deux confirmé la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+          w.target = "_blank"; w.rel = "noopener";
+          actions.appendChild(w);
+        }
+        actions.append(
+          ...(confirmeeT ? [bouton("✅ Marquer comme terminée", "mini", async () => {
+            if (!(await confirmer("Tu déclares la mission terminée. " + nomT + " devra le confirmer.", { titre: "Déclarer la mission terminée", ok: "Déclarer" }))) return;
+            await maj({ statut: "a_confirmer", declarePar: "auteur", declareeAt: serverTimestamp() });
+          })] : []),
+          bouton("↩️ Remettre disponible", "sec mini", async () => {
+            if (!(await confirmer("Remettre la mission en disponible ?", { titre: "Remettre en disponible", ok: "Remettre" }))) return;
+            const lot = writeBatch(db);
+            lot.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
+            const idCand = m.id + "_" + m.workerUid;
+            if (candidaturesRecues.some(x => x.id === idCand)) lot.update(doc(db, "candidatures", idCand), { statut: "en_attente", confirmee: false });
+            await lot.commit();
+          })
+        );
+      }
+
+      if (statut === "a_confirmer"){
+        const parT = m.declarePar === "travailleur";
+        const o = el("div", "info", parT
+          ? "⏳ " + nomT + " déclare avoir terminé la mission. Confirmes-tu ?"
+          : "⏳ En attente de la confirmation de " + nomT + ".");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        if (parT){
+          actions.append(
+            bouton("✅ Confirmer la fin de la mission", "mini", async () => {
+              if (!(await confirmer("Confirmer que la mission est bien terminée ?", { titre: "Confirmer la fin de la mission", ok: "Confirmer" }))) return;
+              await maj({ statut: "terminee", termineeAt: serverTimestamp() });
+            }),
+            bouton("↩️ Pas encore terminée", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))
+          );
+        } else {
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() })));
+        }
+      }
+
+      if (statut === "terminee"){
+        const cible = cibleAvis(m);
+        if (cible) actions.appendChild(formAvis(m, cible.uid, cible.nom));
+      }
+
+      if (statut === "disponible"){
+        actions.appendChild(bouton("✏️ Modifier la mission", "sec mini", async () => demarrerEdition(m)));
+      }
+
+      if (statut === "disponible" || statut === "attribuee"){
+        actions.appendChild(bouton("Supprimer ma mission", "danger mini", async () => {
+          if (!(await confirmer("Supprimer cette mission ?", { titre: "Supprimer la mission", ok: "Supprimer", danger: true }))) return;
+          await deleteDoc(doc(db, "missions", m.id));
+        }));
+      }
+
+    } else if (statut === "disponible"){
+      // --- Visiteur connecté : se proposer ---
+      if (estExpiree(m)){
+        actions.appendChild(el("div", "verrou", "⌛ Cette mission est expirée."));
+      } else if (peutPostuler()){
+        const maCand = mesCandidatures.find(x => x.missionId === m.id);
+        if (maCand && maCand.statut === "refusee"){
+          actions.appendChild(el("div", "verrou", "❌ Ta candidature n'a pas été retenue pour cette mission."));
+        } else {
+          if (maCand){
+            const o = el("div", "info", "✅ Intérêt envoyé : l'auteur va te répondre.");
+            o.style.marginBottom = "0";
+            actions.appendChild(o);
+            if (maCand.statut === "en_attente"){
+              actions.appendChild(bouton("Retirer ma candidature", "sec mini", async () => {
+                if (!(await confirmer("Retirer ta candidature pour cette mission ?", { titre: "Retirer ma candidature", ok: "Retirer", danger: true }))) return;
+                await deleteDoc(doc(db, "candidatures", maCand.id));
+                afficherMessage("Candidature retirée|Tu peux de nouveau postuler à une autre mission.", "succes");
+              }));
+            }
+          } else if (blocageCandidature()){
+            actions.appendChild(el("div", "verrou", blocageCandidature().texte));
+          } else {
+            const bInt = el("button", "mini", "🙋 Je suis intéressé");
+            bInt.type = "button";
+            bInt.addEventListener("click", async () => {
+              if (!profilOk()){ afficherMessage("Complète ton profil pour te proposer."); return; }
+              const bl = blocageCandidature();
+              if (bl){ afficherMessage("Candidature impossible|" + bl.texte.replace("Postuler est indisponible : ", "")); return; }
+              bInt.disabled = true;
+              try {
+                await setDoc(doc(db, "candidatures", m.id + "_" + user.uid), {
+                  missionId: m.id, uid: user.uid, auteurUid: m.uid,
+                  nom: nomCourt(profil), profession: profil.profession, tel: profil.tel,
+                  titre: m.titre, prix: m.prix, ville: m.ville,
+                  statut: "en_attente", createdAt: serverTimestamp()
+                });
+              } catch (e) {
+                console.error(e);
+                bInt.disabled = false;
+                afficherMessage("Impossible d'envoyer ton intérêt. Réessaie.");
+              }
+            });
+            actions.appendChild(bInt);
+          }
+        }
+      }
+
+    } else if (m.workerUid === user.uid){
+      // --- Actions du travailleur choisi ---
+      const maj = champs => updateDoc(doc(db, "missions", m.id), champs);
+      const auteurNom = m.auteur || "L'auteur";
+
+      const maCandT = mesCandidatures.find(x => x.missionId === m.id);
+      const confirmeeMoi = !!(maCandT && maCandT.confirmee);
+      if (statut === "attribuee" && !confirmeeMoi){
+        const o = el("div", "info", "🎉 Tu as été choisi(e) pour cette mission ! Confirme-la pour pouvoir échanger avec l'auteur sur WhatsApp.");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        actions.appendChild(bouton("✅ Je confirme la mission", "mini", async () => {
+          await updateDoc(doc(db, "candidatures", m.id + "_" + user.uid), { confirmee: true });
+          afficherMessage("Mission confirmée|Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
+        }));
+      } else if (statut === "attribuee"){
+        const o = el("div", "info", "✅ Mission confirmée : tu peux échanger avec l'auteur.");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        const w = el("a", "wa", "💬 Écrire à l'auteur sur WhatsApp");
+        w.style.marginTop = "0";
+        w.href = lienWhatsAppMsg(m.tel, "Bonjour, merci de m'avoir choisi(e) pour la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+        w.target = "_blank"; w.rel = "noopener";
+        actions.appendChild(w);
+        if (adressesVues[m.id]){
+          const info = el("div", "info", adressesVues[m.id]);
+          info.style.marginBottom = "0";
+          actions.appendChild(info);
+        } else {
+          actions.appendChild(bouton("📍 Voir l'adresse précise", "sec mini", async () => {
+            const s = await getDoc(doc(db, "missions", m.id, "prive", "adresse"));
+            adressesVues[m.id] = s.exists() ? "📍 " + s.data().adresse : "Aucune adresse précise renseignée : demande-la à l'auteur sur WhatsApp.";
+            afficher();
+          }));
+        }
+        actions.appendChild(bouton("✅ J'ai terminé la mission", "mini", async () => {
+          if (!(await confirmer("Tu déclares avoir terminé la mission. " + auteurNom + " devra le confirmer.", { titre: "Déclarer la mission terminée", ok: "Déclarer" }))) return;
+          await maj({ statut: "a_confirmer", declarePar: "travailleur", declareeAt: serverTimestamp() });
+        }));
+      } else if (statut === "a_confirmer"){
+        const parA = m.declarePar === "auteur";
+        const o = el("div", "info", parA
+          ? "⏳ " + auteurNom + " déclare la mission terminée. Confirmes-tu ?"
+          : "⏳ En attente de la confirmation de " + auteurNom + ".");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        if (parA){
+          actions.append(
+            bouton("✅ Je confirme", "mini", async () => {
+              if (!(await confirmer("Confirmer que la mission est terminée ?", { titre: "Confirmer la fin de la mission", ok: "Confirmer" }))) return;
+              await maj({ statut: "terminee", termineeAt: serverTimestamp() });
+            }),
+            bouton("❌ Ce n'est pas terminé", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() }))
+          );
+        } else {
+          actions.appendChild(bouton("↩️ Annuler ma déclaration", "sec mini", () => maj({ statut: "attribuee", declarePar: deleteField(), declareeAt: deleteField() })));
+        }
+      } else if (statut === "terminee"){
+        const o = el("div", "info", "✔️ Tu as réalisé cette mission.");
+        o.style.marginBottom = "0";
+        actions.appendChild(o);
+        const cible = cibleAvis(m);
+        if (cible) actions.appendChild(formAvis(m, cible.uid, cible.nom));
+      }
+    } else if (mesCandidatures.some(x => x.missionId === m.id)){
+      actions.appendChild(el("div", "verrou", "Cette mission a été attribuée à quelqu'un d'autre."));
+    }
+
+    if (actions.childNodes.length) c.appendChild(actions);
+    ajouterPartage();
+    if (m.uid !== user.uid && profilOk()) c.appendChild(formSignalement("mission", m.id, m.titre, m.uid));
+    return c;
+  }
+
+  // ---------- Affichage de la liste ----------
+  function afficher(){
+    const f = $("filtre").value;
+    const fs = $("filtre-statut").value;
+    const cpt = compteurs();
+    $("stat-dispo").textContent = missions.filter(m => st(m) === "disponible" && !estExpiree(m) && m.valide !== false).length;
+    $("stat-fin").textContent = missions.filter(m => st(m) === "terminee").length;
+    const nbVerifiees = missions.filter(m => m.valide === true && st(m) === "disponible" && !estExpiree(m)).length;
+    $("stat-verif").textContent = nbVerifiees;
+    $("lib-verif").textContent = nbVerifiees > 1 ? "missions vérifiées" : "mission vérifiée";
+
+    const liste = $("liste");
+    liste.innerHTML = "";
+    const q = normaliser($("recherche").value.trim());
+    const cat = $("f-cat").value;
+    const px = $("f-prix").value;
+    const tri = $("f-tri").value;
+    const dansPrix = p => {
+      const n = Number(p || 0);
+      if (px === "0-2000") return n <= 2000;
+      if (px === "2000-5000") return n > 2000 && n <= 5000;
+      if (px === "5000-") return n > 5000;
+      return true;
+    };
+    const okStatut = m => {
+      if (fs === "toutes") return true;
+      if (fs === "favoris") return favoris.has(m.id);
+      if (fs === "expirees") return estExpiree(m);
+      if (fs === "disponible") return st(m) === "disponible" && !estExpiree(m);
+      if (fs === "attribuee") return st(m) === "attribuee" || st(m) === "a_confirmer";
+      return st(m) === fs;
+    };
+    let items = missions.filter(m =>
+      visible(m)
+      && (!f || m.ville === f)
+      && okStatut(m)
+      && (!cat || m.categorie === cat)
+      && dansPrix(m.prix)
+      && (!q || normaliser([m.titre, m.desc, m.lieu, m.ville, (catInfo(m.categorie) || [])[2]].join(" ")).includes(q)));
+    if (tri === "urgentes") items = items.slice().sort((a, b) => (b.quand === "urgent") - (a.quand === "urgent"));
+    else if (tri === "prix-asc") items = items.slice().sort((a, b) => Number(a.prix || 0) - Number(b.prix || 0));
+    else if (tri === "prix-desc") items = items.slice().sort((a, b) => Number(b.prix || 0) - Number(a.prix || 0));
+    $("compteur-res").textContent = items.length + " mission" + (items.length > 1 ? "s" : "");
+    const filtreActif = q || f || cat || px || tri !== "recentes" || fs !== "disponible";
+    $("btn-reset-filtres").classList.toggle("cache", !filtreActif);
+    if (items.length === 0){
+      liste.innerHTML = fs === "favoris" && !favoris.size
+        ? '<div class="vide">Aucun favori pour l\'instant : touche ☆ sur une mission pour l\'ajouter ici.</div>'
+        : '<div class="vide">Aucune mission ne correspond à ta recherche.</div>';
+      return;
+    }
+    items.forEach(m => liste.appendChild(carte(m, cpt)));
+  }
+
+  // ---------- Missions en temps réel ----------
+  const q = query(missionsRef, orderBy("createdAt", "desc"), limit(200));
+  onSnapshot(q, snap => {
+    missions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    charges.missions = true;
+    afficher();
+    majNotifs();
+    ouvrirLienDirect();
+  }, err => {
+    console.error(err);
+    afficherMessage("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
+    $("liste").innerHTML = "";
+  });
+
+  // ---------- Authentification ----------
+  onAuthStateChanged(auth, async u => {
+    if (u && connexionPerimee()){
+      signOut(auth).catch(() => {});
+      afficherMessage("Session expirée|Tu as été déconnecté(e) après une longue période d'inactivité. Reconnecte-toi pour continuer.", "info");
+      return;
+    }
+    if (u) noterActivite();
+    user = u;
+    profil = null;
+    if (u && !enInscription){
+      try {
+        const s = await getDoc(doc(db, "users", u.uid));
+        profil = s.exists() ? s.data() : null;
+      } catch (e) { console.error(e); }
+    }
+    $("lien-admin").classList.add("cache");
+    $("aide-admin").classList.add("cache");
+    estAdminUtilisateur = false;
+    if (u){
+      try {
+        const a = await getDoc(doc(db, "admins", u.uid));
+        if (a.exists()){
+          estAdminUtilisateur = true;
+          $("lien-admin").classList.remove("cache");
+          $("aide-admin").classList.remove("cache");
+        }
+      } catch (e) { /* pas administrateur */ }
+    }
+    majUI();
+    if (u && !enInscription && !profilOk()) ouvrirEspace();
+    if (LIEN_DIRECT && !lienDirectFait){
+      lienDirectFait = true;
+      if (!u){
+        vueInscription = LIEN_DIRECT === "inscription";
+        majUI();
+        ouvrirEspace();
+      }
+    }
+  });
+
+  $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
+  $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
+
+  $("btn-connexion").addEventListener("click", async () => {
+    afficherMessage("");
+    noterActivite();
+    try {
+      await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
+      $("mdp").value = "";
+      afficherMessage("Connexion réussie|Bienvenue sur Bohicon Jobs.", "info");
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  $("btn-inscription").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("i-");
+    if (!data) return;
+    const btn = $("btn-inscription");
+    btn.disabled = true; btn.textContent = "Création du compte…";
+    enInscription = true;
+    try {
+      noterActivite();
+      const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
+      await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
+      profil = data;
+      $("i-mdp").value = "";
+      afficherMessage("Compte créé|Bienvenue sur Bohicon Jobs.", "info");
+      choisirOnglet("resume");
+    } catch (e) {
+      console.error(e);
+      afficherMessage(e.code ? texteErreurAuth(e) : "Compte créé, mais le profil n'a pas pu être enregistré. Complète-le ci-dessous.");
+    }
+    enInscription = false;
+    user = auth.currentUser;
+    btn.disabled = false; btn.textContent = "S'inscrire";
+    majUI();
+  });
+
+  $("btn-profil").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("p-");
+    if (!data || !user) return;
+    try {
+      await setDoc(doc(db, "users", user.uid), { ...data, email: user.email, createdAt: serverTimestamp() }, { merge: true });
+      profil = data;
+      majUI();
+    } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
+  });
+
+  $("btn-reset").addEventListener("click", async () => {
+    const email = $("email").value.trim();
+    if (!email){ afficherMessage("Entre ton e-mail ci-dessus, puis reclique sur « Mot de passe oublié ? »."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      afficherMessage("E-mail envoyé|Vérifie ta boîte de réception et tes courriers indésirables.", "info");
+    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+  });
+
+  const deconnecter = () => signOut(auth).then(() => afficherMessage("Déconnexion réussie|À bientôt sur Bohicon Jobs.", "info"));
+  $("btn-deconnexion").addEventListener("click", deconnecter);
+  $("btn-deco-profil").addEventListener("click", deconnecter);
+
+  // ---------- Publication ----------
+  $("publier").addEventListener("click", async () => {
+    if (!user || !profilOk()){ afficherMessage("Connecte-toi et complète ton profil pour publier."); return; }
+    const titre = $("titre").value.trim();
+    const ville = $("ville").value;
+    const prix = Number($("prix").value);
+    const desc = $("desc").value.trim();
+    const lieu = $("lieu").value.trim();
+    const adressePrecise = $("adresse-precise").value.trim();
+    const quand = $("quand").value;
+    const dateExec = $("date-exec").value;
+    const heureExec = $("heure-exec").value;
+    const categorie = $("categorie").value;
+
+    const champsRequis = [
+      ["titre", titre.length < 3, "le titre"],
+      ["categorie", !categorie, "la catégorie"],
+      ["ville", !ville, "la ville"],
+      ["lieu", lieu.length < 3, "le lieu d'exécution"],
+      ["date-exec", quand === "date" && (!dateExec || dateExec < aujourdhui()), "une date valide (aujourd'hui ou plus tard)"],
+      ["prix", !(prix > 0), "le prix"],
+      ["desc", desc.length < 10, "la description (10 caractères minimum)"]
+    ];
+    champsRequis.forEach(([id]) => $(id).classList.remove("invalide"));
+    const manquants = champsRequis.filter(c => c[1]);
+    if (manquants.length){
+      manquants.forEach(([id]) => $(id).classList.add("invalide"));
+      $(manquants[0][0]).focus();
+      afficherMessage("Publication refusée : renseigne " + manquants.map(c => c[2]).join(", ") + ".");
+      return;
+    }
+
+    if (missionEnEdition){
+      const btnE = $("publier");
+      btnE.disabled = true; btnE.textContent = "Enregistrement…";
+      try {
+        const champs = {
+          titre, ville, lieu, categorie, quand,
+          dateExec: quand === "date" ? dateExec : "",
+          heureExec: quand === "date" ? heureExec : "",
+          prix, desc, modifieeLe: serverTimestamp()
+        };
+        if (!estAdminUtilisateur){ champs.valide = false; champs.valideLe = deleteField(); champs.refusMotif = deleteField(); }
+        await updateDoc(doc(db, "missions", missionEnEdition), champs);
+        finirEdition();
+        afficherMessage(estAdminUtilisateur
+          ? "Mission modifiée|Les changements ont été enregistrés."
+          : "Mission modifiée|Elle sera de nouveau visible après validation par l'administrateur.", "info");
+        choisirOnglet("histo");
+      } catch (e) {
+        console.error(e);
+        afficherMessage("Modification impossible. Réessaie.");
+        btnE.textContent = "Enregistrer les modifications";
+      }
+      btnE.disabled = false;
+      return;
+    }
+
+    const btn = $("publier");
+    btn.disabled = true; btn.textContent = "Publication…";
+    try {
+      const ref = await addDoc(missionsRef, {
+        titre, ville, lieu, categorie, quand,
+        dateExec: quand === "date" ? dateExec : "",
+        heureExec: quand === "date" ? heureExec : "",
+        prix, desc,
+        tel: profil.tel,
+        auteur: nomCourt(profil),
+        uid: user.uid,
+        statut: "disponible",
+        valide: estAdminUtilisateur,
+        createdAt: serverTimestamp()
+      });
+      ["titre","lieu","adresse-precise","prix","desc","date-exec","heure-exec"].forEach(id => $(id).value = "");
+      $("quand").value = "flexible";
+      $("categorie").value = "";
+      $("bloc-date").classList.add("cache");
+      afficherMessage(estAdminUtilisateur ? "Mission publiée|Elle apparaît dans la liste des missions." : "Mission envoyée|Elle sera visible par tous après validation par l'administrateur.", "info");
+      choisirOnglet("histo");
+      if (adressePrecise){
+        try { await setDoc(doc(db, "missions", ref.id, "prive", "adresse"), { adresse: adressePrecise, uid: user.uid }); }
+        catch (e) { console.error(e); afficherMessage("Mission publiée, mais l'adresse précise n'a pas pu être enregistrée."); }
+      }
+    } catch (e) {
+      console.error(e);
+      afficherMessage("La mission n'a pas pu être publiée. Réessaie.");
+    }
+    btn.disabled = false; btn.textContent = "Publier";
+  });
+
+  $("filtre").addEventListener("change", afficher);
+  $("filtre-statut").addEventListener("change", afficher);
+
+  // ---------- « Mon espace » : panneau, sous-menus, historique et édition du profil ----------
+  let espaceOuvert = false;
+
+  function choisirOnglet(t){
+    if (t === "publier" && !peutPublier()) t = "resume";
+    document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
+    ["resume", "histo", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
+    if (t === "profil" && profil) remplir("e-", profil);
+    const actif = document.querySelector(".onglet.on");
+    if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+
+  function ouvrirEspace(onglet){
+    const v = $("vue-espace");
+    v.style.top = document.querySelector(".topbar").offsetHeight + "px";
+    v.classList.remove("cache");
+    document.body.style.overflow = "hidden";
+    if (!espaceOuvert){
+      espaceOuvert = true;
+      try { history.pushState({ espace: true }, ""); } catch (e) { /* ignoré */ }
+    }
+    if (onglet) choisirOnglet(onglet);
+    v.scrollTop = 0;
+    majNav();
+  }
+
+  function majNav(){
+    $("nav-espace").classList.toggle("actif", espaceOuvert);
+    $("nav-accueil").classList.toggle("actif", !espaceOuvert);
+  }
+
+  function fermerEspace(viaRetour){
+    if (!espaceOuvert) return;
+    espaceOuvert = false;
+    $("vue-espace").classList.add("cache");
+    document.body.style.overflow = "";
+    majNav();
+    if (!viaRetour){
+      try { if (history.state && history.state.espace) history.back(); } catch (e) { /* ignoré */ }
+    }
+  }
+
+  window.addEventListener("popstate", () => { if (espaceOuvert) fermerEspace(true); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerEspace(); });
+  try { history.scrollRestoration = "manual"; } catch (e) { /* ignoré */ }
+  function retourAccueil(){
+    fermerEspace();
+    window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
+  }
+  $("btn-fermer-espace").addEventListener("click", retourAccueil);
+  $("btn-retour-bas").addEventListener("click", retourAccueil);
+  document.querySelector(".marque").addEventListener("click", e => { if (espaceOuvert){ e.preventDefault(); retourAccueil(); } });
+  document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => choisirOnglet(b.dataset.t)));
+  $("histo-filtre").addEventListener("change", majHisto);
+  $("btn-edit").addEventListener("click", async () => {
+    afficherMessage("");
+    const data = lireProfil("e-", false);
+    if (!data || !user) return;
+    try {
+      await setDoc(doc(db, "users", user.uid), data, { merge: true });
+      profil = { ...profil, ...data };
+      afficherMessage("Profil mis à jour|Tes informations ont été enregistrées.", "info");
+      majUI();
+    } catch (e) { console.error(e); afficherMessage("Le profil n'a pas pu être enregistré. Réessaie."); }
+  });
+
+  // ---------- Notifications dans le site ----------
+  function cleStockage(){ return "bj_vues_" + (user ? user.uid : ""); }
+  function chargerVues(){
+    try {
+      const brut = localStorage.getItem(cleStockage());
+      vues = new Set(brut ? JSON.parse(brut) : []);
+      return brut !== null;
+    } catch (e) { vues = new Set(); return false; }
+  }
+  function sauverVues(){
+    try { localStorage.setItem(cleStockage(), JSON.stringify([...vues])); } catch (e) { /* stockage indisponible */ }
+  }
+
+  function calculerNotifs(){
+    if (!user || !profilOk()) return [];
+    const liste = [];
+    const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
+    candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).forEach(c => liste.push({
+      cle: "recu:" + c.id, ms: dateMs(c), type: "recu", missionId: c.missionId,
+      texte: "🙋 Nouveau candidat pour « " + c.titre + " » : " + c.nom + (c.profession ? " (" + c.profession + ")" : "")
+    }));
+    mesCandidatures.forEach(c => {
+      const e = etatCandidature(c);
+      if (e.startsWith("Retenue")) liste.push({ cle: "ret:" + c.id, ms: 0, type: "carte", missionId: c.missionId, texte: c.confirmee ? "✅ Mission « " + c.titre + " » confirmée : tu peux écrire à l'auteur sur WhatsApp." : "🎉 Tu as été choisi(e) pour « " + c.titre + " » : confirme la mission pour pouvoir échanger sur WhatsApp." });
+      else if (e === "Refusée") liste.push({ cle: "ref:" + c.id, ms: 0, type: "moi", texte: "❌ Ta candidature pour « " + c.titre + " » n'a pas été retenue" });
+      else if (e === "Non retenue") liste.push({ cle: "non:" + c.id, ms: 0, type: "moi", texte: "La mission « " + c.titre + " » a été attribuée à quelqu'un d'autre" });
+    });
+    mesRealisees.filter(m => m.uid !== user.uid && st(m) === "terminee").forEach(m => liste.push({
+      cle: "fin:" + m.id, ms: dateMs(m), type: "moi",
+      texte: "✔️ La mission « " + m.titre + " » est terminée : +10 points et " + fcfa(m.prix) + " de gains indicatifs."
+    }));
+    mesPubliees.filter(m => st(m) === "a_confirmer" && m.declarePar === "travailleur").forEach(m => liste.push({
+      cle: "conf:" + m.id + ":t", ms: 0, type: "carte", missionId: m.id,
+      texte: "⏳ " + (m.workerNom || "Le travailleur") + " déclare avoir terminé « " + m.titre + " » : confirme la fin de la mission."
+    }));
+    mesRealisees.filter(m => m.uid !== user.uid && st(m) === "a_confirmer" && m.declarePar === "auteur").forEach(m => liste.push({
+      cle: "conf:" + m.id + ":a", ms: 0, type: "carte", missionId: m.id,
+      texte: "⏳ " + (m.auteur || "L'auteur") + " déclare « " + m.titre + " » terminée : confirme-la."
+    }));
+    avisTous.filter(a => a.pour === user.uid).forEach(a => liste.push({
+      cle: "avis:" + a.id, ms: dateMs(a), type: "histo",
+      texte: "⭐ " + (a.deNom || "Quelqu'un") + " t'a laissé un avis (" + a.note + "/5) pour « " + a.titre + " »"
+    }));
+    mesPubliees.concat(mesRealisees.filter(m => m.uid !== user.uid)).forEach(m => {
+      const cible = cibleAvis(m);
+      if (cible) liste.push({ cle: "noter:" + m.id, ms: dateMs(m), type: "histo", texte: "⭐ Mission terminée : laisse un avis à " + cible.nom + "." });
+    });
+    candidaturesRecues.filter(c => c.confirmee && c.statut === "acceptee").forEach(c => liste.push({
+      cle: "conf2:" + c.id, ms: 0, type: "carte", missionId: c.missionId,
+      texte: "✅ " + c.nom + " a confirmé la mission « " + c.titre + " » : vous pouvez vous écrire sur WhatsApp."
+    }));
+    mesPubliees.filter(m => m.valide === true && m.valideLe).forEach(m => liste.push({
+      cle: "val:" + m.id, ms: dateMs(m), type: "carte", missionId: m.id,
+      texte: "✅ Ta mission « " + m.titre + " » a été validée : elle est visible par tous."
+    }));
+    mesPubliees.filter(m => m.valide === false && m.refusMotif).forEach(m => liste.push({
+      cle: "refus:" + m.id, ms: 0, type: "carte", missionId: m.id,
+      texte: "❌ Ta mission « " + m.titre + " » a été refusée : " + m.refusMotif
+    }));
+    return liste.sort((a, b) => b.ms - a.ms);
+  }
+
+  function afficherToast(texte){
+    const t = $("toast");
+    t.textContent = sansEmoji(texte);
+    t.classList.remove("cache");
+    clearTimeout(minuteurToast);
+    minuteurToast = setTimeout(() => t.classList.add("cache"), 7000);
+    try { if (navigator.vibrate) navigator.vibrate(200); } catch (e) { /* non supporté */ }
+  }
+
+  function majNotifs(){
+    const actif = !!user && profilOk();
+    $("btn-cloche").classList.toggle("cache", !actif);
+    if (!actif){
+      $("nav-badge").classList.add("cache");
+      document.title = TITRE_BASE;
+      $("panneau-notifs").classList.add("cache");
+      return;
+    }
+    if (!vuInit){
+      if (!Object.values(charges).every(Boolean)) return;
+      const existait = chargerVues();
+      if (!existait){ calculerNotifs().forEach(n => vues.add(n.cle)); sauverVues(); }
+      dernieresCles = new Set(calculerNotifs().map(n => n.cle));
+      vuInit = true;
+    }
+    const liste = calculerNotifs();
+    const nonLus = liste.filter(n => !vues.has(n.cle));
+    const nouvelles = nonLus.filter(n => !dernieresCles.has(n.cle));
+    dernieresCles = new Set(liste.map(n => n.cle));
+    if (nouvelles.length) afficherToast(nouvelles.length === 1 ? nouvelles[0].texte : "🔔 " + nouvelles.length + " nouvelles notifications");
+    const p = $("cloche-n");
+    p.textContent = nonLus.length > 9 ? "9+" : String(nonLus.length);
+    p.classList.toggle("cache", !nonLus.length);
+    $("nav-badge").textContent = p.textContent;
+    $("nav-badge").classList.toggle("cache", !nonLus.length);
+    document.title = nonLus.length ? "(" + nonLus.length + ") " + TITRE_BASE : TITRE_BASE;
+    if (!$("panneau-notifs").classList.contains("cache")) rendrePanneau(liste);
+  }
+
+  function rendrePanneau(liste){
+    const z = $("panneau-notifs");
+    z.innerHTML = "";
+    const tete = el("div", "tete-notifs");
+    tete.appendChild(el("h2", "", "Notifications"));
+    const tout = el("button", "lien", "Tout marquer comme lu");
+    tout.type = "button";
+    tout.addEventListener("click", e => { e.stopPropagation(); marquerTout(); });
+    tete.appendChild(tout);
+    z.appendChild(tete);
+    if (!liste.length){ z.appendChild(el("div", "vide", "Aucune notification pour l'instant.")); return; }
+    liste.slice().sort((a, b) => (vues.has(a.cle) ? 1 : 0) - (vues.has(b.cle) ? 1 : 0) || b.ms - a.ms).slice(0, 30).forEach(n => {
+      const lu = vues.has(n.cle);
+      const l = el("div", "notif " + (lu ? "lu" : "nonlu"));
+      l.appendChild(el("span", "pt"));
+      const c = el("div");
+      c.appendChild(el("div", "", sansEmoji(n.texte)));
+      if (n.ms) c.appendChild(el("small", "", dateTexte(n.ms)));
+      l.appendChild(c);
+      l.addEventListener("click", () => {
+        fermerPanneau();
+        if (n.type === "recu" || n.type === "carte") fermerEspace();
+        if (n.type === "recu"){
+          ouverts.add(n.missionId);
+          afficher();
+          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
+          defiler(cible || $("missions"));
+        } else if (n.type === "carte"){
+          reinitialiserFiltres();
+          $("filtre-statut").value = "toutes";
+          afficher();
+          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
+          defiler(cible || $("missions"));
+        } else if (n.type === "histo"){
+          ouvrirEspace("histo");
+        } else {
+          ouvrirEspace("resume");
+        }
+      });
+      z.appendChild(l);
+    });
+  }
+
+  function marquerTout(){
+    calculerNotifs().forEach(n => vues.add(n.cle));
+    sauverVues();
+    majNotifs();
+  }
+  function ouvrirPanneau(){
+    $("toast").classList.add("cache");
+    $("panneau-notifs").classList.remove("cache");
+    rendrePanneau(calculerNotifs());
+  }
+  function fermerPanneau(){
+    const p = $("panneau-notifs");
+    if (p.classList.contains("cache")) return;
+    p.classList.add("cache");
+    marquerTout();
+  }
+
+  $("btn-cloche").addEventListener("click", e => {
+    e.stopPropagation();
+    if ($("panneau-notifs").classList.contains("cache")) ouvrirPanneau(); else fermerPanneau();
+  });
+  $("toast").addEventListener("click", e => { e.stopPropagation(); ouvrirPanneau(); });
+  document.addEventListener("click", e => {
+    const p = $("panneau-notifs");
+    if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
+
+  // ---------- Retours des testeurs ----------
+  const VERSION_SITE = "test-1";
+  const BOUTON_AVIS = !(window.CONFIG && window.CONFIG.BOUTON_AVIS === false);
+  (function(){
+    let note = 0;
+    const zoneEtoiles = $("retour-etoiles");
+    function dessinerEtoiles(){
+      zoneEtoiles.innerHTML = "";
+      for (let i = 1; i <= 5; i++){
+        const s = el("button", "etoile", i <= note ? "★" : "☆");
+        s.type = "button";
+        s.setAttribute("aria-label", i + " sur 5");
+        s.addEventListener("click", () => { note = (note === i ? 0 : i); dessinerEtoiles(); });
+        zoneEtoiles.appendChild(s);
+      }
+    }
+    const erreur = t => {
+      $("retour-erreur").innerHTML = "";
+      if (t) $("retour-erreur").appendChild(el("div", "erreur", t));
+    };
+    function fermer(){ $("retour-overlay").classList.add("cache"); }
+    function ouvrir(){
+      note = 0;
+      dessinerEtoiles();
+      erreur("");
+      $("retour-ok").classList.add("cache");
+      $("retour-contact").classList.toggle("cache", !!user);
+      $("retour-overlay").classList.remove("cache");
+      $("retour-message").focus();
+    }
+    $("btn-retour").classList.toggle("cache", !BOUTON_AVIS);
+    $("btn-retour").addEventListener("click", ouvrir);
+    $("retour-fermer").addEventListener("click", fermer);
+    $("retour-overlay").addEventListener("click", e => { if (e.target === $("retour-overlay")) fermer(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") fermer(); });
+
+    $("retour-envoyer").addEventListener("click", async () => {
+      erreur("");
+      if ($("retour-site").value){ fermer(); return; }          // piège anti-robots
+      const message = $("retour-message").value.trim();
+      if (message.length < 5){ erreur("Écris au moins quelques mots pour que je comprenne."); return; }
+      let dernier = 0;
+      try { dernier = Number(localStorage.getItem("bj_dernier_retour") || 0); } catch (e) { /* ignoré */ }
+      if (Date.now() - dernier < 30000){ erreur("Patiente quelques secondes avant d'envoyer un autre retour."); return; }
+      const btn = $("retour-envoyer");
+      btn.disabled = true; btn.textContent = "Envoi…";
+      try {
+        await addDoc(collection(db, "retours"), {
+          de: user ? user.uid : "",
+          deNom: user && profil ? nomCourt(profil) : "",
+          contact: user ? "" : $("retour-contact").value.trim().slice(0, 60),
+          type: $("retour-type").value,
+          note,
+          message,
+          page: ((location.pathname.split("/").pop() || "index.html") + location.hash).slice(0, 100),
+          appareil: String(navigator.userAgent || "").slice(0, 180),
+          ecran: window.innerWidth + "x" + window.innerHeight,
+          version: VERSION_SITE,
+          connecte: !!user,
+          statut: "nouveau",
+          createdAt: serverTimestamp()
+        });
+        try { localStorage.setItem("bj_dernier_retour", String(Date.now())); } catch (e) { /* ignoré */ }
+        $("retour-message").value = "";
+        note = 0;
+        dessinerEtoiles();
+        $("retour-ok").classList.remove("cache");
+        setTimeout(() => { $("retour-ok").classList.add("cache"); fermer(); }, 1800);
+      } catch (e) {
+        console.error(e);
+        erreur("Envoi impossible pour le moment. Réessaie plus tard.");
+      }
+      btn.disabled = false; btn.textContent = "Envoyer mon retour";
+    });
+  })();
+
+  // ---------- Modifier une mission publiée ----------
+  let missionEnEdition = null;
+  function demarrerEdition(m){
+    if (!peutPublier()){ afficherMessage("Ton profil ne permet pas de modifier des missions. Change ton type d'usage dans l'onglet Profil."); return; }
+    missionEnEdition = m.id;
+    $("titre").value = m.titre || "";
+    $("categorie").value = m.categorie || "";
+    $("ville").value = m.ville || "Bohicon";
+    $("lieu").value = m.lieu || "";
+    $("quand").value = ["flexible", "urgent", "date"].includes(m.quand) ? m.quand : "flexible";
+    $("date-exec").value = m.dateExec || "";
+    $("heure-exec").value = m.heureExec || "";
+    $("bloc-date").classList.toggle("cache", $("quand").value !== "date");
+    $("prix").value = m.prix || "";
+    $("desc").value = m.desc || "";
+    $("adresse-precise").classList.add("cache");
+    $("t-publier-titre").textContent = "Modifier la mission";
+    $("publier").textContent = "Enregistrer les modifications";
+    $("annuler-edition").classList.remove("cache");
+    ouvrirEspace("publier");
+  }
+  function finirEdition(){
+    missionEnEdition = null;
+    ["titre", "lieu", "adresse-precise", "prix", "desc", "date-exec", "heure-exec"].forEach(id => { $(id).value = ""; });
+    $("quand").value = "flexible";
+    $("categorie").value = "";
+    $("bloc-date").classList.add("cache");
+    $("adresse-precise").classList.remove("cache");
+    $("t-publier-titre").textContent = "Publier une mission";
+    $("publier").textContent = "Publier";
+    $("annuler-edition").classList.add("cache");
+  }
+  $("annuler-edition").addEventListener("click", finirEdition);
+
+  // ---------- Barre de navigation du bas (mobile) ----------
+  $("nav-accueil").addEventListener("click", () => retourAccueil());
+  $("nav-missions").addEventListener("click", () => { fermerEspace(); defiler($("missions")); });
+  $("nav-publier").addEventListener("click", () => $("cta-publier").click());
+  $("nav-alertes").addEventListener("click", e => {
+    e.stopPropagation();
+    if (!user) ouvrirEspace(); else $("btn-cloche").click();
+  });
+  $("nav-espace").addEventListener("click", () => ouvrirEspace());
+
+  // ---------- Déconnexion automatique après une période d'inactivité ----------
+  const INACTIVITE_H = Number(window.CONFIG && window.CONFIG.INACTIVITE_HEURES) > 0 ? Number(window.CONFIG.INACTIVITE_HEURES) : 4;
+  const INACTIVITE_MS = INACTIVITE_H * 3600 * 1000;
+  const ACT_CLE = "bj_activite";
+  function noterActivite(){
+    try { localStorage.setItem(ACT_CLE, String(Date.now())); } catch (e) { /* stockage indisponible */ }
+  }
+  function connexionPerimee(){
+    try {
+      const der = Number(localStorage.getItem(ACT_CLE) || 0);
+      return der > 0 && Date.now() - der > INACTIVITE_MS;
+    } catch (e) { return false; }
+  }
+  function verifierInactivite(){
+    if (!user || !connexionPerimee()) return;
+    signOut(auth).catch(() => {});
+    afficherMessage("Session expirée|Tu as été déconnecté(e) après " + INACTIVITE_H + " heure(s) d'inactivité. Reconnecte-toi pour continuer.", "info");
+  }
+  let derniereNote = 0;
+  ["click", "keydown", "touchstart", "scroll", "mousemove"].forEach(ev => window.addEventListener(ev, () => {
+    const t = Date.now();
+    if (t - derniereNote > 30000){ derniereNote = t; noterActivite(); }
+  }, { passive: true }));
+  setInterval(verifierInactivite, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
+
+  $("icone-garantie").innerHTML = SVG_VERIF;
+
+  // ---------- Mise à jour de la plateforme ----------
+  const BUILD_ACTUEL = (document.querySelector('meta[name="build"]') || {}).content || "";
+  let majReportee = 0;
+  let derniereVerifMaj = 0;
+  try {   // retire le paramètre technique ajouté lors d'une mise à jour
+    const p = new URL(location.href);
+    if (p.searchParams.has("maj")){ p.searchParams.delete("maj"); history.replaceState(history.state, "", p.pathname + p.search + p.hash); }
+  } catch (e) { /* ignoré */ }
+
+  function lireMeta(texte, nom){
+    const m = texte.match(new RegExp('<meta name="' + nom + '" content="([^"]*)"'));
+    return m ? m[1] : "";
+  }
+  async function verifierMiseAJour(){
+    if (!BUILD_ACTUEL || Date.now() < majReportee) return;
+    derniereVerifMaj = Date.now();
+    try {
+      const url = new URL("index.html", location.href);
+      url.searchParams.set("v", String(Date.now()));
+      const r = await fetch(url.href, { cache: "no-store", headers: { Range: "bytes=0-3999" } });
+      if (!r.ok) return;
+      const debut = (await r.text()).slice(0, 4000);
+      const nouvelle = lireMeta(debut, "build");
+      if (!nouvelle || nouvelle === BUILD_ACTUEL) return;
+      $("maj-notes").textContent = lireMeta(debut, "build-notes") || "Des améliorations ont été ajoutées à la plateforme.";
+      $("bandeau-install").classList.add("cache");
+      $("bandeau-maj").classList.remove("cache");
+    } catch (e) { /* hors connexion : nouvel essai plus tard */ }
+  }
+  function appliquerMiseAJour(){
+    const aller = () => {
+      const u = new URL(location.href);
+      u.searchParams.set("maj", String(Date.now()));
+      location.replace(u.href);
+    };
+    if ("caches" in window) caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))).then(aller, aller);
+    else aller();
+  }
+  $("btn-maj").addEventListener("click", appliquerMiseAJour);
+  $("btn-maj-plus-tard").addEventListener("click", () => {
+    $("bandeau-maj").classList.add("cache");
+    majReportee = Date.now() + 30 * 60 * 1000;
+  });
+  setTimeout(verifierMiseAJour, 20000);
+  setInterval(verifierMiseAJour, 20 * 60 * 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - derniereVerifMaj > 10 * 60 * 1000) verifierMiseAJour();
+  });
+
+  // ---------- Installation comme application (PWA) ----------
+  if ("serviceWorker" in navigator){
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+  }
+  const estInstallee = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const estIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let installEvt = null;
+
+  function majInstall(){
+    const cacher = estInstallee();
+    $("aide-installer").classList.toggle("cache", cacher);
+    $("lien-installer").classList.toggle("cache", cacher);
+    if (cacher) $("bandeau-install").classList.add("cache");
+  }
+
+  function programmerBandeauInstall(){
+    if (estInstallee()) return;
+    let ferme = 0;
+    try { ferme = Number(localStorage.getItem("bj_install_ferme") || 0); } catch (e) { /* ignoré */ }
+    if (Date.now() - ferme < 14 * 24 * 3600 * 1000) return;
+    setTimeout(() => {
+      if ((installEvt || estIOS) && !estInstallee()) $("bandeau-install").classList.remove("cache");
+    }, 8000);
+  }
+
+  async function installerApplication(){
+    if (installEvt){
+      installEvt.prompt();
+      try { await installEvt.userChoice; } catch (e) { /* ignoré */ }
+      installEvt = null;
+      $("bandeau-install").classList.add("cache");
+      return;
+    }
+    afficherMessage(estIOS
+      ? "Sur iPhone : touche le bouton Partager (le carré avec une flèche), puis « Sur l'écran d'accueil »."
+      : "Ouvre le menu ⋮ de ton navigateur, puis touche « Installer l'application » ou « Ajouter à l'écran d'accueil ».", "info");
+  }
+
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; programmerBandeauInstall(); });
+  window.addEventListener("appinstalled", () => {
+    installEvt = null;
+    majInstall();
+    afficherMessage("Application installée|Retrouve Bohicon Jobs sur ton écran d'accueil.", "info");
+  });
+  $("aide-installer").addEventListener("click", installerApplication);
+  $("lien-installer").addEventListener("click", e => { e.preventDefault(); installerApplication(); });
+  $("btn-install-bandeau").addEventListener("click", installerApplication);
+  $("btn-install-fermer").addEventListener("click", () => {
+    $("bandeau-install").classList.add("cache");
+    try { localStorage.setItem("bj_install_ferme", String(Date.now())); } catch (e) { /* ignoré */ }
+  });
+  majInstall();
+  if (estIOS) programmerBandeauInstall();
+
+  // ---------- Afficher / masquer le mot de passe ----------
+  $("voir-mdp").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
+  $("voir-i-mdp").addEventListener("change", e => { $("i-mdp").type = e.target.checked ? "text" : "password"; });
+
+  // Retire le surlignage rouge dès que le champ est corrigé
+  ["titre", "categorie", "ville", "lieu", "date-exec", "prix", "desc"].forEach(id => {
+    $(id).addEventListener("input", () => $(id).classList.remove("invalide"));
+    $(id).addEventListener("change", () => $(id).classList.remove("invalide"));
+  });
+
+  // ---------- Favoris (enregistrés sur cet appareil) ----------
+  const FAV_CLE = "bj_favoris";
+  let favoris = new Set();
+  try { favoris = new Set(JSON.parse(localStorage.getItem(FAV_CLE) || "[]")); } catch (e) { favoris = new Set(); }
+  function basculerFavori(id){
+    if (favoris.has(id)) favoris.delete(id); else favoris.add(id);
+    try { localStorage.setItem(FAV_CLE, JSON.stringify([...favoris])); } catch (e) { /* stockage indisponible */ }
+    afficher();
+  }
+
+  // ---------- Catégories, recherche et filtres ----------
+  (function(){
+    const remplirCat = (sel, premier) => {
+      const o0 = el("option", "", premier);
+      o0.value = "";
+      sel.appendChild(o0);
+      CATEGORIES.forEach(([k, e, l]) => { const o = el("option", "", e + " " + l); o.value = k; sel.appendChild(o); });
+    };
+    remplirCat($("categorie"), "Catégorie de la mission…");
+    remplirCat($("f-cat"), "Toutes les catégories");
+  })();
+  $("recherche").addEventListener("input", afficher);
+  $("f-cat").addEventListener("change", afficher);
+  $("f-prix").addEventListener("change", afficher);
+  $("f-tri").addEventListener("change", afficher);
+  $("btn-reset-filtres").addEventListener("click", () => { reinitialiserFiltres(); afficher(); });
+
+  // ---------- Lien d'ambassadeur (?ref=code) ----------
+  const REF_CLE = "bj_ref";
+  const REF_DUREE = 30 * 24 * 3600 * 1000;   // 30 jours
+  function codeParrain(){
+    try {
+      const a = JSON.parse(localStorage.getItem(REF_CLE) || "null");
+      return a && a.code && Date.now() - a.ts < REF_DUREE ? a.code : "";
+    } catch (e) { return ""; }
+  }
+  // Les liens d'ambassadeur (?ref=code) ouvrent directement l'inscription ; ?page=connexion ou ?page=inscription ouvre le formulaire voulu.
+  const LIEN_DIRECT = (function(){
+    try {
+      const p = new URLSearchParams(location.search);
+      const page = String(p.get("page") || "").toLowerCase();
+      if (page === "connexion" || page === "inscription") return page;
+      return /^[a-z0-9-]{2,30}$/.test(String(p.get("ref") || "").trim().toLowerCase()) ? "inscription" : "";
+    } catch (e) { return ""; }
+  })();
+  let lienDirectFait = false;
+
+  (function memoriserParrain(){
+    try {
+      const code = String(new URLSearchParams(location.search).get("ref") || "").trim().toLowerCase();
+      if (!/^[a-z0-9-]{2,30}$/.test(code)) return;
+      if (!codeParrain()) localStorage.setItem(REF_CLE, JSON.stringify({ code, ts: Date.now() }));
+    } catch (e) { /* stockage indisponible */ }
+  })();
+
+  // ---------- Date souhaitée et invitation ----------
+  $("date-exec").min = aujourdhui();
+  $("quand").addEventListener("change", () => $("bloc-date").classList.toggle("cache", $("quand").value !== "date"));
+  const lienInvitation = "https://wa.me/?text=" + encodeURIComponent(
+    "Découvre Bohicon Jobs : trouve ou publie de petits jobs à Bohicon 👉 " + urlSite());
+  $("lien-partage").href = lienInvitation;
+  $("aide-inviter").href = lienInvitation;
+  $("aide-avis").classList.toggle("cache", !BOUTON_AVIS);
+  $("aide-avis").addEventListener("click", () => $("btn-retour").click());
+
+  // ---------- Navigation et boutons flottants ----------
+  const defiler = el => el.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "start" });
+  $("btn-mon-espace").addEventListener("click", () => { if (espaceOuvert) fermerEspace(); else ouvrirEspace(); });
+  $("cta-publier").addEventListener("click", () => {
+    if (!user){ vueInscription = true; majUI(); ouvrirEspace(); }
+    else if (profilOk() && suspendu()){
+      afficherMessage("Ton compte est suspendu : tu ne peux plus publier. Contacte l'administrateur.");
+    }
+    else if (profilOk() && !peutPublier()){
+      afficherMessage("Ton profil est réglé pour chercher des missions. Pour en publier, change ton type d'usage dans l'onglet Profil.", "info");
+      ouvrirEspace("profil");
+    }
+    else ouvrirEspace(profilOk() ? "publier" : undefined);
+  });
+  window.addEventListener("scroll", () => $("fab-haut").classList.toggle("on", window.scrollY > 400), { passive: true });
+  $("fab-haut").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }));
+  if (NUMERO_WA){
+    const f = $("fab-wa");
+    f.href = "https://wa.me/" + NUMERO_WA;
+    f.classList.remove("cache");
+  }
+  $("annee").textContent = new Date().getFullYear();
+
+  // ---------- Bannières (modifiables depuis l'espace administrateur) ----------
+  const FONDS = {
+    vert: "linear-gradient(135deg,#0a7d3b,#13a455)", bleu: "linear-gradient(135deg,#1a4fa0,#3b82f6)",
+    orange: "linear-gradient(135deg,#8a5a00,#f59e0b)", violet: "linear-gradient(135deg,#5b2a86,#9b59b6)",
+    rouge: "linear-gradient(135deg,#a3121f,#e8112d)"
+  };
+  const BANNIERES_DEFAUT = [
+    { titre: "Publie ta mission gratuitement", texte: "Ménage, livraison, jardinage… trouve de l'aide près de chez toi.", image: "promo1.jpg", fond: "vert" },
+    { titre: "Besoin d'un revenu en plus ?", texte: "Choisis des missions autour de toi et fais-toi payer directement.", image: "promo2.jpg", fond: "bleu" },
+    { titre: "Ton commerce ici", texte: "Espace publicitaire disponible. Contacte-nous sur WhatsApp.", image: "promo3.jpg", fond: "orange",
+      lien: NUMERO_WA ? "https://wa.me/" + NUMERO_WA : "" }
+  ];
+  let bannieresDB = [];
+  let bannieresChargees = false;
+  let minuteurSlider = null;
+  const lienSur = u => /^https:\/\/\S+$/.test(String(u || "").trim()) ? String(u).trim() : "";
+  const imageSure = u => { u = String(u || "").trim(); return /^(https:\/\/[^\s'"()]+|[A-Za-z0-9._-]+)$/.test(u) ? u : ""; };
+
+  function bannieresActives(){
+    if (!bannieresDB.length) return BANNIERES_DEFAUT;
+    const auj = aujourdhui();
+    return bannieresDB
+      .filter(b => b.actif !== false && (!b.debut || b.debut <= auj) && (!b.fin || b.fin >= auj))
+      .sort((x, y) => Number(x.ordre || 0) - Number(y.ordre || 0));
+  }
+
+  function compterClic(b){
+    if (!b.id) return;
+    try {
+      if (sessionStorage.getItem("bj_clic_" + b.id)) return;
+      sessionStorage.setItem("bj_clic_" + b.id, "1");
+    } catch (e) { /* stockage indisponible */ }
+    updateDoc(doc(db, "bannieres", b.id), { clics: increment(1) }).catch(() => {});
+  }
+
+  function construireSlider(liste){
+    const zone = $("slider");
+    zone.innerHTML = "";
+    clearInterval(minuteurSlider);
+    if (!liste.length) return;
+    const piste = el("div", "piste");
+    const points = el("div", "points");
+    liste.forEach((b, i) => {
+      const lien = lienSur(b.lien);
+      const s = document.createElement(lien ? "a" : "div");
+      s.className = "slide";
+      if (lien){
+        s.href = lien; s.target = "_blank"; s.rel = "noopener sponsored";
+        s.addEventListener("click", () => compterClic(b));
+      }
+      const fond = FONDS[b.fond] || FONDS.vert;
+      const img = imageSure(b.image);
+      s.style.background = img
+        ? "linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,.18)), url('" + encodeURI(img) + "') center/cover, " + fond
+        : fond;
+      s.append(el("h3", "", b.titre || ""), el("p", "", b.texte || ""));
+      piste.appendChild(s);
+      const pt = document.createElement("i");
+      if (i === 0) pt.className = "on";
+      points.appendChild(pt);
+    });
+    zone.append(piste, points);
+
+    let idx = 0;
+    const largeur = () => piste.clientWidth + 12;
+    piste.addEventListener("scroll", () => {
+      idx = Math.round(piste.scrollLeft / largeur());
+      Array.from(points.children).forEach((pt, i) => pt.classList.toggle("on", i === idx));
+    });
+    if (!reduit && liste.length > 1){
+      minuteurSlider = setInterval(() => {
+        piste.scrollTo({ left: ((idx + 1) % liste.length) * largeur(), behavior: "smooth" });
+      }, 5000);
+      piste.addEventListener("touchstart", () => clearInterval(minuteurSlider), { once: true });
+    }
+  }
+
+  onSnapshot(query(collection(db, "bannieres"), limit(30)), snap => {
+    bannieresDB = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    bannieresChargees = true;
+    construireSlider(bannieresActives());
+  }, err => {
+    console.error(err);
+    bannieresChargees = true;
+    construireSlider(BANNIERES_DEFAUT);
+  });
+  setTimeout(() => { if (!bannieresChargees) construireSlider(BANNIERES_DEFAUT); }, 3000);
+
+  // ---------- Annonce en haut du site (publiée depuis l'espace administrateur) ----------
+  let annonceDB = null;
+  function afficherAnnonce(){
+    const z = $("annonce");
+    z.innerHTML = "";
+    const a = annonceDB;
+    const texte = a ? String(a.texte || "").trim() : "";
+    if (!a || a.actif === false || !texte || (a.fin && a.fin < aujourdhui())){ z.className = "annonce cache"; return; }
+    const cle = texte + "@" + (a.maj && a.maj.toMillis ? a.maj.toMillis() : "");
+    let fermee = "";
+    try { fermee = localStorage.getItem("bj_annonce_fermee") || ""; } catch (e) { /* ignoré */ }
+    if (fermee === cle){ z.className = "annonce cache"; return; }
+    z.className = "annonce " + (["info", "important", "succes"].includes(a.type) ? a.type : "info");
+    z.appendChild(el("span", "icone", "📢"));
+    const zoneTexte = el("div", "defile");
+    const defilant = el("span", "defile-texte", texte);
+    defilant.style.animationDuration = Math.max(10, Math.round(texte.length * 0.22)) + "s";
+    zoneTexte.appendChild(defilant);
+    z.appendChild(zoneTexte);
+    const lien = lienSur(a.lien);
+    if (lien){
+      const l = el("a", "", String(a.libelle || "").trim() || "En savoir plus");
+      l.href = lien; l.target = "_blank"; l.rel = "noopener";
+      z.appendChild(l);
+    }
+    const x = el("button", "", "✕");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer l'annonce");
+    x.addEventListener("click", () => {
+      try { localStorage.setItem("bj_annonce_fermee", cle); } catch (e) { /* ignoré */ }
+      z.className = "annonce cache";
+    });
+    z.appendChild(x);
+  }
+  onSnapshot(doc(db, "config", "annonce"), s => { annonceDB = s.exists() ? s.data() : null; afficherAnnonce(); }, err => console.error(err));
+</script>
+</body>
+</html>
