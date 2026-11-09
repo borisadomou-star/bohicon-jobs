@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261108-1259">
-<meta name="build-notes" content="Nouveau design des formulaires de connexion, d'inscription et de publication.">
+<meta name="build" content="20261109-1805">
+<meta name="build-notes" content="Nouvel espace entreprises : profil, modèles de missions, tableau de bord et republication.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -425,6 +425,36 @@
   .ic-users{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5'/%3E%3Cpath d='M16 5a3.5 3.5 0 0 1 0 7'/%3E%3Cpath d='M18 14.5c2 .6 3.5 2.2 3.5 5'/%3E%3C/svg%3E")}
   .ic-cash{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='6' width='19' height='12' rx='2'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3Cpath d='M6 9.5v.01M18 14.5v.01'/%3E%3C/svg%3E")}
 
+  /* Espace entreprises */
+  .topbar{gap:10px}
+  .marque{min-width:0;flex:1 1 auto}
+  .btn-pro{display:inline-flex;align-items:center;gap:7px;flex:none;width:auto;margin:0 0 0 auto;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,#0b6b3a,#12995a);color:#fff;font-size:.8rem;font-weight:700;box-shadow:0 8px 18px -10px rgba(11,107,58,.9)}
+  .btn-pro svg{width:17px;height:17px}
+  @media (min-width:721px){.btn-pro{margin-right:10px}}
+  .chip-entr{display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 7px;border:1px solid #cdd9f4;border-radius:999px;background:#eaf0fd;color:#1a4fa0;font-size:.72rem;font-weight:700}
+  .chip-entr svg{width:14px;height:14px;flex:none}
+  .pro-hero{margin-bottom:16px;padding:22px 20px;border-radius:24px;color:#fff;background:radial-gradient(120% 90% at 90% 0%,rgba(252,209,22,.2) 0%,rgba(252,209,22,0) 50%),linear-gradient(160deg,#062f1b 0%,#0a5a32 60%,#0f7a45 100%);box-shadow:0 24px 44px -24px rgba(6,47,27,.7)}
+  .pro-sur{display:inline-block;margin-bottom:8px;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--jaune)}
+  .pro-hero h2{margin:0 0 8px;font-size:1.35rem;line-height:1.25;letter-spacing:-.01em;color:#fff}
+  .pro-hero p{margin:0;font-size:.88rem;line-height:1.55;opacity:.88}
+  .pro-avantages{display:grid;gap:10px;margin-bottom:16px}
+  .pro-av{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid #e4ede7;border-radius:16px;background:#fff}
+  .pro-av b{display:block;font-size:.9rem}
+  .pro-av span.t{display:block;font-size:.8rem;line-height:1.4;color:var(--gris)}
+  .pro-pic{flex:none;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;background:#e7f5ed;color:#0f7a45}
+  .pro-pic svg{width:20px;height:20px}
+  .pro-entete{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:14px;border:1px solid #e4ede7;border-radius:18px;background:#fff}
+  .pro-logo{flex:none;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;font-size:1.15rem;font-weight:700}
+  .pro-entete b{display:block;font-size:1rem}
+  .pro-entete small{display:block;font-size:.78rem;color:var(--gris)}
+  .pro-onglets{display:flex;gap:6px;margin-bottom:14px;padding:4px;border-radius:999px;background:#fff;box-shadow:0 6px 18px -12px rgba(8,69,42,.4);overflow-x:auto}
+  .pro-onglet{flex:1 0 auto;width:auto;margin:0;padding:10px 14px;border-radius:999px;background:transparent;color:var(--gris);font-size:.85rem;font-weight:600;white-space:nowrap;box-shadow:none}
+  .pro-onglet.on{background:var(--vert);color:#fff}
+  .modeles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .modele{width:auto;margin:0;padding:14px;border:1.5px solid #dfe9e3;border-radius:16px;background:#fff;color:var(--encre);font-size:.85rem;font-weight:600;line-height:1.3;text-align:left;box-shadow:none}
+  .modele small{display:block;margin-top:4px;font-size:.74rem;font-weight:400;color:var(--gris)}
+  .pro-titre{margin:18px 2px 10px;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -493,6 +523,7 @@
 
 <div class="topbar">
   <a class="marque" href="#haut"><span class="logo">BJ</span><span class="marque-texte"><b>Bohicon Jobs</b><small>Les opportunités à portée de main</small></span></a>
+  <button class="btn-pro" id="btn-pro" type="button" aria-label="Espace entreprises"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2"/><path d="M8 12h2"/><path d="M8 16h2"/><path d="M3 21h18"/></svg><span>Entreprises</span></button>
   <div class="droite">
     <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
     <button class="btn-espace" id="btn-mon-espace" type="button">👤 Mon espace</button>
@@ -562,6 +593,11 @@
           <option value="prix-asc">Prix croissant</option>
           <option value="prix-desc">Prix décroissant</option>
         </select>
+        <select id="f-type">
+          <option value="">Tous les annonceurs</option>
+          <option value="entreprise">Entreprises</option>
+          <option value="particulier">Particuliers</option>
+        </select>
       </div>
     </details>
     <div class="resultats">
@@ -602,6 +638,15 @@
   <div class="bi-texte"><b>Installer Bohicon Jobs</b><small>Accès rapide depuis ton écran d'accueil</small></div>
   <button id="btn-install-bandeau" class="mini" type="button">Installer</button>
   <button id="btn-install-fermer" class="lien" type="button" aria-label="Fermer">✕</button>
+</div>
+
+<div id="vue-pro" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Espace entreprises">
+  <div class="vue-corps">
+    <div class="vue-tete">
+      <button id="btn-fermer-pro" class="btn-accueil" type="button">← Retour à l'accueil</button>
+    </div>
+    <div id="pro-contenu"></div>
+  </div>
 </div>
 
 <!-- Mon espace : panneau avec sous-menus -->
@@ -684,6 +729,8 @@
             <span id="icone-verif-pub" aria-hidden="true"></span>
             <div><b>Contrôle avant publication</b><span class="vn-txt">Notre équipe vérifie chaque mission avant de la rendre visible.</span></div>
           </div>
+
+          <label class="check cache" id="champ-pub-entreprise"><input type="checkbox" id="pub-entreprise"> <span>Publier au nom de mon entreprise : <b id="pub-entreprise-nom"></b></span></label>
 
           <div class="sect">
             <div class="sect-titre"><span class="sect-num">1</span>Ta mission</div>
@@ -1148,6 +1195,7 @@
     $("f-cat").value = "";
     $("f-prix").value = "";
     $("f-tri").value = "recentes";
+    $("f-type").value = "";
     $("filtre-statut").value = "disponible";
   }
 
@@ -1383,6 +1431,7 @@
   }
 
   function majTableau(){
+    if (proOuvert && !proSaisie) rendrePro();
     if (!user || !profilOk()) return;
     const s = statsPerso();
     const r = $("t-resume");
@@ -1609,6 +1658,12 @@
       v.appendChild(document.createTextNode("Vérifiée"));
       haut.appendChild(v);
     }
+    if (m.entrepriseNom){
+      const ce = el("span", "chip-entr");
+      ce.innerHTML = SVG_ENTR;
+      ce.appendChild(document.createTextNode("Entreprise"));
+      haut.appendChild(ce);
+    }
     if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
     haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
     if (estExpiree(m)) haut.appendChild(el("span", "badge b-gris", "Expirée"));
@@ -1649,10 +1704,10 @@
       const nbTerminees = cpt.parAuteur[m.uid] || 0;
       const nr = notesPour(m.uid);
       const aut = el("div", "c-auteur");
-      aut.appendChild(el("span", "avatar", String(m.auteur).trim().charAt(0).toUpperCase()));
+      aut.appendChild(el("span", "avatar", String(m.entrepriseNom || m.auteur).trim().charAt(0).toUpperCase()));
       const t = el("div");
-      t.appendChild(el("b", "", m.auteur));
-      const sous = [nr ? etoilesTxt(nr) : "", nbTerminees ? "✔️ " + pluriel(nbTerminees, "mission") + " terminée" + (nbTerminees > 1 ? "s" : "") : ""].filter(Boolean).join(" · ");
+      t.appendChild(el("b", "", m.entrepriseNom || m.auteur));
+      const sous = [m.entrepriseNom ? (m.entrepriseSecteur || "Entreprise") : "", nr ? etoilesTxt(nr) : "", nbTerminees ? "✔️ " + pluriel(nbTerminees, "mission") + " terminée" + (nbTerminees > 1 ? "s" : "") : ""].filter(Boolean).join(" · ");
       t.appendChild(el("small", "", sous || "Nouveau membre"));
       aut.appendChild(t);
       bas.appendChild(aut);
@@ -1758,6 +1813,9 @@
 
       if (statut === "disponible"){
         actions.appendChild(bouton("✏️ Modifier la mission", "sec mini", async () => demarrerEdition(m)));
+      }
+      if (statut === "terminee" || estExpiree(m)){
+        actions.appendChild(bouton("Republier cette mission", "sec mini", async () => republier(m)));
       }
 
       if (statut === "disponible" || statut === "attribuee"){
@@ -1906,6 +1964,7 @@
     const cat = $("f-cat").value;
     const px = $("f-prix").value;
     const tri = $("f-tri").value;
+    const typ = $("f-type").value;
     const dansPrix = p => {
       const n = Number(p || 0);
       if (px === "0-2000") return n <= 2000;
@@ -1927,12 +1986,13 @@
       && okStatut(m)
       && (!cat || m.categorie === cat)
       && dansPrix(m.prix)
+      && (!typ || (typ === "entreprise" ? !!m.entrepriseNom : !m.entrepriseNom))
       && (!q || normaliser([m.titre, m.desc, m.lieu, m.ville, (catInfo(m.categorie) || [])[2]].join(" ")).includes(q)));
     if (tri === "urgentes") items = items.slice().sort((a, b) => (b.quand === "urgent") - (a.quand === "urgent"));
     else if (tri === "prix-asc") items = items.slice().sort((a, b) => Number(a.prix || 0) - Number(b.prix || 0));
     else if (tri === "prix-desc") items = items.slice().sort((a, b) => Number(b.prix || 0) - Number(a.prix || 0));
     $("compteur-res").textContent = items.length + " mission" + (items.length > 1 ? "s" : "");
-    const filtreActif = q || f || cat || px || tri !== "recentes" || fs !== "disponible";
+    const filtreActif = q || f || cat || px || typ || tri !== "recentes" || fs !== "disponible";
     $("btn-reset-filtres").classList.toggle("cache", !filtreActif);
     if (items.length === 0){
       liste.innerHTML = fs === "favoris" && !favoris.size
@@ -2131,6 +2191,8 @@
         uid: user.uid,
         statut: "disponible",
         valide: estAdminUtilisateur,
+        ...(profil && profil.entreprise && profil.entreprise.nom && $("pub-entreprise").checked
+          ? { entrepriseNom: profil.entreprise.nom, entrepriseSecteur: profil.entreprise.secteur || "" } : {}),
         createdAt: serverTimestamp()
       });
       ["titre","lieu","adresse-precise","prix","desc","date-exec","heure-exec"].forEach(id => $(id).value = "");
@@ -2168,6 +2230,7 @@
   }
 
   function ouvrirEspace(onglet){
+    if (proOuvert) fermerPro(true);
     const v = $("vue-espace");
     v.style.top = document.querySelector(".topbar").offsetHeight + "px";
     v.classList.remove("cache");
@@ -2202,6 +2265,7 @@
   try { history.scrollRestoration = "manual"; } catch (e) { /* ignoré */ }
   function retourAccueil(){
     fermerEspace();
+    fermerPro();
     window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
   }
   $("btn-fermer-espace").addEventListener("click", retourAccueil);
@@ -2471,6 +2535,13 @@
 
   // ---------- Formulaire de publication : compteur et aperçu en direct ----------
   function majFormPublication(){
+    const ent = profil && profil.entreprise && profil.entreprise.nom ? profil.entreprise : null;
+    $("champ-pub-entreprise").classList.toggle("cache", !ent);
+    if (ent){
+      $("pub-entreprise-nom").textContent = ent.nom;
+      if (!$("pub-entreprise").dataset.init){ $("pub-entreprise").checked = true; $("pub-entreprise").dataset.init = "1"; }
+    }
+    const auNom = ent && $("pub-entreprise").checked ? ent.nom : (profil ? nomCourt(profil) : "");
     const d = $("desc");
     $("compteur-desc").textContent = d.value.length + " / 300";
     const z = $("apercu-mission");
@@ -2497,10 +2568,10 @@
     const bas = el("div", "c-bas");
     if (profil){
       const aut = el("div", "c-auteur");
-      aut.appendChild(el("span", "avatar", String(profil.prenom || "?").trim().charAt(0).toUpperCase()));
+      aut.appendChild(el("span", "avatar", String(auNom || "?").trim().charAt(0).toUpperCase()));
       const tt = el("div");
-      tt.appendChild(el("b", "", nomCourt(profil)));
-      tt.appendChild(el("small", "", "Auteur de la mission"));
+      tt.appendChild(el("b", "", auNom));
+      tt.appendChild(el("small", "", ent && $("pub-entreprise").checked ? (ent.secteur || "Entreprise") : "Auteur de la mission"));
       aut.appendChild(tt);
       bas.appendChild(aut);
     }
@@ -2515,6 +2586,7 @@
     $(id).addEventListener("change", majFormPublication);
   });
   $("icone-verif-pub").innerHTML = SVG_VERIF;
+  $("pub-entreprise").addEventListener("change", majFormPublication);
 
   // ---------- Modifier une mission publiée ----------
   let missionEnEdition = null;
@@ -2554,7 +2626,7 @@
 
   // ---------- Barre de navigation du bas (mobile) ----------
   $("nav-accueil").addEventListener("click", () => retourAccueil());
-  $("nav-missions").addEventListener("click", () => { fermerEspace(); defiler($("missions")); });
+  $("nav-missions").addEventListener("click", () => { fermerEspace(); fermerPro(); defiler($("missions")); });
   $("nav-publier").addEventListener("click", () => $("cta-publier").click());
   $("nav-alertes").addEventListener("click", e => {
     e.stopPropagation();
@@ -2703,6 +2775,218 @@
     $(id).addEventListener("change", () => $(id).classList.remove("invalide"));
   });
 
+  // ---------- Espace entreprises ----------
+  const SVG_ENTR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2"/><path d="M8 12h2"/><path d="M8 16h2"/><path d="M3 21h18"/></svg>';
+  const SVG_COCHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>';
+  const SECTEURS = ["Commerce et boutique", "Restauration", "Transport et livraison", "BTP et construction", "Agriculture et élevage",
+    "Services aux entreprises", "Éducation et formation", "Santé, beauté et bien-être", "Événementiel", "Technologie et numérique", "Autre"];
+  const MODELES = [
+    { nom: "Livraison de colis", cat: "livraison", titre: "Livraison de colis à Bohicon", desc: "Livrer des colis chez nos clients à Bohicon. Un moyen de déplacement est nécessaire. Paiement à la fin de la tournée." },
+    { nom: "Distribution de flyers", cat: "autre", titre: "Distribution de flyers", desc: "Distribuer des flyers dans des lieux de passage de Bohicon. Le matériel est fourni, durée estimée : une demi-journée." },
+    { nom: "Aide en boutique", cat: "autre", titre: "Aide en boutique", desc: "Accueillir les clients, ranger les produits et aider à la vente pendant la journée. Sérieux et ponctualité demandés." },
+    { nom: "Manutention", cat: "transport", titre: "Déchargement de marchandises", desc: "Décharger et ranger des marchandises à l'arrivée d'un camion. Personnes en bonne forme physique de préférence." },
+    { nom: "Nettoyage du local", cat: "menage", titre: "Nettoyage de notre local", desc: "Nettoyer et ranger notre local commercial (sols, vitrines, rayons). Le matériel de nettoyage est fourni." },
+    { nom: "Petits travaux", cat: "bricolage", titre: "Petits travaux de réparation", desc: "Réparations et petits travaux dans notre local : peinture, étagères, branchements simples. Expérience appréciée." },
+    { nom: "Service et événement", cat: "cuisine", titre: "Service lors d'un événement", desc: "Aide au service et à l'installation lors d'un événement : accueil, boissons, rangement. Tenue correcte exigée." },
+    { nom: "Saisie et bureautique", cat: "informatique", titre: "Saisie de documents", desc: "Saisir des documents et mettre à jour des fichiers de stock ou de clients sur ordinateur. Maîtrise de base requise." }
+  ];
+  let proOuvert = false;
+  let proOnglet = "dash";
+  let proSaisie = false;
+
+  function ouvrirPro(onglet){
+    if (espaceOuvert) fermerEspace(true);
+    const v = $("vue-pro");
+    v.classList.remove("cache");
+    v.style.top = document.querySelector(".topbar").offsetHeight + "px";
+    document.body.style.overflow = "hidden";
+    if (!proOuvert){
+      proOuvert = true;
+      try { history.pushState({ pro: true }, ""); } catch (e) { /* ignoré */ }
+    }
+    if (onglet) proOnglet = onglet;
+    rendrePro();
+    v.scrollTop = 0;
+  }
+  function fermerPro(viaRetour){
+    if (!proOuvert) return;
+    proOuvert = false;
+    $("vue-pro").classList.add("cache");
+    if (!espaceOuvert) document.body.style.overflow = "";
+    if (!viaRetour){
+      try { if (history.state && history.state.pro) history.back(); } catch (e) { /* ignoré */ }
+    }
+  }
+
+  // Préremplit le formulaire de publication puis l'ouvre
+  function preparerPublication(valeurs, message){
+    if (!peutPublier()){ afficherMessage("Ton profil ne permet pas de publier. Change ton type d'usage dans l'onglet Profil."); return; }
+    finirEdition();
+    $("titre").value = valeurs.titre || "";
+    $("categorie").value = valeurs.cat || "";
+    $("ville").value = valeurs.ville || "Bohicon";
+    $("lieu").value = valeurs.lieu || "";
+    $("quand").value = valeurs.quand || "flexible";
+    $("bloc-date").classList.add("cache");
+    $("prix").value = valeurs.prix || "";
+    $("desc").value = valeurs.desc || "";
+    majFormPublication();
+    afficherMessage(message, "info");
+    fermerPro(true);
+    ouvrirEspace("publier");
+  }
+  function republier(m){
+    preparerPublication({ titre: m.titre, cat: m.categorie, ville: m.ville, lieu: m.lieu, prix: m.prix, desc: m.desc,
+      quand: m.quand === "urgent" ? "urgent" : "flexible" }, "Formulaire prérempli|Vérifie les informations, puis publie la mission.");
+  }
+
+  function formEntreprise(ent){
+    const f = el("div");
+    f.innerHTML = '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Ton entreprise</div>'
+      + '<label class="champ"><span>Nom de l\'entreprise ou du commerce</span><input class="ic ic-briefcase" id="pro-nom" maxlength="60" placeholder="Ex : Boutique Saint-Michel"></label>'
+      + '<label class="champ"><span>Secteur d\'activité</span><select class="ic ic-tag" id="pro-secteur"></select></label>'
+      + '<label class="champ"><span>Présentation <small>facultatif</small></span><textarea id="pro-desc" rows="3" maxlength="300" placeholder="Que faites-vous ? Depuis quand ? Où êtes-vous situé ?"></textarea></label></div>';
+    const sel = f.querySelector("#pro-secteur");
+    const o0 = el("option", "", "Choisis un secteur…"); o0.value = ""; sel.appendChild(o0);
+    SECTEURS.forEach(s => { const o = el("option", "", s); o.value = s; sel.appendChild(o); });
+    if (ent){
+      f.querySelector("#pro-nom").value = ent.nom || "";
+      sel.value = ent.secteur || "";
+      f.querySelector("#pro-desc").value = ent.description || "";
+    }
+    f.appendChild(bouton(ent ? "Enregistrer les modifications" : "Créer mon profil entreprise", "", async () => {
+      const nom = $("pro-nom").value.trim();
+      const secteur = $("pro-secteur").value;
+      const description = $("pro-desc").value.trim();
+      if (nom.length < 2){ afficherMessage("Indique le nom de ton entreprise ou de ton commerce."); return; }
+      if (!secteur){ afficherMessage("Choisis ton secteur d'activité."); return; }
+      const nouvelle = { nom, secteur, description };
+      await setDoc(doc(db, "users", user.uid), { entreprise: nouvelle }, { merge: true });
+      profil = { ...profil, entreprise: nouvelle };
+      afficherMessage("Entreprise enregistrée|Tu peux maintenant publier au nom de ton entreprise.", "succes");
+      proOnglet = "dash";
+      majFormPublication();
+      rendrePro();
+    }));
+    if (ent){
+      f.appendChild(bouton("Retirer le profil entreprise", "danger", async () => {
+        if (!(await confirmer("Tes missions déjà publiées resteront visibles. Tu pourras recréer ton profil entreprise à tout moment.", { titre: "Retirer le profil entreprise", ok: "Retirer", danger: true }))) return;
+        await updateDoc(doc(db, "users", user.uid), { entreprise: deleteField() });
+        const copie = { ...profil }; delete copie.entreprise; profil = copie;
+        afficherMessage("Profil entreprise retiré|Tu restes connecté avec ton compte personnel.", "succes");
+        majFormPublication();
+        rendrePro();
+      }));
+    }
+    return f;
+  }
+
+  function rendrePro(){
+    const z = $("pro-contenu");
+    z.innerHTML = "";
+    proSaisie = false;
+    const hero = el("div", "pro-hero");
+    hero.append(el("span", "pro-sur", "Espace entreprises"), el("h2", "", "Trouvez de l'aide locale en quelques minutes"),
+      el("p", "", "Publiez vos besoins, gérez vos candidatures et suivez vos missions au même endroit."));
+    z.appendChild(hero);
+
+    if (!user){
+      const av = el("div", "pro-avantages");
+      [["Publication rapide", "Des modèles de missions prêts à l'emploi pour publier en quelques secondes."],
+       ["Annonces contrôlées", "Chaque mission est vérifiée par notre équipe, avec un badge Entreprise bien visible."],
+       ["Suivi simple", "Un tableau de bord pour vos candidatures, vos missions en cours et vos dépenses."]].forEach(([t, d]) => {
+        const l = el("div", "pro-av");
+        const ic = el("span", "pro-pic"); ic.innerHTML = SVG_COCHE;
+        const tx = el("div"); tx.append(el("b", "", t), el("span", "t", d));
+        l.append(ic, tx); av.appendChild(l);
+      });
+      z.appendChild(av);
+      z.appendChild(bouton("Créer un compte", "", async () => { fermerPro(true); vueInscription = true; majUI(); ouvrirEspace(); }));
+      z.appendChild(bouton("J'ai déjà un compte", "sec", async () => { fermerPro(true); vueInscription = false; majUI(); ouvrirEspace(); }));
+      return;
+    }
+    if (!profilOk()){
+      z.appendChild(el("div", "info attente", "En attente de ton profil : complète-le pour accéder à l'espace entreprises."));
+      z.appendChild(bouton("Compléter mon profil", "", async () => { fermerPro(true); ouvrirEspace(); }));
+      return;
+    }
+    const ent = profil.entreprise;
+    if (!ent || !ent.nom){
+      proSaisie = true;
+      z.appendChild(formEntreprise(null));
+      return;
+    }
+
+    const entete = el("div", "pro-entete");
+    entete.appendChild(el("span", "pro-logo", ent.nom.trim().charAt(0).toUpperCase()));
+    const txt = el("div");
+    txt.append(el("b", "", ent.nom), el("small", "", [ent.secteur, profil.ville].filter(Boolean).join(" · ")));
+    entete.appendChild(txt);
+    z.appendChild(entete);
+
+    const ong = el("div", "pro-onglets");
+    [["dash", "Tableau de bord"], ["modeles", "Modèles"], ["profil", "Mon entreprise"]].forEach(([k, t]) => {
+      const b = el("button", "pro-onglet" + (proOnglet === k ? " on" : ""), t);
+      b.type = "button";
+      b.addEventListener("click", () => { proOnglet = k; rendrePro(); });
+      ong.appendChild(b);
+    });
+    z.appendChild(ong);
+
+    if (proOnglet === "profil"){
+      proSaisie = true;
+      z.appendChild(formEntreprise(ent));
+      return;
+    }
+    if (proOnglet === "modeles"){
+      z.appendChild(el("p", "h-sous", "Choisis un modèle : le formulaire de publication se préremplit, tu n'as plus qu'à ajuster."));
+      const g = el("div", "modeles");
+      MODELES.forEach(mod => {
+        const b = el("button", "modele", mod.nom);
+        b.type = "button";
+        b.appendChild(el("small", "", (catInfo(mod.cat) || [])[2] || ""));
+        b.addEventListener("click", () => preparerPublication({ titre: mod.titre, cat: mod.cat, desc: mod.desc },
+          "Modèle appliqué|Complète le lieu et le prix, puis publie la mission."));
+        g.appendChild(b);
+      });
+      z.appendChild(g);
+      return;
+    }
+
+    const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
+    const terminees = mesPubliees.filter(m => st(m) === "terminee");
+    const tuile = (valeur, label) => { const t = el("div", "tuile-s"); t.append(el("b", "", valeur), el("span", "", label)); return t; };
+    const tuiles = el("div", "tuiles");
+    tuiles.append(
+      tuile(String(mesPubliees.length), "Missions publiées"),
+      tuile(String(candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).length), "Candidatures à traiter"),
+      tuile(String(mesPubliees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length), "Missions en cours"),
+      tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Montant confié")
+    );
+    z.appendChild(tuiles);
+    z.appendChild(bouton("Publier une mission", "", async () => preparerPublication({}, "Nouvelle mission|Renseigne les informations puis publie.")));
+    z.appendChild(bouton("Voir mes annonces et candidatures", "sec", async () => { fermerPro(true); ouvrirEspace("histo"); }));
+    z.appendChild(el("div", "pro-titre", "Mes dernières annonces"));
+    const recentes = mesPubliees.slice().sort((a, b) => dateMs(b) - dateMs(a)).slice(0, 5);
+    if (!recentes.length) z.appendChild(el("div", "vide", "Aucune annonce pour l'instant. Utilise un modèle pour publier rapidement."));
+    recentes.forEach(m => {
+      const ligne = el("div", "h-ligne");
+      const g = el("div");
+      g.appendChild(el("div", "h-titre", m.titre));
+      g.appendChild(el("div", "h-sous", [fcfa(m.prix), dateTexte(dateMs(m))].filter(Boolean).join(" · ")));
+      const d = el("div", "btns");
+      d.appendChild(el("span", "badge b-" + st(m), LIBELLES[st(m)]));
+      d.appendChild(bouton("Republier", "sec mini", async () => republier(m)));
+      ligne.append(g, d);
+      z.appendChild(ligne);
+    });
+  }
+
+  $("btn-pro").addEventListener("click", () => { if (proOuvert) fermerPro(); else ouvrirPro(); });
+  $("btn-fermer-pro").addEventListener("click", () => { fermerPro(); window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }); });
+  window.addEventListener("popstate", () => { if (proOuvert) fermerPro(true); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPro(); });
+
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
   let favoris = new Set();
@@ -2728,6 +3012,7 @@
   $("f-cat").addEventListener("change", afficher);
   $("f-prix").addEventListener("change", afficher);
   $("f-tri").addEventListener("change", afficher);
+  $("f-type").addEventListener("change", afficher);
   $("btn-reset-filtres").addEventListener("click", () => { reinitialiserFiltres(); afficher(); });
 
   // ---------- Lien d'ambassadeur (?ref=code) ----------
