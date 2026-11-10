@@ -368,6 +368,7 @@
   const demander = (message, opts) => dialogue(Object.assign({ message, champ: {} }, opts));
 
   let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
+  let entreprisesV = new Set();
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
 
@@ -421,6 +422,7 @@
       tuile(signalements.filter(s => s.statut !== "traite").length, "Signalements à traiter"),
       tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
       tuile(users.filter(u => u.ref).length, "Inscrits via un ambassadeur"),
+      tuile(users.filter(u => u.entreprise && u.entreprise.nom).length + " (" + entreprisesV.size + " vérifiées)", "Entreprises"),
       tuile(missions.filter(m => m.valide === false && !m.refusMotif).length, "Missions à valider"),
       tuile((() => {
         const n = retours.filter(r => r.note);
@@ -454,6 +456,9 @@
       const pub = missions.filter(m => m.uid === u.id).length;
       const real = missions.filter(m => m.workerUid === u.id && st(m) === "terminee").length;
       g.appendChild(el("div", "h-sous", pub + " publiée(s) · " + real + " réalisée(s)"));
+      if (u.entreprise && u.entreprise.nom){
+        g.appendChild(el("div", "h-sous", "Entreprise : " + u.entreprise.nom + (u.entreprise.secteur ? " · " + u.entreprise.secteur : "") + (entreprisesV.has(u.id) ? " · vérifiée" : " · non vérifiée")));
+      }
 
       const btns = el("div", "btns");
       if (u.tel){
@@ -475,6 +480,18 @@
           catch (e) { console.error(e); message("Action impossible. Vérifie les règles Firestore."); }
         });
         btns.appendChild(b);
+      }
+      if (u.entreprise && u.entreprise.nom){
+        const verifiee = entreprisesV.has(u.id);
+        btns.appendChild(bouton(verifiee ? "Retirer le badge" : "Vérifier l'entreprise", verifiee ? "sec mini" : "mini", async () => {
+          if (verifiee){
+            if (!(await confirmer("Le badge « Entreprise vérifiée » disparaîtra de ses annonces.", { titre: "Retirer la vérification", ok: "Retirer", danger: true }))) return;
+            await deleteDoc(doc(db, "entreprises", u.id));
+          } else {
+            if (!(await confirmer("Le badge « Entreprise vérifiée » s'affichera sur toutes ses annonces. Vérifie d'abord que l'entreprise existe réellement.", { titre: "Vérifier l'entreprise", ok: "Vérifier" }))) return;
+            await setDoc(doc(db, "entreprises", u.id), { verifiee: true, nom: u.entreprise.nom, secteur: u.entreprise.secteur || "", depuis: serverTimestamp() });
+          }
+        }));
       }
       ligne.append(g, btns);
       zone.appendChild(ligne);
@@ -896,7 +913,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -906,6 +923,7 @@
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "entreprises"), limit(500)), s => { entreprisesV = new Set(s.docs.map(d => d.id)); rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
       annonceAdmin = s.exists() ? s.data() : null;
       if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
