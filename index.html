@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261111-2147">
-<meta name="build-notes" content="Nouvel onglet Candidatures dans ton espace et réattribution d'une mission à un autre candidat.">
+<meta name="build" content="20261111-2209">
+<meta name="build-notes" content="Nouveaux menus de choix plus élégants : listes, cartes d'inscription et choix de la date.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -547,6 +547,43 @@
   .choix-txt small{display:block;font-size:.74rem;color:var(--gris)}
   .choix-ligne .mini{width:auto;margin:0;flex:none}
 
+  /* Sélecteurs premium : flèche unifiée, feuille de choix, cartes et segments */
+  select:not(.ic):not([data-cartes]):not([data-segments]){-webkit-appearance:none;appearance:none;padding-right:42px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 16px center!important;background-size:18px!important}
+  .champ select.ic{-webkit-appearance:none;appearance:none;padding-right:44px}
+  .champ select.ic.ic-pin{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E");background-position:right 16px center,16px center;background-size:18px,20px;background-repeat:no-repeat}
+  .champ select.ic.ic-tag{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12V4h8l9 9-8 8-9-9z'/%3E%3Ccircle cx='7.5' cy='8.5' r='1.2'/%3E%3C/svg%3E");background-position:right 16px center,16px center;background-size:18px,20px;background-repeat:no-repeat}
+  .sh-fond{position:fixed;inset:0;z-index:118;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .sh-fond.sortie{animation:dlg-sortie .14s ease both}
+  .sh{display:flex;flex-direction:column;width:min(100%,520px);max-height:78vh;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:26px 26px 0 0;background:#fff;box-shadow:0 -20px 60px -20px rgba(6,30,19,.6);animation:sh-monte .26s cubic-bezier(.2,.9,.3,1.05) both}
+  .sh-poignee{align-self:center;width:44px;height:5px;margin:2px 0 12px;border-radius:999px;background:#dfe7e2}
+  .sh-titre{margin:0 4px 12px;font-size:1.05rem;font-weight:700;text-align:center;color:var(--encre)}
+  .sh-liste{display:grid;gap:6px;padding:2px;overflow:auto}
+  .sh-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:0;padding:15px 16px;border:1.5px solid transparent;border-radius:16px;background:#f6f9f7;color:var(--encre);font-size:.98rem;font-weight:500;text-align:left;box-shadow:none}
+  .sh-coche{flex:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #d3ded7;border-radius:50%;color:#fff}
+  .sh-coche svg{width:14px;height:14px;opacity:0}
+  .sh-opt.on{border-color:var(--vert2);background:linear-gradient(135deg,#f1faf5,#e5f5ec);color:var(--vert-fonce);font-weight:700}
+  .sh-opt.on .sh-coche{border-color:var(--vert);background:var(--vert)}
+  .sh-opt.on .sh-coche svg{opacity:1}
+  .sh-opt:disabled{opacity:.45}
+  @keyframes sh-monte{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+  @media (min-width:721px){.sh-fond{align-items:center}.sh{border-radius:24px;max-height:70vh;padding-bottom:16px}}
+  .rc-groupe{display:grid;gap:10px}
+  .rc-carte{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:14px;border:1.5px solid #dfe9e3;border-radius:18px;background:#fff;color:var(--encre);text-align:left;box-shadow:none;transition:border-color .15s,box-shadow .15s,background .15s}
+  .rc-ico{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:#e7f5ed;color:#0f7a45}
+  .rc-ico svg{width:23px;height:23px}
+  .rc-txt{flex:1;min-width:0}
+  .rc-txt b{display:block;font-size:.95rem;line-height:1.25}
+  .rc-txt small{display:block;margin-top:3px;font-size:.78rem;line-height:1.35;color:var(--gris)}
+  .rc-radio{flex:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #cfdcd3;border-radius:50%;color:#fff}
+  .rc-radio svg{width:14px;height:14px;opacity:0}
+  .rc-carte.on{border-color:var(--vert2);background:linear-gradient(135deg,#f3fbf6,#e6f5ec);box-shadow:0 0 0 4px rgba(18,153,90,.12),0 14px 26px -18px rgba(11,107,58,.7)}
+  .rc-carte.on .rc-ico{background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff}
+  .rc-carte.on .rc-radio{border-color:var(--vert);background:var(--vert)}
+  .rc-carte.on .rc-radio svg{opacity:1}
+  .seg{display:flex;gap:4px;padding:4px;border-radius:16px;background:#eaf0ec}
+  .seg-btn{flex:1;width:auto;margin:0;padding:12px 6px;border-radius:12px;background:transparent;color:var(--gris);font-size:.86rem;font-weight:600;line-height:1.2;box-shadow:none}
+  .seg-btn.on{background:#fff;color:var(--vert-fonce);box-shadow:0 8px 16px -10px rgba(8,69,42,.7)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -855,11 +892,11 @@
             </select></label>
             <label class="champ"><span>Lieu d'exécution</span><input class="ic ic-home" id="lieu" placeholder="Quartier ou repère (ex : Agbanzoun, près du marché)" maxlength="100"></label>
             <label class="champ" id="champ-adresse"><span>Adresse précise <small>facultatif, visible seulement par la personne choisie</small></span><textarea id="adresse-precise" rows="2" placeholder="Rue, repère détaillé…" maxlength="200"></textarea></label>
-            <label class="champ"><span>Quand ?</span><select class="ic ic-calendar" id="quand">
+            <div class="champ"><span>Quand ?</span><select class="ic ic-calendar" id="quand" data-segments>
               <option value="flexible">Flexible (pas de date précise)</option>
               <option value="urgent">Urgent (aujourd'hui)</option>
               <option value="date">À une date précise</option>
-            </select></label>
+            </select></div>
             <div id="bloc-date" class="duo-champs cache">
               <label class="champ"><span>Date</span><input class="ic ic-calendar" id="date-exec" type="date" aria-label="Date souhaitée"></label>
               <label class="champ"><span>Heure <small>facultatif</small></span><input class="ic ic-clock" id="heure-exec" type="time" aria-label="Heure souhaitée (facultatif)"></label>
@@ -1042,11 +1079,11 @@
     </div>
     <div class="sect">
       <div class="sect-titre"><span class="sect-num">${debut + 2}</span>Ton usage</div>
-      <label class="champ"><span>Je veux…</span><select class="ic ic-users" id="${p}role">
+      <div class="champ champ-role"><span>Je veux…</span><select class="ic ic-users" id="${p}role" data-cartes="role">
         <option value="les deux">Trouver ET publier des missions</option>
         <option value="travailleur">Chercher des missions à faire</option>
         <option value="client">Publier des missions</option>
-      </select></label>
+      </select></div>
     </div>
     ${avecOk ? `<label class="check"><input type="checkbox" id="${p}ok">
       <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>` : ""}`;
@@ -3557,6 +3594,179 @@
   $("btn-fermer-pro").addEventListener("click", () => { fermerPro(); window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }); });
   window.addEventListener("popstate", () => { if (proOuvert) fermerPro(true); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPro(); });
+
+  // ---------- Sélecteurs premium (remplacent les listes natives du navigateur) ----------
+  const SVG_COCHE_SEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const TITRES_SELECT = {
+    "filtre-statut": "Statut des missions", "filtre": "Ville", "f-cat": "Catégorie", "f-prix": "Fourchette de prix",
+    "f-tri": "Trier par", "f-type": "Annonceur", "histo-filtre": "Afficher", "categorie": "Catégorie",
+    "ville": "Ville", "retour-type": "Type de message", "pro-secteur": "Secteur d'activité", "pro-ville": "Ville"
+  };
+  const CARTES_ROLE = {
+    "les deux": ["Trouver et publier", "Je réalise des missions et je publie aussi les miennes.",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>'],
+    "travailleur": ["Trouver des missions", "Je veux réaliser des missions et gagner de l'argent.",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>'],
+    "client": ["Publier des missions", "J'ai des tâches à confier à d'autres personnes.",
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>']
+  };
+  let feuilleOuverte = false;
+
+  function titreSelect(sel){
+    if (TITRES_SELECT[sel.id]) return TITRES_SELECT[sel.id];
+    if (/ville$/.test(sel.id)) return "Ville de résidence";
+    const lab = sel.getAttribute("aria-label");
+    if (lab) return lab;
+    const sp = sel.closest(".champ") && sel.closest(".champ").querySelector(":scope > span");
+    if (sp && sp.childNodes[0]) return sp.childNodes[0].textContent.trim();
+    return "Choisir";
+  }
+
+  // Feuille de choix : liste d'options élégante, à la place de la fenêtre noire du navigateur
+  function ouvrirFeuille(sel){
+    if (feuilleOuverte || sel.disabled) return;
+    feuilleOuverte = true;
+    const avant = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const fond = document.createElement("div");
+    fond.className = "sh-fond";
+    const feuille = document.createElement("div");
+    feuille.className = "sh";
+    feuille.setAttribute("role", "listbox");
+    feuille.setAttribute("aria-label", titreSelect(sel));
+    const poignee = document.createElement("span"); poignee.className = "sh-poignee";
+    const titre = document.createElement("h3"); titre.className = "sh-titre"; titre.textContent = titreSelect(sel);
+    const liste = document.createElement("div"); liste.className = "sh-liste";
+    feuille.append(poignee, titre, liste);
+    const fermer = () => {
+      document.removeEventListener("keydown", touche, true);
+      fond.classList.add("sortie");
+      setTimeout(() => { fond.remove(); document.body.style.overflow = avant; feuilleOuverte = false; }, 140);
+    };
+    const touche = e => { if (e.key === "Escape"){ e.stopPropagation(); fermer(); } };
+    let choisie = null;
+    Array.from(sel.options).forEach(o => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "sh-opt" + (o.selected ? " on" : "");
+      b.setAttribute("role", "option");
+      b.setAttribute("aria-selected", o.selected ? "true" : "false");
+      b.disabled = o.disabled;
+      const lib = document.createElement("span"); lib.textContent = o.textContent;
+      const coche = document.createElement("span"); coche.className = "sh-coche"; coche.innerHTML = SVG_COCHE_SEL;
+      b.append(lib, coche);
+      b.addEventListener("click", () => {
+        sel.value = o.value;
+        sel.dispatchEvent(new Event("input", { bubbles: true }));
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        fermer();
+      });
+      if (o.selected) choisie = b;
+      liste.appendChild(b);
+    });
+    fond.appendChild(feuille);
+    fond.addEventListener("click", e => { if (e.target === fond) fermer(); });
+    document.addEventListener("keydown", touche, true);
+    document.body.appendChild(fond);
+    if (choisie && choisie.scrollIntoView) choisie.scrollIntoView({ block: "center" });
+  }
+
+  // Cartes de choix (3 options maximum) : le menu natif est caché, ses valeurs restent utilisées par le site
+  function brancherCartes(sel){
+    sel.style.display = "none";
+    const groupe = document.createElement("div");
+    groupe.className = "rc-groupe";
+    groupe.setAttribute("role", "radiogroup");
+    sel.insertAdjacentElement("afterend", groupe);
+    const dessiner = () => {
+      groupe.innerHTML = "";
+      Array.from(sel.options).forEach(o => {
+        const d = CARTES_ROLE[o.value] || [o.textContent, "", ""];
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "rc-carte" + (sel.value === o.value ? " on" : "");
+        b.setAttribute("role", "radio");
+        b.setAttribute("aria-checked", sel.value === o.value ? "true" : "false");
+        const ico = document.createElement("span"); ico.className = "rc-ico"; ico.innerHTML = d[2];
+        const txt = document.createElement("span"); txt.className = "rc-txt";
+        const t = document.createElement("b"); t.textContent = d[0];
+        const s = document.createElement("small"); s.textContent = d[1];
+        txt.append(t, s);
+        const radio = document.createElement("span"); radio.className = "rc-radio"; radio.innerHTML = SVG_COCHE_SEL;
+        b.append(ico, txt, radio);
+        b.addEventListener("click", () => {
+          sel.value = o.value;
+          sel.dispatchEvent(new Event("input", { bubbles: true }));
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+        groupe.appendChild(b);
+      });
+    };
+    synchroniser(sel, dessiner);
+    dessiner();
+  }
+
+  // Segments (« Quand ? ») : 3 choix visibles d'un coup
+  function brancherSegments(sel){
+    sel.style.display = "none";
+    const groupe = document.createElement("div");
+    groupe.className = "seg";
+    groupe.setAttribute("role", "radiogroup");
+    sel.insertAdjacentElement("afterend", groupe);
+    const court = t => { const c = t.split(" (")[0].replace(/^À une /, ""); return c.charAt(0).toUpperCase() + c.slice(1); };
+    const dessiner = () => {
+      groupe.innerHTML = "";
+      Array.from(sel.options).forEach(o => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "seg-btn" + (sel.value === o.value ? " on" : "");
+        b.setAttribute("role", "radio");
+        b.setAttribute("aria-checked", sel.value === o.value ? "true" : "false");
+        b.textContent = court(o.textContent);
+        b.addEventListener("click", () => {
+          sel.value = o.value;
+          sel.dispatchEvent(new Event("input", { bubbles: true }));
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+        groupe.appendChild(b);
+      });
+    };
+    synchroniser(sel, dessiner);
+    dessiner();
+  }
+
+  // Quand le site modifie la valeur par programme, l'affichage suit
+  function synchroniser(sel, dessiner){
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+    Object.defineProperty(sel, "value", {
+      configurable: true,
+      get(){ return desc.get.call(sel); },
+      set(v){ desc.set.call(sel, v); dessiner(); }
+    });
+    new MutationObserver(dessiner).observe(sel, { childList: true });
+  }
+
+  function brancherSelect(sel){
+    if (sel.dataset.pro || sel.multiple) return;
+    sel.dataset.pro = "1";
+    if (sel.dataset.cartes){ brancherCartes(sel); return; }
+    if (sel.hasAttribute("data-segments")){ brancherSegments(sel); return; }
+    sel.addEventListener("mousedown", e => { if (sel.disabled) return; e.preventDefault(); ouvrirFeuille(sel); });
+    sel.addEventListener("keydown", e => {
+      if (["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)){ e.preventDefault(); ouvrirFeuille(sel); }
+    });
+    let departY = null;
+    sel.addEventListener("touchstart", e => { departY = e.touches[0].clientY; }, { passive: true });
+    sel.addEventListener("touchend", e => {
+      if (departY !== null && !sel.disabled && Math.abs(e.changedTouches[0].clientY - departY) < 8){ e.preventDefault(); ouvrirFeuille(sel); }
+      departY = null;
+    }, { passive: false });
+  }
+  let planifie = false;
+  const brancherTous = () => { planifie = false; document.querySelectorAll("select:not([data-pro])").forEach(brancherSelect); };
+  new MutationObserver(() => { if (!planifie){ planifie = true; requestAnimationFrame(brancherTous); } })
+    .observe(document.body, { childList: true, subtree: true });
+  brancherTous();
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
