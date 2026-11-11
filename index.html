@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261111-0444">
-<meta name="build-notes" content="Espace entreprises modernisé : logo, téléphone, adresse et fiche publique.">
+<meta name="build" content="20261111-2147">
+<meta name="build-notes" content="Nouvel onglet Candidatures dans ton espace et réattribution d'une mission à un autre candidat.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -526,6 +526,27 @@
   .dlg.fiche a.dlg-btn{display:flex;align-items:center;justify-content:center;text-decoration:none}
   .dlg.fiche > .lien{display:block;width:100%;margin:12px 0 0;font-size:.85rem}
 
+  /* Mes candidatures et réattribution */
+  .cc-chips{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto;padding-bottom:2px}
+  .cc-chip{flex:0 0 auto;width:auto;margin:0;padding:8px 14px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;color:var(--gris);font-size:.8rem;font-weight:600;white-space:nowrap;box-shadow:none}
+  .cc-chip.on{background:var(--vert);border-color:var(--vert);color:#fff}
+  .cc-carte{margin-bottom:12px;padding:14px;border:1px solid #e4ede7;border-radius:18px;background:#fff;box-shadow:0 10px 24px -18px rgba(8,69,42,.4)}
+  .cc-haut{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .cc-date{font-size:.74rem;color:var(--gris)}
+  .cc-titre{margin-bottom:4px;font-size:1rem;font-weight:700;line-height:1.3;color:var(--encre)}
+  .cc-infos{font-size:.82rem;line-height:1.45;color:var(--gris)}
+  .cc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .cc-actions .mini,.cc-actions .wa{width:auto;margin:0}
+  #alerte-cands .info{display:block;margin-bottom:12px}
+  #alerte-cands .info .mini{width:auto;margin:10px 0 0}
+  .dlg.choix{text-align:left}
+  .dlg.choix .dlg-titre,.dlg.choix .dlg-msg{text-align:center}
+  .choix-liste{display:grid;gap:8px;max-height:46vh;margin:0 0 14px;overflow:auto}
+  .choix-ligne{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #e4ede7;border-radius:14px;background:#f8fbf9}
+  .choix-txt b{display:block;font-size:.88rem}
+  .choix-txt small{display:block;font-size:.74rem;color:var(--gris)}
+  .choix-ligne .mini{width:auto;margin:0;flex:none}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -784,12 +805,19 @@
         <div class="onglets">
           <button class="onglet on" data-t="resume" type="button">📊 Résumé</button>
           <button class="onglet" data-t="histo" type="button">🕘 Historique</button>
+          <button class="onglet" data-t="cands" type="button" id="onglet-cands">📨 Candidatures</button>
           <button class="onglet" data-t="publier" type="button" id="onglet-publier">➕ Publier</button>
           <button class="onglet" data-t="profil" type="button">👤 Profil</button>
           <button class="onglet" data-t="aide" type="button">❓ Aide</button>
         </div>
 
         <div id="t-resume"></div>
+
+        <div id="t-cands" class="cache">
+          <div id="alerte-cands"></div>
+          <div id="chips-cands" class="cc-chips"></div>
+          <div id="liste-cands"></div>
+        </div>
 
         <div id="t-histo" class="cache">
           <select id="histo-filtre">
@@ -1479,6 +1507,116 @@
     sel.value = "tout";
   }
 
+  // ---------- Mes candidatures : suivi détaillé ----------
+  let filtreMesCands = "attente";
+
+  function detailCandidature(c){
+    const m = missions.find(x => x.id === c.missionId);
+    if (!m) return { cle: "supprimee", libelle: "Mission supprimée", cls: "b-gris", m };
+    if (c.statut === "refusee") return { cle: "refusee", libelle: "Refusée", cls: "b-refus", m };
+    if (m.workerUid === c.uid){
+      const s = st(m);
+      if (s === "attribuee") return c.confirmee
+        ? { cle: "encours", libelle: "En cours · confirmée", cls: "b-a_confirmer", m }
+        : { cle: "aconfirmer", libelle: "Retenue · à confirmer", cls: "b-attribuee", m };
+      if (s === "a_confirmer") return { cle: "encours", libelle: "Travail à confirmer", cls: "b-a_confirmer", m };
+      if (s === "terminee") return { cle: "terminee", libelle: "Terminée", cls: "b-terminee", m };
+    }
+    if (st(m) !== "disponible") return { cle: "nonretenue", libelle: "Non retenue", cls: "b-gris", m };
+    return { cle: "attente", libelle: "En attente de réponse", cls: "b-attribuee", m };
+  }
+
+  function voirMission(id){
+    fermerEspace();
+    reinitialiserFiltres();
+    $("filtre-statut").value = "toutes";
+    afficher();
+    setTimeout(() => {
+      const cible = document.querySelector('[data-id="' + String(id).replace(/[^A-Za-z0-9]/g, "") + '"]');
+      if (cible){
+        cible.scrollIntoView({ behavior: reduit ? "auto" : "smooth", block: "center" });
+        cible.classList.add("surligne");
+        setTimeout(() => cible.classList.remove("surligne"), 3000);
+      } else afficherMessage("Cette mission n'est plus affichée dans la liste.", "info");
+    }, 350);
+  }
+
+  function majCandidatures(){
+    const bouton0 = $("onglet-cands");
+    const ok = !!user && peutPostuler();
+    bouton0.classList.toggle("cache", !ok);
+    if (!ok) return;
+    const zone = $("liste-cands"), chips = $("chips-cands"), alerte = $("alerte-cands");
+    zone.innerHTML = ""; chips.innerHTML = ""; alerte.innerHTML = "";
+    const items = mesCandidatures.map(c => ({ c, d: detailCandidature(c) })).sort((a, b) => dateMs(b.c) - dateMs(a.c));
+    const GROUPES = {
+      attente: ["attente"], retenues: ["aconfirmer", "encours"], terminees: ["terminee"],
+      closes: ["refusee", "nonretenue", "supprimee"]
+    };
+    const compte = k => k === "tout" ? items.length : items.filter(i => GROUPES[k].includes(i.d.cle)).length;
+    const nb = compte("attente");
+    $("onglet-cands").textContent = "📨 Candidatures" + (nb ? " (" + nb + ")" : "");
+
+    items.filter(i => i.d.cle === "aconfirmer").forEach(i => {
+      const b = el("div", "info attente", "Tu as été retenu(e) pour « " + (i.c.titre || "une mission") + " ». Confirme-la pour pouvoir écrire à l'auteur.");
+      b.appendChild(bouton("Je confirme la mission", "mini", async () => {
+        await updateDoc(doc(db, "candidatures", i.c.id), { confirmee: true });
+        afficherMessage("Mission confirmée|Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
+      }));
+      alerte.appendChild(b);
+    });
+
+    [["attente", "En attente"], ["retenues", "Retenues"], ["terminees", "Terminées"], ["closes", "Non retenues"], ["tout", "Toutes"]].forEach(([k, l]) => {
+      const b = el("button", "cc-chip" + (filtreMesCands === k ? " on" : ""), l + " (" + compte(k) + ")");
+      b.type = "button";
+      b.addEventListener("click", () => { filtreMesCands = k; majCandidatures(); });
+      chips.appendChild(b);
+    });
+
+    const liste = items.filter(i => filtreMesCands === "tout" || GROUPES[filtreMesCands].includes(i.d.cle));
+    if (!liste.length){
+      zone.appendChild(el("div", "vide", filtreMesCands === "attente" ? "Aucune candidature en attente. Parcours les missions pour te proposer." : "Aucune candidature dans cette catégorie."));
+      return;
+    }
+    liste.forEach(({ c, d }) => {
+      const m = d.m;
+      const carteC = el("div", "cc-carte");
+      const haut = el("div", "cc-haut");
+      haut.append(el("span", "badge " + d.cls, d.libelle), el("span", "cc-date", dateTexte(dateMs(c))));
+      carteC.appendChild(haut);
+      carteC.appendChild(el("div", "cc-titre", c.titre || (m && m.titre) || "Mission"));
+      const infos = [fcfa(c.prix || (m && m.prix)), (m && m.ville) || c.ville, m && m.lieu].filter(Boolean).join(" · ");
+      carteC.appendChild(el("div", "cc-infos", infos));
+      if (m){
+        const quiEst = m.entrepriseNom || m.auteur;
+        if (quiEst) carteC.appendChild(el("div", "cc-infos", "Proposée par " + quiEst + (m.entrepriseNom ? " (entreprise)" : "")));
+      }
+      const act = el("div", "cc-actions");
+      if (d.cle === "aconfirmer"){
+        act.appendChild(bouton("Je confirme la mission", "mini", async () => {
+          await updateDoc(doc(db, "candidatures", c.id), { confirmee: true });
+          afficherMessage("Mission confirmée|Tu peux maintenant écrire à l'auteur sur WhatsApp.", "info");
+        }));
+      }
+      if (d.cle === "encours" && m && m.tel){
+        const w = el("a", "wa petit", "Écrire à l'auteur sur WhatsApp");
+        w.href = lienWhatsAppMsg(m.tel, "Bonjour, je vous contacte au sujet de la mission « " + m.titre + " ». Quand pouvons-nous commencer ?");
+        w.target = "_blank"; w.rel = "noopener";
+        act.appendChild(w);
+      }
+      if (d.cle === "attente"){
+        act.appendChild(bouton("Retirer ma candidature", "sec mini", async () => {
+          if (!(await confirmer("Tu pourras te proposer de nouveau à cette mission ou à une autre.", { titre: "Retirer ma candidature", ok: "Retirer", danger: true }))) return;
+          await deleteDoc(doc(db, "candidatures", c.id));
+          afficherMessage("Candidature retirée|Tu peux de nouveau postuler à une autre mission.", "succes");
+        }));
+      }
+      if (m && d.cle !== "terminee") act.appendChild(bouton("Voir la mission", "sec mini", async () => voirMission(m.id)));
+      if (act.children.length) carteC.appendChild(act);
+      zone.appendChild(carteC);
+    });
+  }
+
   function majHisto(){
     if (!user) return;
     majFiltreHisto();
@@ -1554,6 +1692,8 @@
         tuile(String(s.faites), "Missions réalisées", s.encoursTrav ? s.encoursTrav + " en cours" : ""),
         tuile(String(s.enAttente), "Candidatures en attente")
       );
+      tuiles.lastChild.style.cursor = "pointer";
+      tuiles.lastChild.addEventListener("click", () => choisirOnglet("cands"));
     }
     if (peutPublier()){
       tuiles.append(
@@ -1587,6 +1727,7 @@
       });
     }
     majHisto();
+    majCandidatures();
     majNotifs();
   }
 
@@ -1709,6 +1850,77 @@
       ligne.appendChild(formSignalement("utilisateur", c.uid, c.nom, c.uid));
       zone.appendChild(ligne);
     });
+  }
+
+  // Fenêtre de choix d'un autre candidat
+  function choisirCandidat(m, candidats, cpt){
+    return new Promise(resolve => {
+      const fond = document.createElement("div");
+      fond.className = "dlg-fond";
+      const boite = document.createElement("div");
+      boite.className = "dlg choix";
+      boite.setAttribute("role", "dialog");
+      boite.setAttribute("aria-modal", "true");
+      boite.appendChild(el("h3", "dlg-titre", "Choisir un autre candidat"));
+      boite.appendChild(el("p", "dlg-msg", "La mission « " + m.titre + " » sera retirée au candidat actuel puis attribuée à la personne que tu choisis. Elle devra confirmer à son tour."));
+      const liste = el("div", "choix-liste");
+      const fermer = valeur => { document.removeEventListener("keydown", touche, true); fond.remove(); resolve(valeur); };
+      const touche = e => { if (e.key === "Escape"){ e.stopPropagation(); fermer(null); } };
+      candidats.forEach(c => {
+        const l = el("div", "choix-ligne");
+        const g = el("div", "choix-txt");
+        g.appendChild(el("b", "", c.nom + (c.profession ? " · " + c.profession : "")));
+        const n = cpt.parTravailleur[c.uid] || 0;
+        g.appendChild(el("small", "", [
+          n ? pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
+          notesPour(c.uid) ? etoilesTxt(notesPour(c.uid)) : "Pas encore d'avis"
+        ].join(" · ")));
+        const b = el("button", "mini", "Choisir");
+        b.type = "button";
+        b.addEventListener("click", () => fermer(c));
+        l.append(g, b);
+        liste.appendChild(l);
+      });
+      boite.appendChild(liste);
+      const ann = el("button", "dlg-btn sec", "Annuler");
+      ann.type = "button";
+      ann.addEventListener("click", () => fermer(null));
+      const rang = el("div", "dlg-actions"); rang.appendChild(ann);
+      boite.appendChild(rang);
+      fond.appendChild(boite);
+      fond.addEventListener("click", e => { if (e.target === fond) fermer(null); });
+      document.body.appendChild(fond);
+      document.addEventListener("keydown", touche, true);
+    });
+  }
+
+  // Le candidat retenu tarde à confirmer : l'auteur peut attribuer la mission à un autre candidat
+  async function reattribuer(m, cpt){
+    const actuel = candidaturesRecues.find(x => x.id === m.id + "_" + m.workerUid);
+    const autres = candidaturesRecues.filter(x => x.missionId === m.id && x.uid !== m.workerUid && x.statut === "en_attente");
+    if (!autres.length){
+      afficherMessage("Aucun autre candidat|Personne d'autre ne s'est proposé pour cette mission. Tu peux la remettre en disponible.", "info");
+      return;
+    }
+    const choisi = await choisirCandidat(m, autres, cpt);
+    if (!choisi) return;
+    if (!(await confirmer("Retirer la mission à " + (m.workerNom || "ce candidat") + " et l'attribuer à " + choisi.nom + " ?", { titre: "Réattribuer la mission", ok: "Réattribuer" }))) return;
+    // 1) le candidat actuel retourne en attente et la mission redevient disponible
+    const retrait = writeBatch(db);
+    retrait.update(doc(db, "missions", m.id), { statut: "disponible", workerUid: deleteField(), workerNom: deleteField() });
+    if (actuel) retrait.update(doc(db, "candidatures", actuel.id), { statut: "en_attente", confirmee: false });
+    await retrait.commit();
+    // 2) la mission est attribuée au nouveau candidat
+    try {
+      const lot = writeBatch(db);
+      lot.update(doc(db, "missions", m.id), { statut: "attribuee", workerUid: choisi.uid, workerNom: choisi.nom });
+      lot.update(doc(db, "candidatures", choisi.id), { statut: "acceptee" });
+      await lot.commit();
+      afficherMessage("Mission réattribuée|" + choisi.nom + " doit maintenant confirmer la mission.", "succes");
+    } catch (e) {
+      console.error(e);
+      afficherMessage("Mission remise en disponible|La réattribution a échoué : choisis un candidat dans la liste des intéressés.");
+    }
   }
 
   // ---------- Carte d'une mission ----------
@@ -1866,6 +2078,7 @@
             if (!(await confirmer("Tu déclares la mission terminée. " + nomT + " devra le confirmer.", { titre: "Déclarer la mission terminée", ok: "Déclarer" }))) return;
             await maj({ statut: "a_confirmer", declarePar: "auteur", declareeAt: serverTimestamp() });
           })] : []),
+          ...(!confirmeeT ? [bouton("Réattribuer à un autre candidat", "sec mini", async () => reattribuer(m, cpt))] : []),
           bouton("↩️ Remettre disponible", "sec mini", async () => {
             if (!(await confirmer("Remettre la mission en disponible ?", { titre: "Remettre en disponible", ok: "Remettre" }))) return;
             const lot = writeBatch(db);
@@ -2312,8 +2525,9 @@
 
   function choisirOnglet(t){
     if (t === "publier" && !peutPublier()) t = "resume";
+    if (t === "cands" && !peutPostuler()) t = "resume";
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
-    ["resume", "histo", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
+    ["resume", "histo", "cands", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
     if (t === "profil" && profil) remplir("e-", profil);
     if (t === "publier") majFormPublication();
     const actif = document.querySelector(".onglet.on");
