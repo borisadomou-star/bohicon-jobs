@@ -486,10 +486,10 @@
         btns.appendChild(bouton(verifiee ? "Retirer le badge" : "Vérifier l'entreprise", verifiee ? "sec mini" : "mini", async () => {
           if (verifiee){
             if (!(await confirmer("Le badge « Entreprise vérifiée » disparaîtra de ses annonces.", { titre: "Retirer la vérification", ok: "Retirer", danger: true }))) return;
-            await deleteDoc(doc(db, "entreprises", u.id));
+            await updateDoc(doc(db, "entreprises", u.id), { verifiee: false });
           } else {
             if (!(await confirmer("Le badge « Entreprise vérifiée » s'affichera sur toutes ses annonces. Vérifie d'abord que l'entreprise existe réellement.", { titre: "Vérifier l'entreprise", ok: "Vérifier" }))) return;
-            await setDoc(doc(db, "entreprises", u.id), { verifiee: true, nom: u.entreprise.nom, secteur: u.entreprise.secteur || "", depuis: serverTimestamp() });
+            await setDoc(doc(db, "entreprises", u.id), { verifiee: true, nom: u.entreprise.nom, secteur: u.entreprise.secteur || "", depuis: serverTimestamp() }, { merge: true });
           }
         }));
       }
@@ -923,7 +923,7 @@
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
-    unsubs.push(onSnapshot(query(collection(db, "entreprises"), limit(500)), s => { entreprisesV = new Set(s.docs.map(d => d.id)); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "entreprises"), limit(500)), s => { entreprisesV = new Set(s.docs.filter(d => d.data().verifiee === true).map(d => d.id)); rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
       annonceAdmin = s.exists() ? s.data() : null;
       if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
