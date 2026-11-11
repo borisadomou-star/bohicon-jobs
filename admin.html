@@ -100,6 +100,29 @@
   @keyframes dlg-sortie{from{opacity:1}to{opacity:0}}
   @keyframes dlg-entree{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion: reduce){.dlg-fond,.dlg,.dlg-fond.sortie{animation:none}}
+
+  /* Suivi : inscriptions en direct et candidatures */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  .chip{width:auto;margin:0;padding:8px 14px;border:1.5px solid var(--trait);border-radius:999px;background:#fff;color:var(--gris);font-size:.8rem;font-weight:600;box-shadow:none}
+  .chip.on{background:var(--vert);border-color:var(--vert);color:#fff}
+  .b-attente{background:#fff1d6;color:#8a5a00}
+  .b-acceptee{background:#e3f4ea;color:#0a5d2c}
+  .b-refusee{background:#fdecea;color:#b3261e}
+  .b-cloturee{background:#eceff1;color:#455a64}
+  .attente-longue{color:#b36b00;font-weight:600}
+  .btn-lien{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border:1.5px solid #cfe0d6;border-radius:999px;background:#fff;color:var(--vert);font-size:.78rem;font-weight:600;text-decoration:none;white-space:nowrap}
+  .derniere{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:16px;border-radius:20px;color:#fff;background:linear-gradient(160deg,#062f1b 0%,#0a5a32 60%,#0f7a45 100%);box-shadow:0 18px 36px -22px rgba(6,47,27,.7)}
+  .dern-avatar{flex:none;display:flex;align-items:center;justify-content:center;width:54px;height:54px;border:1px solid rgba(255,255,255,.3);border-radius:16px;background:rgba(255,255,255,.16);font-size:1.5rem;font-weight:700}
+  .dern-sur{display:inline-flex;align-items:center;gap:8px;margin-bottom:4px;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fcd116}
+  .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4cd137;animation:pulse-admin 1.6s infinite}
+  @keyframes pulse-admin{0%{box-shadow:0 0 0 0 rgba(76,209,55,.6)}70%{box-shadow:0 0 0 9px rgba(76,209,55,0)}100%{box-shadow:0 0 0 0 rgba(76,209,55,0)}}
+  .derniere h3{margin:0 0 4px;font-size:1.15rem;color:#fff}
+  .dern-meta{font-size:.8rem;line-height:1.45;opacity:.92}
+  .jour-titre{margin:16px 0 2px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
+  .heure{flex:none;font-size:.82rem;font-weight:700;color:var(--vert-fonce)}
+  #toasts-admin{position:fixed;top:10px;left:10px;right:10px;z-index:110;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+  .toast-admin{pointer-events:auto;cursor:pointer;padding:12px 14px;border:1px solid #cfe8d9;border-left:4px solid #0f7a45;border-radius:14px;background:#fff;box-shadow:0 18px 40px -16px rgba(6,47,27,.5);color:#12261b;font-size:.88rem;font-weight:600;animation:toast-admin-in .25s ease both}
+  @keyframes toast-admin-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -142,7 +165,9 @@
     <div class="onglets">
       <button class="onglet on" data-t="apercu" type="button">Aperçu</button>
       <button class="onglet" data-t="users" type="button">Utilisateurs</button>
+      <button class="onglet" data-t="inscriptions" type="button" id="onglet-inscr">Inscriptions</button>
       <button class="onglet" data-t="missions" type="button">Missions</button>
+      <button class="onglet" data-t="cands" type="button" id="onglet-cands">Candidatures</button>
       <button class="onglet" data-t="validation" type="button" id="onglet-validation">À valider</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
@@ -156,6 +181,20 @@
       <input id="q-users" type="search" placeholder="Rechercher (nom, profession, ville, e-mail, téléphone)">
       <button class="sec" id="btn-export" type="button">⬇️ Exporter les utilisateurs (CSV)</button>
       <div id="liste-users"></div>
+    </div>
+
+    <div id="t-inscriptions" class="card cache">
+      <h2>Inscriptions en direct</h2>
+      <div id="derniere-inscription"></div>
+      <div id="compteurs-inscr" class="tuiles"></div>
+      <div id="liste-inscr"></div>
+    </div>
+
+    <div id="t-cands" class="card cache">
+      <h2>Suivi des candidatures</h2>
+      <input id="q-cands" type="search" placeholder="Rechercher (candidat, mission, auteur, téléphone)">
+      <div id="chips-cands" class="chips"></div>
+      <div id="liste-cands"></div>
     </div>
 
     <div id="t-missions" class="card cache">
@@ -270,7 +309,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, query, limit, onSnapshot }
+  import { getFirestore, collection, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, serverTimestamp, writeBatch, query, orderBy, limit, onSnapshot }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
@@ -369,6 +408,7 @@
 
   let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
   let entreprisesV = new Set();
+  let recents = [], premierRecents = true, premierCands = true, filtreCands = "attente";
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
 
@@ -423,6 +463,8 @@
       tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
       tuile(users.filter(u => u.ref).length, "Inscrits via un ambassadeur"),
       tuile(users.filter(u => u.entreprise && u.entreprise.nom).length + " (" + entreprisesV.size + " vérifiées)", "Entreprises"),
+      tuile(users.filter(u => ms(u) >= Date.now() - 24 * 3600 * 1000).length, "Inscriptions (24 h)"),
+      tuile(cands.filter(c => etatCand(c) === "attente").length, "Candidatures en attente"),
       tuile(missions.filter(m => m.valide === false && !m.refusMotif).length, "Missions à valider"),
       tuile((() => {
         const n = retours.filter(r => r.note);
@@ -893,7 +935,157 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
+  // ---------- Notifications en direct, inscriptions et candidatures ----------
+  function toastAdmin(texte, onglet){
+    let z = document.getElementById("toasts-admin");
+    if (!z){ z = document.createElement("div"); z.id = "toasts-admin"; document.body.appendChild(z); }
+    const t = el("div", "toast-admin", texte);
+    t.addEventListener("click", () => {
+      t.remove();
+      const b = onglet ? document.querySelector('.onglet[data-t="' + onglet + '"]') : null;
+      if (b){ b.click(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    });
+    z.appendChild(t);
+    setTimeout(() => t.remove(), 8000);
+  }
+  function ilYa(t){
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+    if (s < 60) return "à l'instant";
+    const mn = Math.round(s / 60);
+    if (mn < 60) return "il y a " + mn + " min";
+    const h = Math.round(mn / 60);
+    if (h < 24) return "il y a " + h + " h";
+    const j = Math.round(h / 24);
+    return "il y a " + j + " j";
+  }
+  const heureTexte = t => new Date(t).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const dateHeure = t => new Date(t).toLocaleString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  function jourLabel(t){
+    const d = new Date(t), auj = new Date();
+    const debut = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diff = Math.round((debut(auj) - debut(d)) / 86400000);
+    if (diff === 0) return "Aujourd'hui";
+    if (diff === 1) return "Hier";
+    return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  }
+  function numWA(tel){
+    let n = String(tel || "").replace(/\D/g, "");
+    if (!n.startsWith("229")) n = "229" + n;
+    return n;
+  }
+
+  function rendreInscriptions(){
+    const base = recents.length ? recents : users.slice().sort((x, y) => ms(y) - ms(x)).slice(0, 100);
+    const zD = $("derniere-inscription"), zC = $("compteurs-inscr"), zL = $("liste-inscr");
+    zD.innerHTML = ""; zC.innerHTML = ""; zL.innerHTML = "";
+    const jour = Date.now() - 24 * 3600 * 1000, sem = Date.now() - 7 * 24 * 3600 * 1000;
+    const n24 = users.filter(u => ms(u) >= jour).length;
+    $("onglet-inscr").textContent = "Inscriptions" + (n24 ? " (" + n24 + ")" : "");
+    if (!base.length){ zL.appendChild(el("div", "vide", "Aucune inscription pour le moment.")); return; }
+
+    const u0 = base[0], t0 = ms(u0);
+    const carte = el("div", "derniere");
+    carte.appendChild(el("span", "dern-avatar", String(u0.prenom || "?").trim().charAt(0).toUpperCase()));
+    const txt = el("div", "dern-txt");
+    const sur = el("span", "dern-sur"); sur.appendChild(el("i", "pulse")); sur.appendChild(document.createTextNode("Dernière inscription"));
+    txt.append(sur,
+      el("h3", "", ((u0.prenom || "") + " " + (u0.nom || "")).trim() || "Sans nom"),
+      el("div", "dern-meta", [u0.profession, u0.ville, u0.role].filter(Boolean).join(" · ")),
+      el("div", "dern-meta", t0 ? ilYa(t0) + " · " + dateHeure(t0) : "Date inconnue"),
+      el("div", "dern-meta", "📞 " + (u0.tel || "—") + " · ✉️ " + (u0.email || "—")));
+    if (u0.ref){ const amb = ambassadeurs.find(x => x.code === u0.ref); txt.appendChild(el("div", "dern-meta", "Parrain : " + (amb ? amb.nom : u0.ref))); }
+    carte.appendChild(txt);
+    zD.appendChild(carte);
+
+    const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+    zC.append(tuile(n24, "Dernières 24 h"), tuile(users.filter(u => ms(u) >= sem).length, "7 derniers jours"));
+    zC.style.margin = "0 0 6px";
+
+    let dernier = "";
+    base.forEach(u => {
+      const t = ms(u);
+      const lib = t ? jourLabel(t) : "Date inconnue";
+      if (lib !== dernier){ zL.appendChild(el("div", "jour-titre", lib)); dernier = lib; }
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", ((u.prenom || "") + " " + (u.nom || "")).trim() || "Sans nom");
+      if (u.entreprise && u.entreprise.nom) titre.appendChild(el("span", "badge b-disponible", "Entreprise"));
+      if (u.suspendu) titre.appendChild(el("span", "badge b-susp", "Suspendu"));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", [u.profession, u.ville, u.role].filter(Boolean).join(" · ")));
+      g.appendChild(el("div", "h-sous", "📞 " + (u.tel || "—") + " · ✉️ " + (u.email || "—")));
+      if (u.ref){ const amb = ambassadeurs.find(x => x.code === u.ref); g.appendChild(el("div", "h-sous", "Parrain : " + (amb ? amb.nom : u.ref))); }
+      ligne.append(g, el("div", "heure", t ? heureTexte(t) : "—"));
+      zL.appendChild(ligne);
+    });
+  }
+
+  function etatCand(c){
+    if (c.statut === "refusee") return "refusee";
+    if (c.statut === "acceptee") return "acceptee";
+    const m = missions.find(x => x.id === c.missionId);
+    return m && st(m) === "disponible" ? "attente" : "cloturee";
+  }
+
+  function rendreCandidatures(){
+    const zone = $("liste-cands"), chips = $("chips-cands");
+    zone.innerHTML = ""; chips.innerHTML = "";
+    const defs = [["attente", "En attente"], ["acceptee", "Acceptées"], ["refusee", "Refusées"], ["cloturee", "Clôturées"], ["tout", "Toutes"]];
+    const compte = k => k === "tout" ? cands.length : cands.filter(c => etatCand(c) === k).length;
+    $("onglet-cands").textContent = "Candidatures" + (compte("attente") ? " (" + compte("attente") + ")" : "");
+    defs.forEach(([k, l]) => {
+      const b = el("button", "chip" + (filtreCands === k ? " on" : ""), l + " (" + compte(k) + ")");
+      b.type = "button";
+      b.addEventListener("click", () => { filtreCands = k; rendreCandidatures(); });
+      chips.appendChild(b);
+    });
+    const q = $("q-cands").value.trim().toLowerCase();
+    const util = id => users.find(u => u.id === id) || {};
+    const nomDe = u => ((u.prenom || "") + " " + (u.nom || "")).trim();
+    const items = cands
+      .filter(c => filtreCands === "tout" || etatCand(c) === filtreCands)
+      .filter(c => {
+        if (!q) return true;
+        const cu = util(c.uid), au = util(c.auteurUid);
+        return [c.nom, c.profession, c.tel, c.titre, c.ville, nomDe(cu), cu.email, nomDe(au), au.tel].join(" ").toLowerCase().includes(q);
+      })
+      .sort((x, y) => ms(y) - ms(x));
+    if (!items.length){
+      zone.appendChild(el("div", "vide", filtreCands === "attente" ? "Aucune candidature en attente." : "Aucune candidature dans cette catégorie."));
+      return;
+    }
+    const LIB_ETAT = { attente: "En attente", refusee: "Refusée", cloturee: "Clôturée" };
+    const LIB_MISSION = { disponible: "disponible", attribuee: "attribuée", a_confirmer: "à confirmer", terminee: "terminée" };
+    items.forEach(c => {
+      const cu = util(c.uid), au = util(c.auteurUid);
+      const m = missions.find(x => x.id === c.missionId);
+      const etat = etatCand(c);
+      const ligne = el("div", "rang");
+      const g = el("div");
+      const titre = el("div", "h-titre", c.nom || nomDe(cu) || "Candidat");
+      titre.appendChild(el("span", "badge b-" + etat, etat === "acceptee" ? (c.confirmee ? "Acceptée · confirmée" : "Acceptée · à confirmer") : LIB_ETAT[etat]));
+      g.appendChild(titre);
+      g.appendChild(el("div", "h-sous", [c.profession || cu.profession, cu.ville, cu.role].filter(Boolean).join(" · ")));
+      g.appendChild(el("div", "h-sous", "📞 " + (c.tel || cu.tel || "—") + " · ✉️ " + (cu.email || "—")));
+      g.appendChild(el("div", "h-sous", "Mission : « " + (c.titre || (m && m.titre) || "—") + " » · " + fcfa(c.prix || (m && m.prix)) + (c.ville ? " · " + c.ville : "")));
+      g.appendChild(el("div", "h-sous", "Auteur : " + (nomDe(au) || "—") + (au.tel ? " (" + au.tel + ")" : "") + " · mission " + (m ? LIB_MISSION[st(m)] : "supprimée")));
+      const t = ms(c);
+      if (t) g.appendChild(el("div", "h-sous", "Candidature du " + dateHeure(t) + " · " + ilYa(t)));
+      if (etat === "attente" && t && Date.now() - t > 2 * 24 * 3600 * 1000){
+        g.appendChild(el("div", "h-sous attente-longue", "En attente depuis " + Math.round((Date.now() - t) / 86400000) + " jours : à relancer"));
+      }
+      const btns = el("div", "btns");
+      const lien = (tel, texte) => { const l = el("a", "btn-lien", texte); l.href = "https://wa.me/" + numWA(tel); l.target = "_blank"; l.rel = "noopener"; return l; };
+      if (c.tel || cu.tel) btns.appendChild(lien(c.tel || cu.tel, "WhatsApp candidat"));
+      if (au.tel) btns.appendChild(lien(au.tel, "WhatsApp auteur"));
+      ligne.append(g, btns);
+      zone.appendChild(ligne);
+    });
+  }
+
+  setInterval(() => { rendreInscriptions(); rendreCandidatures(); }, 60000);
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -913,13 +1105,36 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
     unsubs.push(onSnapshot(query(collection(db, "users"), limit(500)), s => { users = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "users"), orderBy("createdAt", "desc"), limit(100)), s => {
+      recents = lire(s);
+      if (!premierRecents){
+        s.docChanges().forEach(ch => {
+          if (ch.type !== "added") return;
+          const u = ch.doc.data();
+          toastAdmin("Nouvelle inscription : " + (((u.prenom || "") + " " + (u.nom || "")).trim() || "un utilisateur") + (u.ville ? " (" + u.ville + ")" : ""), "inscriptions");
+        });
+      }
+      premierRecents = false;
+      rendre();
+    }, err));
     unsubs.push(onSnapshot(query(collection(db, "missions"), limit(500)), s => { missions = lire(s); rendre(); }, err));
-    unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => { cands = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "candidatures"), limit(500)), s => {
+      cands = lire(s);
+      if (!premierCands){
+        s.docChanges().forEach(ch => {
+          if (ch.type !== "added") return;
+          const c = ch.doc.data();
+          toastAdmin("Nouvelle candidature : " + (c.nom || "un candidat") + " pour « " + (c.titre || "une mission") + " »", "cands");
+        });
+      }
+      premierCands = false;
+      rendre();
+    }, err));
     unsubs.push(onSnapshot(query(collection(db, "signalements"), limit(500)), s => { signalements = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
@@ -973,9 +1188,10 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "inscriptions", "cands", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
+  $("q-cands").addEventListener("input", rendreCandidatures);
   $("q-missions").addEventListener("input", rendreMissions);
   $("f-statut").addEventListener("change", rendreMissions);
   $("f-sig").addEventListener("change", rendreSignalements);
