@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261111-2209">
-<meta name="build-notes" content="Nouveaux menus de choix plus élégants : listes, cartes d'inscription et choix de la date.">
+<meta name="build" content="20261112-0512">
+<meta name="build-notes" content="Notifications push : réponses aux candidatures et avancée des missions.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -584,6 +584,19 @@
   .seg-btn{flex:1;width:auto;margin:0;padding:12px 6px;border-radius:12px;background:transparent;color:var(--gris);font-size:.86rem;font-weight:600;line-height:1.2;box-shadow:none}
   .seg-btn.on{background:#fff;color:var(--vert-fonce);box-shadow:0 8px 16px -10px rgba(8,69,42,.7)}
 
+  /* Notifications push */
+  .push-invite,.push-carte{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:14px;border:1px solid #cfe8d9;border-radius:18px;background:linear-gradient(135deg,#f3fbf6,#e8f6ee)}
+  .push-invite{flex-wrap:wrap}
+  #push-invite[data-onglet]:not([data-onglet="resume"]){display:none}
+  .pi-ico{flex:none;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff}
+  .pi-ico svg{width:22px;height:22px}
+  .pi-txt{flex:1;min-width:150px}
+  .pi-txt b{display:block;font-size:.92rem}
+  .pi-txt small{display:block;margin-top:2px;font-size:.78rem;line-height:1.4;color:var(--gris)}
+  .pi-actions{display:flex;align-items:center;gap:10px}
+  .push-invite .mini,.push-carte .mini{width:auto;margin:0}
+  .push-invite .lien{width:auto;margin:0;padding:4px 6px;font-size:.82rem}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -848,6 +861,12 @@
           <button class="onglet" data-t="aide" type="button">❓ Aide</button>
         </div>
 
+        <div id="push-invite" class="push-invite cache">
+          <span class="pi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
+          <div class="pi-txt"><b>Ne rate aucune réponse</b><small>Active les notifications : tu seras prévenu(e) dès qu'une candidature est acceptée ou qu'une mission avance.</small></div>
+          <div class="pi-actions"><button id="push-invite-oui" class="mini" type="button">Activer</button><button id="push-invite-non" class="lien" type="button">Plus tard</button></div>
+        </div>
+
         <div id="t-resume"></div>
 
         <div id="t-cands" class="cache">
@@ -918,6 +937,11 @@
         </div>
 
         <div id="t-profil" class="cache">
+          <div class="push-carte" id="push-carte">
+            <span class="pi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
+            <div class="pi-txt"><b>Notifications</b><small id="push-etat">…</small></div>
+            <button id="push-bouton" class="mini" type="button">Activer</button>
+          </div>
           <div id="champs-edit"></div>
           <button id="btn-edit" type="button">Enregistrer mes informations</button>
         </div>
@@ -996,6 +1020,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getMessaging, getToken, deleteToken, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
   import { getFirestore, collection, addDoc, deleteDoc, updateDoc, deleteField, doc, getDoc, writeBatch, setDoc,
            query, where, orderBy, limit, onSnapshot, serverTimestamp, increment }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
@@ -1687,6 +1712,7 @@
   }
 
   function majTableau(){
+    majPushUI();
     if (proOuvert && !proSaisie) rendrePro();
     if (!user || !profilOk()) return;
     const s = statsPerso();
@@ -2457,7 +2483,12 @@
     } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
-  const deconnecter = () => signOut(auth).then(() => afficherMessage("Déconnexion réussie|À bientôt sur Bohicon Jobs.", "info"));
+  const deconnecter = async () => {
+    try { const j = localStorage.getItem("bj_push_jeton"); if (j && user) await deleteDoc(doc(db, "pushTokens", j)); } catch (e) { /* ignoré */ }
+    try { localStorage.removeItem("bj_push_jeton"); } catch (e) { /* ignoré */ }
+    await signOut(auth);
+    afficherMessage("Déconnexion réussie|À bientôt sur Bohicon Jobs.", "info");
+  };
   $("btn-deconnexion").addEventListener("click", deconnecter);
   $("btn-deco-profil").addEventListener("click", deconnecter);
 
@@ -2563,6 +2594,7 @@
   function choisirOnglet(t){
     if (t === "publier" && !peutPublier()) t = "resume";
     if (t === "cands" && !peutPostuler()) t = "resume";
+    $("push-invite").dataset.onglet = t;
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
     ["resume", "histo", "cands", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
     if (t === "profil" && profil) remplir("e-", profil);
@@ -3767,6 +3799,90 @@
   new MutationObserver(() => { if (!planifie){ planifie = true; requestAnimationFrame(brancherTous); } })
     .observe(document.body, { childList: true, subtree: true });
   brancherTous();
+
+  // ---------- Notifications push ----------
+  const VAPID_KEY = "BEv0WvenTvJ_ONNS9B5CBoYlWLys_YyOvoHdVllRaM0aOojBlyGhhgs6zShHnBUAT-9JeQpHK79YQfKNVehsR_Q";
+  const PUSH_OK = "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+  const lsLire = cle => { try { return localStorage.getItem(cle) || ""; } catch (e) { return ""; } };
+  const lsEcrire = (cle, v) => { try { if (v === null) localStorage.removeItem(cle); else localStorage.setItem(cle, v); } catch (e) { /* ignoré */ } };
+  const etatPush = () => PUSH_OK ? Notification.permission : "indisponible";
+
+  async function enregistrerJeton(){
+    if (!user) return null;
+    if (!(await isSupported())) return null;
+    const reg = await navigator.serviceWorker.ready;
+    const jeton = await getToken(getMessaging(app), { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+    if (!jeton) return null;
+    await setDoc(doc(db, "pushTokens", jeton), {
+      uid: user.uid, role: (profil && profil.role) || "", ville: (profil && profil.ville) || "",
+      appareil: String(navigator.userAgent).slice(0, 180), maj: serverTimestamp()
+    });
+    lsEcrire("bj_push_jeton", jeton);
+    return jeton;
+  }
+
+  async function activerPush(){
+    if (!user){ afficherMessage("Connecte-toi pour activer les notifications."); return; }
+    let pris = false;
+    try { pris = PUSH_OK && await isSupported(); } catch (e) { pris = false; }
+    if (!pris){ afficherMessage("Notifications indisponibles|Ton navigateur ne les prend pas en charge. Sur iPhone, installe d'abord l'application sur l'écran d'accueil."); return; }
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted"){ afficherMessage("Notifications non autorisées|Tu peux les autoriser dans les réglages de ton navigateur."); majPushUI(); return; }
+    let jeton = null;
+    try { jeton = await enregistrerJeton(); } catch (e) { console.error(e); }
+    lsEcrire("bj_push_desactive", null);
+    if (jeton) afficherMessage("Notifications activées|Tu seras prévenu(e) des réponses à tes candidatures et de l'avancée de tes missions.", "succes");
+    else afficherMessage("Activation impossible|Réessaie dans un instant.");
+    majPushUI();
+  }
+
+  async function desactiverPush(){
+    const jeton = lsLire("bj_push_jeton");
+    try { await deleteToken(getMessaging(app)); } catch (e) { /* ignoré */ }
+    if (jeton && user){ try { await deleteDoc(doc(db, "pushTokens", jeton)); } catch (e) { /* ignoré */ } }
+    lsEcrire("bj_push_jeton", null);
+    lsEcrire("bj_push_desactive", "1");
+    afficherMessage("Notifications désactivées|Tu ne recevras plus d'alertes sur cet appareil.", "succes");
+    majPushUI();
+  }
+
+  function majPushUI(){
+    const bouton0 = $("push-bouton");
+    if (!bouton0) return;
+    const etat = etatPush();
+    const actif = etat === "granted" && !!lsLire("bj_push_jeton");
+    bouton0.disabled = etat === "indisponible" || etat === "denied";
+    bouton0.textContent = actif ? "Désactiver" : "Activer";
+    bouton0.classList.toggle("sec", actif);
+    $("push-etat").textContent = etat === "indisponible" ? "Non prises en charge par ce navigateur."
+      : etat === "denied" ? "Bloquées dans les réglages du navigateur."
+      : actif ? "Activées sur cet appareil."
+      : "Désactivées. Active-les pour être prévenu(e) en temps réel.";
+    const ferme = Number(lsLire("bj_push_invite") || 0);
+    const invite = !!user && etat === "default" && Date.now() - ferme > 7 * 24 * 3600 * 1000;
+    $("push-invite").classList.toggle("cache", !invite);
+  }
+
+  $("push-bouton").addEventListener("click", () => {
+    if (etatPush() === "granted" && lsLire("bj_push_jeton")) desactiverPush(); else activerPush();
+  });
+  $("push-invite-oui").addEventListener("click", () => activerPush());
+  $("push-invite-non").addEventListener("click", () => { lsEcrire("bj_push_invite", String(Date.now())); majPushUI(); });
+  if ("serviceWorker" in navigator){
+    navigator.serviceWorker.addEventListener("message", e => {
+      const d = e.data;
+      if (d && d.type === "push"){
+        const n = (d.payload && d.payload.notification) || {};
+        afficherMessage((n.title || "Notification") + "|" + (n.body || ""), "info");
+      }
+    });
+  }
+  onAuthStateChanged(auth, u => {
+    majPushUI();
+    if (u && PUSH_OK && Notification.permission === "granted" && !lsLire("bj_push_desactive")){
+      setTimeout(() => { enregistrerJeton().then(majPushUI).catch(() => { /* ignoré */ }); }, 2500);
+    }
+  });
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";

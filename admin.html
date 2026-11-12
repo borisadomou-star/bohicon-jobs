@@ -168,6 +168,8 @@
   .info{border-color:#cfe8d9}
   .check input{accent-color:var(--vert2)}
 
+  .info.attente{background:#fff6e5;border-color:#f6dfb0;color:#8a5a00}
+
   /* feuille de choix (remplace la liste noire du navigateur) */
   .sh-fond{position:fixed;inset:0;z-index:118;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
   .sh-fond.sortie{animation:dlg-sortie .14s ease both}
@@ -238,6 +240,7 @@
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
       <button class="onglet" data-t="retours" type="button" id="onglet-retours">Retours</button>
       <button class="onglet" data-t="ambassadeurs" type="button">Ambassadeurs</button>
+      <button class="onglet" data-t="push" type="button">Notifications</button>
     </div>
 
     <div id="t-apercu" class="card"></div>
@@ -354,6 +357,8 @@
       </div>
       <p class="note">Si aucune bannière n'est enregistrée, le site affiche ses 3 bannières par défaut. Dès que tu en crées une, seules tes bannières actives s'affichent. Les clics sont comptés une fois par visiteur et par session : ils sont indicatifs.</p>
     </div>
+
+    <div id="t-push" class="card cache"></div>
 
     <div id="t-ambassadeurs" class="card cache">
       <h2>Ambassadeurs</h2>
@@ -474,6 +479,7 @@
   let users = [], missions = [], cands = [], signalements = [], bannieres = [], retours = [], ambassadeurs = [], unsubs = [], moi = null;
   let entreprisesV = new Set();
   let recents = [], premierRecents = true, premierCands = true, filtreCands = "attente";
+  let pushTokens = [], pushEtat = null;
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
 
@@ -1226,7 +1232,66 @@
 
   setInterval(() => { rendreInscriptions(); rendreCandidatures(); }, 60000);
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); }
+  function appareilTexte(ua){
+    ua = String(ua || "");
+    const os = /iPhone|iPad/.test(ua) ? "iPhone/iPad" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac/.test(ua) ? "Mac" : "Appareil";
+    const nav = /Edg\//.test(ua) ? "Edge" : /Firefox/.test(ua) ? "Firefox" : /Chrome/.test(ua) ? "Chrome" : /Safari/.test(ua) ? "Safari" : "";
+    return os + (nav ? " · " + nav : "");
+  }
+  function rendrePush(){
+    const z = $("t-push");
+    z.innerHTML = "";
+    z.appendChild(el("h2", "", "Notifications push"));
+    const msJ = t => (t.maj && t.maj.toMillis ? t.maj.toMillis() : 0);
+    const util = id => users.find(u => u.id === id) || {};
+    const nomDe = u => ((u.prenom || "") + " " + (u.nom || "")).trim();
+    const distincts = new Set(pushTokens.map(t => t.uid)).size;
+    const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+    const g = el("div", "tuiles");
+    g.append(tuile(pushTokens.length, "Appareils inscrits"), tuile(distincts, "Utilisateurs joignables"));
+    z.appendChild(g);
+
+    const dernier = pushEtat && pushEtat.maj && pushEtat.maj.toMillis ? pushEtat.maj.toMillis() : 0;
+    const actif = dernier && Date.now() - dernier < 30 * 60 * 1000;
+    z.appendChild(el("div", "info" + (actif ? "" : " attente"), actif
+      ? "Envoi automatique actif : dernière vérification " + ilYa(dernier) + " (" + (pushEtat.envois || 0) + " notification(s) envoyée(s))."
+      : dernier ? "Envoi automatique en pause : dernière vérification " + ilYa(dernier) + "."
+      : "Envoi automatique non configuré : les notifications ne partent que manuellement depuis la console Firebase."));
+
+    if (pushTokens.length){
+      const b = el("button", "sec", "Copier les jetons des 20 derniers appareils");
+      b.type = "button";
+      b.addEventListener("click", async () => {
+        const liste = pushTokens.slice().sort((x, y) => msJ(y) - msJ(x)).slice(0, 20).map(t => t.id).join("\n");
+        try { await navigator.clipboard.writeText(liste); toastAdmin("Jetons copiés dans le presse-papiers"); } catch (e) { toastAdmin("Copie impossible sur cet appareil"); }
+      });
+      z.appendChild(b);
+    }
+    z.appendChild(el("p", "note", "Envoi manuel : console Firebase → Messaging → Nouvelle campagne → Messages Firebase → « Envoyer un message test », puis colle un jeton."));
+
+    z.appendChild(el("h3", "", "Appareils"));
+    if (!pushTokens.length){ z.appendChild(el("div", "vide", "Aucun appareil inscrit pour le moment.")); return; }
+    pushTokens.slice().sort((x, y) => msJ(y) - msJ(x)).forEach(t => {
+      const u = util(t.uid);
+      const ligne = el("div", "rang");
+      const gg = el("div");
+      gg.appendChild(el("div", "h-titre", nomDe(u) || "Utilisateur"));
+      gg.appendChild(el("div", "h-sous", appareilTexte(t.appareil) + (t.role ? " · " + t.role : "") + (t.ville ? " · " + t.ville : "")));
+      const j = msJ(t);
+      if (j) gg.appendChild(el("div", "h-sous", "Dernière activité : " + ilYa(j)));
+      const btns = el("div", "btns");
+      const c = el("button", "sec mini", "Copier le jeton");
+      c.type = "button";
+      c.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(t.id); toastAdmin("Jeton copié"); } catch (e) { toastAdmin("Copie impossible sur cet appareil"); }
+      });
+      btns.appendChild(c);
+      ligne.append(gg, btns);
+      z.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); rendrePush(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -1246,7 +1311,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; pushTokens = []; pushEtat = null; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1280,6 +1345,8 @@
     unsubs.push(onSnapshot(query(collection(db, "bannieres"), limit(30)), s => { bannieres = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "retours"), limit(500)), s => { retours = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "entreprises"), limit(500)), s => { entreprisesV = new Set(s.docs.filter(d => d.data().verifiee === true).map(d => d.id)); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "pushTokens"), limit(500)), s => { pushTokens = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(doc(db, "config", "pushEtat"), s => { pushEtat = s.exists() ? s.data() : null; rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
       annonceAdmin = s.exists() ? s.data() : null;
       if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
@@ -1329,7 +1396,7 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "inscriptions", "cands", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "inscriptions", "cands", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs", "push"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-cands").addEventListener("input", rendreCandidatures);
