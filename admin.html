@@ -123,17 +123,78 @@
   #toasts-admin{position:fixed;top:10px;left:10px;right:10px;z-index:110;display:flex;flex-direction:column;gap:8px;pointer-events:none}
   .toast-admin{pointer-events:auto;cursor:pointer;padding:12px 14px;border:1px solid #cfe8d9;border-left:4px solid #0f7a45;border-radius:14px;background:#fff;box-shadow:0 18px 40px -16px rgba(6,47,27,.5);color:#12261b;font-size:.88rem;font-weight:600;animation:toast-admin-in .25s ease both}
   @keyframes toast-admin-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
+  /* ===== Tableau de bord admin : design moderne ===== */
+  .topbar{padding:9px 16px;border-bottom:1px solid #e8efea;box-shadow:0 6px 18px -14px rgba(8,69,42,.5)}
+  .marque .mt b{display:block;font-size:1.05rem;line-height:1.15}
+  .marque .mt small{display:block;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--vert2)}
+  .btn-retour{box-shadow:0 8px 16px -10px rgba(120,95,0,.8)}
+  .hero{position:relative;overflow:hidden;padding:26px 16px 78px;background:radial-gradient(120% 90% at 88% 0%,rgba(252,209,22,.18) 0%,rgba(252,209,22,0) 46%),linear-gradient(165deg,#062f1b 0%,#0a5a32 55%,#0f7a45 100%)}
+  .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 34px rgba(255,255,255,.04),0 0 0 72px rgba(255,255,255,.03);pointer-events:none}
+  .hero > *{position:relative;z-index:1}
+  .hero .tuile{display:flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:20px;box-shadow:0 14px 28px -14px rgba(0,0,0,.6)}
+  .hero h1{margin:12px 0 4px;font-size:1.45rem;letter-spacing:-.01em}
+  .card{border:1px solid #e8efea;border-radius:24px;box-shadow:0 18px 40px -26px rgba(8,69,42,.45)}
+  h2{display:flex;align-items:center;gap:10px;font-size:1.1rem;letter-spacing:-.01em}
+  h2::before{content:"";flex:none;width:4px;height:18px;border-radius:4px;background:linear-gradient(180deg,var(--vert2),var(--jaune))}
+  .lg-tete h2::before{display:none}
+  .lg-tete{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .lg-tete h2{margin:0}
+  .lg-tete p{margin:3px 0 0;font-size:.84rem;color:var(--gris);line-height:1.4}
+  .lg-ico{flex:none;display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 12px 22px -12px rgba(11,107,58,.9)}
+  .lg-champ{display:block;margin-bottom:4px}
+  .lg-champ span{display:block;margin:0 2px 6px;font-size:.78rem;font-weight:600;color:#3a4d42}
+  input,select{padding:13px 16px;border:1.5px solid #dfe9e3;background:#fff;border-radius:14px;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus{border-color:var(--vert2);box-shadow:0 0 0 4px rgba(18,153,90,.14)}
+  input[type=search]{padding-left:46px;border-radius:999px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:16px center;background-size:20px;-webkit-appearance:none;appearance:none}
+  select{-webkit-appearance:none;appearance:none;padding-right:44px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:18px}
+  button{background:linear-gradient(135deg,var(--vert),var(--vert2));box-shadow:0 12px 22px -14px rgba(11,107,58,.85)}
+  button.sec,button.danger{box-shadow:none}
+  .onglets{position:sticky;top:62px;z-index:40;padding:5px;border:1px solid #e8efea;scrollbar-width:none}
+  .onglets::-webkit-scrollbar{display:none}
+  .onglet{padding:10px 14px;font-weight:600;box-shadow:none}
+  .onglet.on{background:linear-gradient(135deg,var(--vert),var(--vert2));box-shadow:0 10px 18px -12px rgba(11,107,58,.9)}
+  .tuile-s{position:relative;overflow:hidden;padding:14px 14px 12px;border:1px solid #e4ede7;border-radius:18px;background:linear-gradient(180deg,#fff,#f5faf7);box-shadow:0 12px 24px -20px rgba(8,69,42,.6)}
+  .tuile-s::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--vert2),var(--jaune))}
+  .tuile-s b{font-size:1.5rem;letter-spacing:-.01em}
+  .tuile-s span{display:block;margin-top:2px;font-size:.76rem;font-weight:500}
+  .rang{padding:14px;margin-bottom:10px;border:1px solid #e6eee8;border-radius:18px;background:#fff;box-shadow:0 10px 22px -18px rgba(8,69,42,.55)}
+  .rang:last-child{margin-bottom:0;border-bottom:1px solid #e6eee8}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid transparent;font-size:.7rem;letter-spacing:.02em}
+  .badge::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:currentColor}
+  .vide{border:1.5px dashed #d5e3da;border-radius:18px;background:#f8fbf9}
+  .erreur,.info{border:1px solid transparent;border-radius:14px}
+  .erreur{border-color:#f5cfcc}
+  .info{border-color:#cfe8d9}
+  .check input{accent-color:var(--vert2)}
+
+  /* feuille de choix (remplace la liste noire du navigateur) */
+  .sh-fond{position:fixed;inset:0;z-index:118;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .sh-fond.sortie{animation:dlg-sortie .14s ease both}
+  .sh{display:flex;flex-direction:column;width:min(100%,520px);max-height:78vh;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:26px 26px 0 0;background:#fff;box-shadow:0 -20px 60px -20px rgba(6,30,19,.6);animation:sh-monte .26s cubic-bezier(.2,.9,.3,1.05) both}
+  .sh-poignee{align-self:center;width:44px;height:5px;margin:2px 0 12px;border-radius:999px;background:#dfe7e2}
+  .sh-titre{margin:0 4px 12px;font-size:1.05rem;font-weight:700;text-align:center;color:var(--encre)}
+  .sh-liste{display:grid;gap:6px;padding:2px;overflow:auto}
+  .sh-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:0;padding:15px 16px;border:1.5px solid transparent;border-radius:16px;background:#f6f9f7;color:var(--encre);font-size:.98rem;font-weight:500;text-align:left;box-shadow:none}
+  .sh-coche{flex:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #d3ded7;border-radius:50%;color:#fff}
+  .sh-coche svg{width:14px;height:14px;opacity:0}
+  .sh-opt.on{border-color:var(--vert2);background:linear-gradient(135deg,#f1faf5,#e5f5ec);color:var(--vert-fonce);font-weight:700}
+  .sh-opt.on .sh-coche{border-color:var(--vert);background:var(--vert)}
+  .sh-opt.on .sh-coche svg{opacity:1}
+  .sh-opt:disabled{opacity:.45}
+  @keyframes sh-monte{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+  @media (min-width:721px){.sh-fond{align-items:center}.sh{border-radius:24px;max-height:70vh;padding-bottom:16px}}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <a class="marque" href="index.html"><span class="logo">BJ</span><span>Bohicon Jobs</span></a>
+  <a class="marque" href="index.html"><span class="logo">BJ</span><span class="mt"><b>Bohicon Jobs</b><small>Administration</small></span></a>
   <a class="btn-retour" href="index.html">← Site</a>
 </div>
 
 <div class="hero">
-  <div class="tuile" aria-hidden="true">🛡️</div>
+  <div class="tuile" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div>
   <h1>Espace administrateur</h1>
   <p>Réservé à l'équipe de Bohicon Jobs</p>
 </div>
@@ -143,9 +204,13 @@
 
   <!-- Connexion -->
   <div class="card" id="bloc-login">
-    <h2>Connexion administrateur</h2>
-    <input id="email" type="email" placeholder="E-mail" autocomplete="email">
-    <input id="mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <div class="lg-tete">
+      <span class="lg-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+      <div><h2>Connexion administrateur</h2><p>Accès réservé à l'équipe de Bohicon Jobs.</p></div>
+    </div>
+    <label class="lg-champ"><span>Adresse e-mail</span><input id="email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
+    <label class="lg-champ"><span>Mot de passe</span><input id="mdp" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
+    <label class="check"><input type="checkbox" id="voir-mdp-admin"> <span>Afficher le mot de passe</span></label>
     <button id="btn-login">Se connecter</button>
   </div>
 
@@ -179,7 +244,7 @@
 
     <div id="t-users" class="card cache">
       <input id="q-users" type="search" placeholder="Rechercher (nom, profession, ville, e-mail, téléphone)">
-      <button class="sec" id="btn-export" type="button">⬇️ Exporter les utilisateurs (CSV)</button>
+      <button class="sec" id="btn-export" type="button">Exporter les utilisateurs (CSV)</button>
       <div id="liste-users"></div>
     </div>
 
@@ -235,12 +300,12 @@
         </select>
         <select id="f-retours-type">
           <option value="tous">Tous les types</option>
-          <option value="bug">🐞 Bugs</option>
-          <option value="idee">💡 Idées</option>
-          <option value="avis">⭐ Avis</option>
+          <option value="bug">Bugs</option>
+          <option value="idee">Idées</option>
+          <option value="avis">Avis</option>
         </select>
       </div>
-      <button class="sec" id="btn-export-retours" type="button">⬇️ Exporter les retours (CSV)</button>
+      <button class="sec" id="btn-export-retours" type="button">Exporter les retours (CSV)</button>
       <div id="liste-retours"></div>
     </div>
 
@@ -297,7 +362,7 @@
       <input id="a-code" placeholder="Code du lien (automatique, modifiable)" maxlength="30">
       <input id="a-contact" type="tel" placeholder="WhatsApp de l'ambassadeur (facultatif)" maxlength="20">
       <button id="btn-ajouter-amb" type="button">+ Créer le lien de cet ambassadeur</button>
-      <button class="sec" id="btn-export-amb" type="button">⬇️ Exporter le bilan (CSV)</button>
+      <button class="sec" id="btn-export-amb" type="button">Exporter le bilan (CSV)</button>
       <div id="liste-amb"></div>
       <p class="note">Le lien ressemble à <b>…/bohicon-jobs/?ref=awa-k</b>. Une personne est comptée pour l'ambassadeur si elle s'inscrit depuis ce lien, sur le même navigateur, dans les 30 jours. « Actifs » = inscrits qui ont publié une mission ou se sont proposés. Les ambassadeurs ne voient jamais les données des inscrits : tu leur communiques seulement les totaux.</p>
     </div>
@@ -494,7 +559,7 @@
       if (u.suspendu) titre.appendChild(el("span", "badge b-susp", "Suspendu"));
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", [u.profession, u.ville, u.role].filter(Boolean).join(" · ")));
-      g.appendChild(el("div", "h-sous", "📞 " + (u.tel || "—") + " · ✉️ " + (u.email || "—")));
+      g.appendChild(el("div", "h-sous", "Tél. : " + (u.tel || "—") + " · E-mail : " + (u.email || "—")));
       const pub = missions.filter(m => m.uid === u.id).length;
       const real = missions.filter(m => m.workerUid === u.id && st(m) === "terminee").length;
       g.appendChild(el("div", "h-sous", pub + " publiée(s) · " + real + " réalisée(s)"));
@@ -557,7 +622,7 @@
       titre.appendChild(el("span", "badge b-" + st(m), LIB[st(m)]));
       if (m.valide === false) titre.appendChild(el("span", "badge b-attribuee", m.refusMotif ? "Refusée" : "À valider"));
       g.appendChild(titre);
-      g.appendChild(el("div", "h-sous", ["📍 " + (m.ville || "—"), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
+      g.appendChild(el("div", "h-sous", ["Ville : " + (m.ville || "—"), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
       if (m.desc) g.appendChild(el("div", "h-sous", m.desc));
       const nc = cands.filter(c => c.missionId === m.id).length;
       g.appendChild(el("div", "h-sous", nc + " candidature(s)" + (m.workerNom ? " · attribuée à " + m.workerNom : "")));
@@ -631,7 +696,7 @@
       const nb = signalements.filter(x => x.type === s.type && x.cibleId === s.cibleId).length;
       const ligne = el("div", "rang");
       const g = el("div");
-      const titre = el("div", "h-titre", (s.type === "mission" ? "📋 Mission : " : "👤 Utilisateur : ") + (s.cibleTitre || s.cibleId));
+      const titre = el("div", "h-titre", (s.type === "mission" ? "Mission : " : "Utilisateur : ") + (s.cibleTitre || s.cibleId));
       if (nb > 1) titre.appendChild(el("span", "badge b-susp", nb + " signalements"));
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", "Motif : " + (MOTIFS[s.motif] || s.motif)));
@@ -670,7 +735,7 @@
   }
 
   // ---------- Retours ----------
-  const TYPES_RETOUR = { bug: "🐞 Bug", idee: "💡 Idée", avis: "⭐ Avis" };
+  const TYPES_RETOUR = { bug: "Bug", idee: "Idée", avis: "Avis" };
   function telDe(r){
     const u = r.uid ? users.find(x => x.id === r.uid) : null;
     const t = (u && u.tel) ? u.tel : (r.contact || "");
@@ -699,7 +764,7 @@
         "De : " + (r.nom || (r.uid ? "utilisateur connecté" : "visiteur non connecté")),
         r.contact ? "Contact : " + r.contact : "", dateTexte(ms(r))
       ].filter(Boolean).join(" · ")));
-      if (r.appareil) g.appendChild(el("div", "h-sous", "📱 " + r.appareil));
+      if (r.appareil) g.appendChild(el("div", "h-sous", "Appareil : " + r.appareil));
 
       const btns = el("div", "btns");
       const tel = telDe(r);
@@ -913,12 +978,12 @@
     zone.innerHTML = "";
     const attente = missions.filter(m => m.valide === false && !m.refusMotif).sort((x, y) => ms(x) - ms(y));
     $("onglet-validation").textContent = "À valider" + (attente.length ? " (" + attente.length + ")" : "");
-    if (!attente.length){ zone.appendChild(el("div", "vide", "Aucune mission en attente de validation. 🎉")); return; }
+    if (!attente.length){ zone.appendChild(el("div", "vide", "Aucune mission en attente de validation.")); return; }
     attente.forEach(m => {
       const ligne = el("div", "rang");
       const g = el("div");
       g.appendChild(el("div", "h-titre", m.titre || "(sans titre)"));
-      g.appendChild(el("div", "h-sous", ["📍 " + (m.ville || "—") + (m.lieu ? " · " + m.lieu : ""), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
+      g.appendChild(el("div", "h-sous", ["Ville : " + (m.ville || "—") + (m.lieu ? " · " + m.lieu : ""), fcfa(m.prix), "par " + (m.auteur || "—"), dateTexte(ms(m))].join(" · ")));
       if (m.categorie) g.appendChild(el("div", "h-sous", "Catégorie : " + m.categorie));
       if (m.desc) g.appendChild(el("div", "h-sous", m.desc));
       const btns = el("div", "btns");
@@ -934,6 +999,82 @@
       zone.appendChild(ligne);
     });
   }
+
+  // ---------- Sélecteurs premium (remplacent les listes natives du navigateur) ----------
+  const SVG_COCHE_SEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const TITRES_SELECT = {
+    "f-statut": "Statut des missions", "f-sig": "Signalements", "f-retours": "Retours",
+    "f-retours-type": "Type de retour", "an-type": "Style de l'annonce", "b-fond": "Fond de la bannière"
+  };
+  let feuilleOuverte = false;
+  function ouvrirFeuille(sel){
+    if (feuilleOuverte || sel.disabled) return;
+    feuilleOuverte = true;
+    const avant = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const titreTxt = TITRES_SELECT[sel.id] || sel.getAttribute("aria-label") || "Choisir";
+    const fond = document.createElement("div");
+    fond.className = "sh-fond";
+    const feuille = document.createElement("div");
+    feuille.className = "sh";
+    feuille.setAttribute("role", "listbox");
+    feuille.setAttribute("aria-label", titreTxt);
+    const poignee = document.createElement("span"); poignee.className = "sh-poignee";
+    const titre = document.createElement("h3"); titre.className = "sh-titre"; titre.textContent = titreTxt;
+    const liste = document.createElement("div"); liste.className = "sh-liste";
+    feuille.append(poignee, titre, liste);
+    const fermer = () => {
+      document.removeEventListener("keydown", touche, true);
+      fond.classList.add("sortie");
+      setTimeout(() => { fond.remove(); document.body.style.overflow = avant; feuilleOuverte = false; }, 140);
+    };
+    const touche = e => { if (e.key === "Escape"){ e.stopPropagation(); fermer(); } };
+    let choisie = null;
+    Array.from(sel.options).forEach(o => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "sh-opt" + (o.selected ? " on" : "");
+      b.setAttribute("role", "option");
+      b.setAttribute("aria-selected", o.selected ? "true" : "false");
+      b.disabled = o.disabled;
+      const lib = document.createElement("span"); lib.textContent = o.textContent;
+      const coche = document.createElement("span"); coche.className = "sh-coche"; coche.innerHTML = SVG_COCHE_SEL;
+      b.append(lib, coche);
+      b.addEventListener("click", () => {
+        sel.value = o.value;
+        sel.dispatchEvent(new Event("input", { bubbles: true }));
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        fermer();
+      });
+      if (o.selected) choisie = b;
+      liste.appendChild(b);
+    });
+    fond.appendChild(feuille);
+    fond.addEventListener("click", e => { if (e.target === fond) fermer(); });
+    document.addEventListener("keydown", touche, true);
+    document.body.appendChild(fond);
+    if (choisie && choisie.scrollIntoView) choisie.scrollIntoView({ block: "center" });
+  }
+  function brancherSelect(sel){
+    if (sel.dataset.pro || sel.multiple) return;
+    sel.dataset.pro = "1";
+    sel.addEventListener("mousedown", e => { if (sel.disabled) return; e.preventDefault(); ouvrirFeuille(sel); });
+    sel.addEventListener("keydown", e => {
+      if (["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)){ e.preventDefault(); ouvrirFeuille(sel); }
+    });
+    let departY = null;
+    sel.addEventListener("touchstart", e => { departY = e.touches[0].clientY; }, { passive: true });
+    sel.addEventListener("touchend", e => {
+      if (departY !== null && !sel.disabled && Math.abs(e.changedTouches[0].clientY - departY) < 8){ e.preventDefault(); ouvrirFeuille(sel); }
+      departY = null;
+    }, { passive: false });
+  }
+  let planifie = false;
+  const brancherTous = () => { planifie = false; document.querySelectorAll("select:not([data-pro])").forEach(brancherSelect); };
+  new MutationObserver(() => { if (!planifie){ planifie = true; requestAnimationFrame(brancherTous); } })
+    .observe(document.body, { childList: true, subtree: true });
+  brancherTous();
+  $("voir-mdp-admin").addEventListener("change", e => { $("mdp").type = e.target.checked ? "text" : "password"; });
 
   // ---------- Notifications en direct, inscriptions et candidatures ----------
   function toastAdmin(texte, onglet){
@@ -992,7 +1133,7 @@
       el("h3", "", ((u0.prenom || "") + " " + (u0.nom || "")).trim() || "Sans nom"),
       el("div", "dern-meta", [u0.profession, u0.ville, u0.role].filter(Boolean).join(" · ")),
       el("div", "dern-meta", t0 ? ilYa(t0) + " · " + dateHeure(t0) : "Date inconnue"),
-      el("div", "dern-meta", "📞 " + (u0.tel || "—") + " · ✉️ " + (u0.email || "—")));
+      el("div", "dern-meta", "Tél. : " + (u0.tel || "—") + " · E-mail : " + (u0.email || "—")));
     if (u0.ref){ const amb = ambassadeurs.find(x => x.code === u0.ref); txt.appendChild(el("div", "dern-meta", "Parrain : " + (amb ? amb.nom : u0.ref))); }
     carte.appendChild(txt);
     zD.appendChild(carte);
@@ -1013,7 +1154,7 @@
       if (u.suspendu) titre.appendChild(el("span", "badge b-susp", "Suspendu"));
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", [u.profession, u.ville, u.role].filter(Boolean).join(" · ")));
-      g.appendChild(el("div", "h-sous", "📞 " + (u.tel || "—") + " · ✉️ " + (u.email || "—")));
+      g.appendChild(el("div", "h-sous", "Tél. : " + (u.tel || "—") + " · E-mail : " + (u.email || "—")));
       if (u.ref){ const amb = ambassadeurs.find(x => x.code === u.ref); g.appendChild(el("div", "h-sous", "Parrain : " + (amb ? amb.nom : u.ref))); }
       ligne.append(g, el("div", "heure", t ? heureTexte(t) : "—"));
       zL.appendChild(ligne);
@@ -1066,7 +1207,7 @@
       titre.appendChild(el("span", "badge b-" + etat, etat === "acceptee" ? (c.confirmee ? "Acceptée · confirmée" : "Acceptée · à confirmer") : LIB_ETAT[etat]));
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", [c.profession || cu.profession, cu.ville, cu.role].filter(Boolean).join(" · ")));
-      g.appendChild(el("div", "h-sous", "📞 " + (c.tel || cu.tel || "—") + " · ✉️ " + (cu.email || "—")));
+      g.appendChild(el("div", "h-sous", "Tél. : " + (c.tel || cu.tel || "—") + " · E-mail : " + (cu.email || "—")));
       g.appendChild(el("div", "h-sous", "Mission : « " + (c.titre || (m && m.titre) || "—") + " » · " + fcfa(c.prix || (m && m.prix)) + (c.ville ? " · " + c.ville : "")));
       g.appendChild(el("div", "h-sous", "Auteur : " + (nomDe(au) || "—") + (au.tel ? " (" + au.tel + ")" : "") + " · mission " + (m ? LIB_MISSION[st(m)] : "supprimée")));
       const t = ms(c);
