@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261112-0512">
-<meta name="build-notes" content="Notifications push : réponses aux candidatures et avancée des missions.">
+<meta name="build" content="20261113-0918">
+<meta name="build-notes" content="Cartes de missions plus compactes, vraies icônes de navigation et liste progressive.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -597,6 +597,54 @@
   .push-invite .mini,.push-carte .mini{width:auto;margin:0}
   .push-invite .lien{width:auto;margin:0;padding:4px 6px;font-size:.82rem}
 
+  /* ===== Missions : cartes compactes et premium ===== */
+  .card.job{margin-bottom:12px;padding:14px 14px 12px;border:1px solid #e4ede7;border-left:4px solid var(--vert2);border-radius:20px;background:#fff;box-shadow:0 14px 28px -22px rgba(8,69,42,.6);transition:transform .15s ease,box-shadow .15s ease}
+  .card.job:active{transform:scale(.992)}
+  .favori{top:10px;right:10px;display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:1px solid #efe5c6;border-radius:50%;background:#fffdf5;color:#e0a100;font-size:1.05rem;box-shadow:none}
+  .c-haut{gap:6px;margin-bottom:8px;padding-right:40px}
+  .c-haut .badge.b-urgent{order:0}
+  .c-haut .chip-cat{order:1}
+  .c-haut .chip-verif{order:2}
+  .c-haut .chip-entr{order:3}
+  .c-haut .badge{order:4}
+  .chip-cat{padding:3px 10px;font-size:.72rem}
+  .chip-verif{justify-content:center;width:26px;height:26px;padding:0;border-radius:50%}
+  .chip-verif svg{width:14px;height:17px}
+  .c-ligne-titre{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .c-ligne-titre .c-titre{flex:1;min-width:0;margin:0;font-size:1.02rem;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .c-ligne-titre .c-prix{flex:none;display:flex;flex-direction:column;align-items:flex-end;margin:0;font-size:1.2rem;line-height:1.05;background:linear-gradient(135deg,#0b6b3a,#12995a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
+  .c-ligne-titre .c-prix small{margin:3px 0 0;font-size:.6rem;font-weight:700;letter-spacing:.1em;color:var(--gris);-webkit-text-fill-color:var(--gris)}
+  .c-infos{flex-direction:row;flex-wrap:wrap;gap:4px 14px;margin-bottom:6px;font-size:.8rem}
+  .ci{display:inline-flex;align-items:center;gap:5px}
+  .ci svg{flex:none;width:14px;height:14px;color:var(--vert2)}
+  .c-desc{margin:0 0 2px;font-size:.86rem;line-height:1.5;-webkit-line-clamp:2}
+  .c-plus{margin:0 0 4px;font-size:.76rem}
+  .c-bas{margin-top:10px;padding-top:10px;gap:10px}
+  .c-auteur{flex:1;min-width:0}
+  .c-auteur .avatar{width:32px;height:32px;font-size:.8rem}
+  .partage-ico{flex:none;display:flex;align-items:center;justify-content:center;width:36px;height:36px;margin-left:auto;border:1.5px solid #cfe0d6;border-radius:50%;color:var(--vert);text-decoration:none;transition:background .15s}
+  .partage-ico:active{background:#e7f5ed}
+  .partage-ico svg{width:17px;height:17px}
+  .card.job .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .card.job .actions > button,.card.job .actions > a.wa{flex:1 1 calc(50% - 8px);width:auto;min-width:0;margin:0;padding:11px 12px;font-size:.84rem}
+  .card.job .actions > button:first-child,.card.job .actions > a.wa:first-child,.card.job .actions > .info,.card.job .actions > .verrou,.card.job .actions > .erreur,.card.job .actions > div{flex-basis:100%}
+  .voir-plus-missions{display:block;width:100%;margin:4px 0 16px;padding:14px;border:1.5px solid #cfe0d6;border-radius:999px;background:#fff;color:var(--vert);font-size:.92rem;font-weight:700;box-shadow:none}
+
+  /* ===== Barre de navigation du bas : vraies icônes ===== */
+  .nav-item{gap:2px;color:#6d8076;font-size:.68rem;font-weight:600}
+  .nav-ico{display:flex;align-items:center;justify-content:center;width:48px;height:30px;border-radius:15px;font-size:0;transition:background .2s,color .2s}
+  .nav-ico svg{width:22px;height:22px}
+  .nav-item.actif{color:var(--vert);font-weight:700}
+  .nav-item.actif .nav-ico{background:#e4f4eb;color:var(--vert)}
+  .nav-item.pub .nav-ico,.nav-item.pub.actif .nav-ico{width:52px;height:52px;margin-top:-26px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 12px 22px -8px rgba(11,107,58,.85)}
+  .nav-item.pub .nav-ico svg{width:26px;height:26px}
+  .nav-badge{left:calc(50% + 4px)}
+
+  /* ===== En-tête : le nom ne se coupe plus ===== */
+  .marque{gap:10px}
+  .marque-texte b{font-size:1.18rem;white-space:nowrap}
+  .btn-pro{padding:8px 12px;font-size:.78rem}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -770,11 +818,11 @@
 </footer>
 
 <nav class="nav-bas" aria-label="Navigation principale">
-  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico">🏠</span>Accueil</button>
-  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico">🔍</span>Missions</button>
-  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico">+</span>Publier</button>
-  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico">🔔</span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
-  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico">👤</span>Mon espace</button>
+  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg></span>Accueil</button>
+  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>Missions</button>
+  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Publier</button>
+  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
+  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg></span>Espace</button>
 </nav>
 
 <div id="bandeau-maj" class="bandeau-install bandeau-maj cache" role="dialog" aria-label="Mise à jour disponible">
@@ -1070,6 +1118,7 @@
   let estAdminUtilisateur = false;
   let entreprisesVerifiees = new Set();
   const descOuvertes = new Set();
+  let nbAffiche = 6, signatureListe = "", missionForcee = null;
   const brouillons = {};
   let avisTous = [];
   let mesSignalements = new Set();
@@ -1337,6 +1386,7 @@
     lienTraite = true;
     const id = new URLSearchParams(location.hash.slice(1)).get("mission");
     if (!id) return;
+    missionForcee = id;
     const m = missions.find(x => x.id === id && visible(x));
     if (!m){ afficherMessage("Cette mission n'existe plus ou n'est plus disponible.", "info"); return; }
     reinitialiserFiltres();
@@ -1592,6 +1642,7 @@
     fermerEspace();
     reinitialiserFiltres();
     $("filtre-statut").value = "toutes";
+    missionForcee = String(id);
     afficher();
     setTimeout(() => {
       const cible = document.querySelector('[data-id="' + String(id).replace(/[^A-Za-z0-9]/g, "") + '"]');
@@ -1987,6 +2038,15 @@
   }
 
   // ---------- Carte d'une mission ----------
+  const SVG_MINI = { pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>', cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>', user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>' };
+  const SVG_PARTAGE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5.5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="18.5" r="2.6"/><path d="M8.3 10.7l7.4-3.9"/><path d="M8.3 13.3l7.4 3.9"/></svg>';
+  function infoIcone(icone, texte){
+    const s = el("span", "ci");
+    s.innerHTML = icone;
+    s.appendChild(document.createTextNode(texte));
+    return s;
+  }
+
   function carte(m, cpt){
     const statut = st(m);
     const c = el("div", "card job s-" + statut);
@@ -1999,9 +2059,15 @@
     c.appendChild(fav);
     const ajouterPartage = () => {
       if (statut !== "disponible" || estExpiree(m) || m.valide === false) return;
-      const p = el("a", "partage", "📲 Partager sur WhatsApp");
+      const p = document.createElement("a");
+      p.className = "partage-ico";
+      p.title = "Partager sur WhatsApp";
+      p.setAttribute("aria-label", "Partager sur WhatsApp");
+      p.innerHTML = SVG_PARTAGE;
       p.href = lienPartageMission(m); p.target = "_blank"; p.rel = "noopener";
-      c.appendChild(p);
+      let bas0 = c.querySelector(".c-bas");
+      if (!bas0){ bas0 = el("div", "c-bas"); c.appendChild(bas0); }
+      bas0.appendChild(p);
     };
 
     // ----- en-tête : catégorie, statut, urgence -----
@@ -2011,7 +2077,7 @@
       const v = el("span", "chip-verif");
       v.title = "Mission contrôlée par l'équipe Bohicon Jobs avant sa publication";
       v.innerHTML = SVG_VERIF;
-      v.appendChild(document.createTextNode("Vérifiée"));
+      v.setAttribute("aria-label", "Mission vérifiée");
       haut.appendChild(v);
     }
     if (m.entrepriseNom){
@@ -2023,20 +2089,25 @@
       haut.appendChild(ce);
     }
     if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
-    haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
+    if (statut !== "disponible") haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
     if (estExpiree(m)) haut.appendChild(el("span", "badge b-gris", "Expirée"));
     const q = quandTexte(m);
     if (q && q.urgent && statut === "disponible") haut.appendChild(el("span", "badge b-urgent", "Urgent"));
     c.appendChild(haut);
 
-    c.appendChild(el("h3", "c-titre", m.titre));
+    const ligneTitre = el("div", "c-ligne-titre");
+    ligneTitre.appendChild(el("h3", "c-titre", m.titre));
+    const prixHaut = el("div", "c-prix", Number(m.prix || 0).toLocaleString("fr-FR"));
+    prixHaut.appendChild(el("small", "", "FCFA"));
+    ligneTitre.appendChild(prixHaut);
+    c.appendChild(ligneTitre);
 
     // ----- informations pratiques -----
     const infos = el("div", "c-infos");
-    infos.appendChild(el("span", "", "📍 " + (m.ville || "") + (m.lieu && user ? " · " + m.lieu : "")));
-    if (m.lieu && !user) infos.appendChild(el("span", "", "🔒 Lieu précis visible après connexion"));
-    if (q) infos.appendChild(el("span", "", "🗓️ " + q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
-    if (statut !== "disponible" && m.workerNom) infos.appendChild(el("span", "", "👤 Attribuée à " + m.workerNom));
+    infos.appendChild(infoIcone(SVG_MINI.pin, (m.ville || "") + (m.lieu && user ? " · " + m.lieu : "")));
+    if (m.lieu && !user) infos.appendChild(infoIcone(SVG_MINI.lock, "Lieu précis visible après connexion"));
+    if (q) infos.appendChild(infoIcone(SVG_MINI.cal, q.texte + (q.depasse && statut === "disponible" ? " (date dépassée)" : "")));
+    if (statut !== "disponible" && m.workerNom) infos.appendChild(infoIcone(SVG_MINI.user, "Attribuée à " + m.workerNom));
     c.appendChild(infos);
 
     // ----- description repliable -----
@@ -2078,10 +2149,7 @@
       aut.appendChild(t);
       bas.appendChild(aut);
     }
-    const prix = el("div", "c-prix", Number(m.prix || 0).toLocaleString("fr-FR"));
-    prix.appendChild(el("small", "", " FCFA"));
-    bas.appendChild(prix);
-    c.appendChild(bas);
+    if (bas.children.length) c.appendChild(bas);
 
     if (m.valide === false){
       const nv = el("div", m.refusMotif ? "erreur" : "info", m.refusMotif
@@ -2367,7 +2435,21 @@
         : '<div class="vide">Aucune mission ne correspond à ta recherche.</div>';
       return;
     }
-    items.forEach(m => liste.appendChild(carte(m, cpt)));
+    const sig = [q, f, cat, px, typ, tri, fs].join("|");
+    if (sig !== signatureListe){ signatureListe = sig; nbAffiche = 6; }
+    if (missionForcee){
+      const idx = items.findIndex(x => x.id === missionForcee);
+      if (idx >= nbAffiche) nbAffiche = idx + 1;
+      missionForcee = null;
+    }
+    items.slice(0, nbAffiche).forEach(m => liste.appendChild(carte(m, cpt)));
+    if (items.length > nbAffiche){
+      const reste = items.length - nbAffiche;
+      const plus = el("button", "voir-plus-missions", "Afficher plus de missions (" + reste + " restante" + (reste > 1 ? "s" : "") + ")");
+      plus.type = "button";
+      plus.addEventListener("click", () => { nbAffiche += 6; afficher(); });
+      liste.appendChild(plus);
+    }
   }
 
   // ---------- Missions en temps réel ----------
@@ -2618,9 +2700,12 @@
     majNav();
   }
 
+  let enMissions = false;
   function majNav(){
+    const autre = espaceOuvert || !$("vue-pro").classList.contains("cache");
     $("nav-espace").classList.toggle("actif", espaceOuvert);
-    $("nav-accueil").classList.toggle("actif", !espaceOuvert);
+    $("nav-missions").classList.toggle("actif", !autre && enMissions);
+    $("nav-accueil").classList.toggle("actif", !autre && !enMissions);
   }
 
   function fermerEspace(viaRetour){
@@ -3964,7 +4049,12 @@
     }
     else ouvrirEspace(profilOk() ? "publier" : undefined);
   });
-  window.addEventListener("scroll", () => $("fab-haut").classList.toggle("on", window.scrollY > 400), { passive: true });
+  window.addEventListener("scroll", () => {
+    $("fab-haut").classList.toggle("on", window.scrollY > 400);
+    const r = $("missions").getBoundingClientRect();
+    const dans = r.top < window.innerHeight * 0.45 && r.bottom > 140;
+    if (dans !== enMissions){ enMissions = dans; majNav(); }
+  }, { passive: true });
   $("fab-haut").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" }));
   if (NUMERO_WA){
     const f = $("fab-wa");
