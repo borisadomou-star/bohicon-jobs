@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261113-0939">
-<meta name="build-notes" content="Nouvelle barre de navigation flottante avec icônes premium.">
+<meta name="build" content="20261113-2210">
+<meta name="build-notes" content="En-tête premium : nouveau design de la barre du haut, du slogan et des informations défilantes.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -669,6 +669,35 @@
     .bandeau-install{bottom:calc(102px + env(safe-area-inset-bottom))}
   }
 
+  /* ===== En-tête premium : barre du haut, slogan et informations défilantes ===== */
+  .topbar{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);border-bottom:1px solid rgba(11,107,58,.1);box-shadow:0 10px 26px -18px rgba(6,47,27,.5)}
+  .logo{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 18px -10px rgba(11,107,58,.9)}
+  .logo::after{content:"";position:absolute;inset:0 0 55% 0;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0));pointer-events:none}
+  .marque-texte b{color:#0a4d2b;font-weight:800;letter-spacing:-.02em}
+  .marque-texte b i{font-style:normal;background:linear-gradient(135deg,#12995a 0%,#c99700 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+  .btn-pro{border:1px solid rgba(252,209,22,.65);background:linear-gradient(135deg,#0a5a32,#12995a);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 22px -12px rgba(11,107,58,.95);letter-spacing:.01em}
+  .btn-pro svg{color:#fcd116}
+
+  .ruban-slogan{gap:12px;padding:8px 16px;background:linear-gradient(90deg,#041f12 0%,#0a5a32 50%,#041f12 100%);border-bottom:1px solid rgba(252,209,22,.35)}
+  .ruban-slogan p{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .rs-losange{width:26px;height:1px;transform:none;background:linear-gradient(90deg,rgba(252,209,22,0),#fcd116);box-shadow:none;animation:none}
+  .rs-losange:last-child{background:linear-gradient(270deg,rgba(252,209,22,0),#fcd116)}
+  @media (min-width:721px){.ruban-slogan p{font-size:.8rem;letter-spacing:.18em}.rs-losange{width:56px}}
+
+  .annonce{gap:10px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.14);box-shadow:0 10px 22px -18px rgba(0,0,0,.6)}
+  .annonce.info{background:linear-gradient(90deg,#123a7a 0%,#1a4fa0 100%)}
+  .annonce.important{background:linear-gradient(90deg,#8f1d17 0%,#c0392b 100%)}
+  .annonce.succes{background:linear-gradient(90deg,#08623a 0%,#0f8a4e 100%)}
+  .an-badge{display:inline-flex;align-items:center;gap:6px;flex:none;padding:4px 10px 4px 8px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(255,255,255,.16);font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .an-ico{display:flex;font-style:normal;animation:clignote 1.4s ease-in-out infinite}
+  .an-ico svg{width:14px;height:14px}
+  .annonce .defile{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 16px),transparent 100%)}
+  .annonce:active .defile-texte{animation-play-state:paused}
+  .annonce .an-lien{flex:none;padding:5px 12px;border-radius:999px;background:#fff;color:#0a3d22;font-size:.72rem;font-weight:700;text-decoration:none}
+  .annonce .an-fermer{display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:28px;padding:0;border:1px solid rgba(255,255,255,.28);border-radius:50%;background:rgba(255,255,255,.14);color:#fff}
+  .an-fermer svg{width:12px;height:12px}
+  @media (prefers-reduced-motion: reduce){.an-ico,.rs-texte{animation:none}}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -736,7 +765,7 @@
 <body>
 
 <div class="topbar">
-  <a class="marque" href="#haut"><span class="logo">BJ</span><span class="marque-texte"><b>Bohicon Jobs</b></span></a>
+  <a class="marque" href="#haut"><span class="logo">BJ</span><span class="marque-texte"><b>Bohicon <i>Jobs</i></b></span></a>
   <button class="btn-pro" id="btn-pro" type="button" aria-label="Espace entreprises"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2"/><path d="M8 12h2"/><path d="M8 16h2"/><path d="M3 21h18"/></svg><span>Entreprises</span></button>
   <div class="droite">
     <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
@@ -4188,8 +4217,13 @@
     let fermee = "";
     try { fermee = localStorage.getItem("bj_annonce_fermee") || ""; } catch (e) { /* ignoré */ }
     if (fermee === cle){ z.className = "annonce cache"; return; }
-    z.className = "annonce " + (["info", "important", "succes"].includes(a.type) ? a.type : "info");
-    z.appendChild(el("span", "icone", "📢"));
+    const type = ["info", "important", "succes"].includes(a.type) ? a.type : "info";
+    z.className = "annonce " + type;
+    const badge = el("span", "an-badge");
+    const iconeAn = el("i", "an-ico");
+    iconeAn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
+    badge.append(iconeAn, document.createTextNode({ info: "Info", important: "Important", succes: "Nouveau" }[type]));
+    z.appendChild(badge);
     const zoneTexte = el("div", "defile");
     const defilant = el("span", "defile-texte", texte);
     defilant.style.animationDuration = Math.max(10, Math.round(texte.length * 0.22)) + "s";
@@ -4197,11 +4231,12 @@
     z.appendChild(zoneTexte);
     const lien = lienSur(a.lien);
     if (lien){
-      const l = el("a", "", String(a.libelle || "").trim() || "En savoir plus");
+      const l = el("a", "an-lien", String(a.libelle || "").trim() || "En savoir plus");
       l.href = lien; l.target = "_blank"; l.rel = "noopener";
       z.appendChild(l);
     }
-    const x = el("button", "", "✕");
+    const x = el("button", "an-fermer");
+    x.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>';
     x.type = "button";
     x.setAttribute("aria-label", "Fermer l'annonce");
     x.addEventListener("click", () => {
