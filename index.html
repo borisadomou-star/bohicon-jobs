@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261113-0918">
-<meta name="build-notes" content="Cartes de missions plus compactes, vraies icônes de navigation et liste progressive.">
+<meta name="build" content="20261113-0939">
+<meta name="build-notes" content="Nouvelle barre de navigation flottante avec icônes premium.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -645,6 +645,30 @@
   .marque-texte b{font-size:1.18rem;white-space:nowrap}
   .btn-pro{padding:8px 12px;font-size:.78rem}
 
+  /* ===== Barre du bas : dock flottant premium ===== */
+  .nav-item{gap:3px;padding:4px 2px 2px;color:#5f7468;font-size:.68rem;font-weight:600;letter-spacing:.01em}
+  .nav-ico{width:54px;height:34px;border-radius:17px;transition:transform .15s ease,background .2s,color .2s}
+  .nav-ico svg{width:24px;height:24px}
+  .nav-item:active .nav-ico{transform:scale(.9)}
+  .nav-item.actif{color:var(--vert-fonce);font-weight:700}
+  .nav-item.actif .nav-ico{background:linear-gradient(135deg,#0b6b3a,#12995a);color:#fff;box-shadow:0 10px 18px -8px rgba(11,107,58,.85);animation:nav-pop .32s cubic-bezier(.2,.9,.3,1.3)}
+  .nav-item.pub{color:var(--vert-fonce);font-weight:700}
+  .nav-item.pub .nav-ico,.nav-item.pub.actif .nav-ico{width:58px;height:58px;margin-top:-30px;border-radius:50%;background:linear-gradient(135deg,#0b6b3a,#12995a);color:#fff;animation:nav-halo 2.6s ease-in-out infinite;box-shadow:0 0 0 4px #fff,0 0 0 6px #fcd116,0 18px 30px -10px rgba(11,107,58,.85)}
+  .nav-item.pub .nav-ico svg{width:28px;height:28px}
+  .nav-badge{min-width:18px;height:18px;border:2px solid #fff;background:linear-gradient(135deg,#ff5a4f,#d92d20)}
+  @keyframes nav-pop{0%{transform:scale(.8)}100%{transform:scale(1)}}
+  @keyframes nav-halo{0%,100%{box-shadow:0 0 0 4px #fff,0 0 0 6px #fcd116,0 18px 30px -10px rgba(11,107,58,.85)}50%{box-shadow:0 0 0 4px #fff,0 0 0 9px rgba(252,209,22,.55),0 18px 30px -10px rgba(11,107,58,.85)}}
+  @media (prefers-reduced-motion: reduce){.nav-item.actif .nav-ico,.nav-item.pub .nav-ico{animation:none}}
+  @media (max-width:720px){
+    .nav-bas{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:8px 6px;border:1px solid rgba(255,255,255,.8);border-radius:30px;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);box-shadow:0 22px 44px -16px rgba(6,47,27,.6),0 1px 0 rgba(255,255,255,.9) inset}
+    body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+    .vue-espace{bottom:calc(90px + env(safe-area-inset-bottom))}
+    #fab-haut{bottom:calc(100px + env(safe-area-inset-bottom))}
+    #fab-wa{bottom:calc(164px + env(safe-area-inset-bottom))}
+    .retour-flottant{bottom:calc(100px + env(safe-area-inset-bottom))}
+    .bandeau-install{bottom:calc(102px + env(safe-area-inset-bottom))}
+  }
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -818,11 +842,11 @@
 </footer>
 
 <nav class="nav-bas" aria-label="Navigation principale">
-  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg></span>Accueil</button>
-  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>Missions</button>
-  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Publier</button>
-  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
-  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg></span>Espace</button>
+  <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.4L12 4.8l6.5 5.6V19a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg></span>Accueil</button>
+  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="currentColor" fill-opacity=".2" stroke="none"/><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>Missions</button>
+  <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Publier</button>
+  <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
+  <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8z" fill="currentColor" fill-opacity=".2" stroke="none"/><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg></span>Espace</button>
 </nav>
 
 <div id="bandeau-maj" class="bandeau-install bandeau-maj cache" role="dialog" aria-label="Mise à jour disponible">
@@ -3092,6 +3116,7 @@
     if (!user) ouvrirEspace(); else $("btn-cloche").click();
   });
   $("nav-espace").addEventListener("click", () => ouvrirEspace());
+  document.querySelectorAll(".nav-item").forEach(b => b.addEventListener("click", () => { if (navigator.vibrate) navigator.vibrate(8); }));
 
   // ---------- Déconnexion automatique après une période d'inactivité ----------
   const INACTIVITE_H = Number(window.CONFIG && window.CONFIG.INACTIVITE_HEURES) > 0 ? Number(window.CONFIG.INACTIVITE_HEURES) : 4;
