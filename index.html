@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261113-2235">
-<meta name="build-notes" content="Domaines et formations : alertes de missions ciblées, priorité aux profils formés et barre d'infos plus lisible.">
+<meta name="build" content="20261114-0440">
+<meta name="build-notes" content="Session permanente : tu restes connecté(e) tant que tu ne te déconnectes pas, avec un accueil personnalisé.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -723,6 +723,12 @@
   .annonce .an-lien{background:var(--acc);color:#0b1220}
   .annonce .an-fermer{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
 
+  /* Accueil personnalisé */
+  .msg.bienvenue{--c:#fcd116;border-color:#cfe8d9;background:linear-gradient(135deg,#ffffff 0%,#eef9f2 100%);align-items:center}
+  .msg-avatar{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;font-size:1.15rem;font-weight:700;box-shadow:0 10px 18px -10px rgba(11,107,58,.9)}
+  .msg.bienvenue .msg-corps b{font-size:1rem}
+  .msg.bienvenue .msg-barre{background:linear-gradient(90deg,#fcd116,#12995a);opacity:.9}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1160,7 +1166,7 @@
            query, where, orderBy, limit, onSnapshot, serverTimestamp, increment }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-           signOut, sendPasswordResetEmail }
+           signOut, sendPasswordResetEmail, setPersistence, browserLocalPersistence }
     from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
   // Le numéro WhatsApp se règle dans le fichier config.js (pas ici).
@@ -1178,6 +1184,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
+  setPersistence(auth, browserLocalPersistence).catch(() => { /* la persistance par défaut s'applique */ });
   const missionsRef = collection(db, "missions");
   const candRef = collection(db, "candidatures");
 
@@ -1385,16 +1392,17 @@
 
   function texteErreurAuth(e){
     switch (e.code){
-      case "auth/invalid-email": return "Adresse e-mail invalide.";
-      case "auth/missing-password": return "Entre ton mot de passe.";
-      case "auth/weak-password": return "Mot de passe trop court (6 caractères minimum).";
-      case "auth/email-already-in-use": return "Cet e-mail a déjà un compte. Clique sur « J'ai déjà un compte ».";
+      case "auth/invalid-email": return "Adresse e-mail invalide|Vérifie l'adresse saisie, par exemple prenom@gmail.com.";
+      case "auth/missing-password": return "Mot de passe manquant|Saisis ton mot de passe pour continuer.";
+      case "auth/weak-password": return "Mot de passe trop court|Choisis un mot de passe d'au moins 6 caractères.";
+      case "auth/email-already-in-use": return "Adresse déjà utilisée|Un compte existe déjà avec cette adresse. Connecte-toi ou réinitialise ton mot de passe.";
       case "auth/invalid-credential":
       case "auth/wrong-password":
-      case "auth/user-not-found": return "E-mail ou mot de passe incorrect.";
-      case "auth/too-many-requests": return "Trop de tentatives. Réessaie dans quelques minutes.";
-      case "auth/network-request-failed": return "Problème de connexion internet.";
-      default: return "Une erreur est survenue. Réessaie.";
+      case "auth/user-not-found": return "Identifiants incorrects|L'adresse e-mail ou le mot de passe ne correspond pas. Réessaie ou réinitialise ton mot de passe.";
+      case "auth/too-many-requests": return "Trop de tentatives|Par sécurité, patiente quelques minutes avant de réessayer.";
+      case "auth/network-request-failed": return "Réseau indisponible|Vérifie ta connexion internet puis réessaie.";
+      case "auth/user-disabled": return "Compte désactivé|Contacte l'équipe Bohicon Jobs pour plus d'informations.";
+      default: return "Une erreur est survenue|Réessaie dans un instant.";
     }
   }
 
@@ -2579,12 +2587,6 @@
 
   // ---------- Authentification ----------
   onAuthStateChanged(auth, async u => {
-    if (u && connexionPerimee()){
-      signOut(auth).catch(() => {});
-      afficherMessage("Session expirée|Tu as été déconnecté(e) après une longue période d'inactivité. Reconnecte-toi pour continuer.", "info");
-      return;
-    }
-    if (u) noterActivite();
     user = u;
     profil = null;
     if (u && !enInscription){
@@ -2608,6 +2610,7 @@
     }
     majUI();
     if (u && !enInscription && !profilOk()) ouvrirEspace();
+    if (u && !enInscription && profilOk()) planifierBienvenue();
     if (LIEN_DIRECT && !lienDirectFait){
       lienDirectFait = true;
       if (!u){
@@ -2623,12 +2626,11 @@
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
-    noterActivite();
+    bienvenue = "connexion";
     try {
       await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
       $("mdp").value = "";
-      afficherMessage("Connexion réussie|Bienvenue sur Bohicon Jobs.", "info");
-    } catch (e) { console.error(e); afficherMessage(texteErreurAuth(e)); }
+    } catch (e) { bienvenue = null; console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
 
   $("btn-inscription").addEventListener("click", async () => {
@@ -2639,7 +2641,6 @@
     btn.disabled = true; btn.textContent = "Création du compte…";
     enInscription = true;
     try {
-      noterActivite();
       const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
       profil = data;
@@ -2680,7 +2681,7 @@
     try { const j = localStorage.getItem("bj_push_jeton"); if (j && user) await deleteDoc(doc(db, "pushTokens", j)); } catch (e) { /* ignoré */ }
     try { localStorage.removeItem("bj_push_jeton"); } catch (e) { /* ignoré */ }
     await signOut(auth);
-    afficherMessage("Déconnexion réussie|À bientôt sur Bohicon Jobs.", "info");
+    afficherMessage("Déconnexion réussie|À bientôt ! Les alertes sont suspendues sur cet appareil jusqu'à ta prochaine connexion.", "info");
   };
   $("btn-deconnexion").addEventListener("click", deconnecter);
   $("btn-deco-profil").addEventListener("click", deconnecter);
@@ -3206,31 +3207,8 @@
   $("nav-espace").addEventListener("click", () => ouvrirEspace());
   document.querySelectorAll(".nav-item").forEach(b => b.addEventListener("click", () => { if (navigator.vibrate) navigator.vibrate(8); }));
 
-  // ---------- Déconnexion automatique après une période d'inactivité ----------
-  const INACTIVITE_H = Number(window.CONFIG && window.CONFIG.INACTIVITE_HEURES) > 0 ? Number(window.CONFIG.INACTIVITE_HEURES) : 4;
-  const INACTIVITE_MS = INACTIVITE_H * 3600 * 1000;
-  const ACT_CLE = "bj_activite";
-  function noterActivite(){
-    try { localStorage.setItem(ACT_CLE, String(Date.now())); } catch (e) { /* stockage indisponible */ }
-  }
-  function connexionPerimee(){
-    try {
-      const der = Number(localStorage.getItem(ACT_CLE) || 0);
-      return der > 0 && Date.now() - der > INACTIVITE_MS;
-    } catch (e) { return false; }
-  }
-  function verifierInactivite(){
-    if (!user || !connexionPerimee()) return;
-    signOut(auth).catch(() => {});
-    afficherMessage("Session expirée|Tu as été déconnecté(e) après " + INACTIVITE_H + " heure(s) d'inactivité. Reconnecte-toi pour continuer.", "info");
-  }
-  let derniereNote = 0;
-  ["click", "keydown", "touchstart", "scroll", "mousemove"].forEach(ev => window.addEventListener(ev, () => {
-    const t = Date.now();
-    if (t - derniereNote > 30000){ derniereNote = t; noterActivite(); }
-  }, { passive: true }));
-  setInterval(verifierInactivite, 60000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
+  // Session permanente : l'utilisateur reste connecté tant qu'il ne se déconnecte pas lui-même.
+  try { localStorage.removeItem("bj_activite"); } catch (e) { /* ignoré */ }
 
   $("icone-garantie").innerHTML = SVG_VERIF;
 
@@ -4128,6 +4106,49 @@
       setTimeout(() => { enregistrerJeton().then(majPushUI).catch(() => { /* ignoré */ }); }, 2500);
     }
   });
+
+  // ---------- Accueil personnalisé : connexion et retour ----------
+  let bienvenue = null;
+  function planifierBienvenue(){
+    const mode = bienvenue;
+    bienvenue = null;
+    const derniere = Number(lsLire("bj_bienvenue") || 0);
+    if (!mode && Date.now() - derniere < 12 * 3600 * 1000) return;   // session retrouvée : au plus un accueil toutes les 12 h
+    lsEcrire("bj_bienvenue", String(Date.now()));
+    setTimeout(() => afficherBienvenue(mode === "connexion"), 1500);
+  }
+  function resumeBienvenue(){
+    const parties = [];
+    const aConfirmer = mesCandidatures.filter(c => c.statut === "acceptee" && !c.confirmee).length;
+    if (aConfirmer) parties.push(aConfirmer > 1 ? aConfirmer + " missions à confirmer" : "1 mission à confirmer");
+    const ouvertes = new Set(missions.filter(m => st(m) === "disponible").map(m => m.id));
+    const recues = candidaturesRecues.filter(c => c.statut === "en_attente" && ouvertes.has(c.missionId)).length;
+    if (recues) parties.push(recues > 1 ? recues + " candidatures à traiter" : "1 candidature à traiter");
+    return parties.length ? parties.join(" · ") : "Les nouvelles opportunités t'attendent.";
+  }
+  function afficherBienvenue(estConnexion){
+    if (!user || !profil) return;
+    const prenom = String(profil.prenom || "").trim();
+    const z = $("message");
+    clearTimeout(minuteurMessage);
+    z.innerHTML = "";
+    const e = el("div", "msg bienvenue");
+    e.setAttribute("role", "status");
+    e.appendChild(el("span", "msg-avatar", (prenom || "B").charAt(0).toUpperCase()));
+    const corps = el("div", "msg-corps");
+    corps.appendChild(el("b", "", (estConnexion ? "Bienvenue" : "Bon retour") + (prenom ? ", " + prenom : "")));
+    corps.appendChild(el("span", "", (estConnexion ? "Connexion réussie · " : "") + resumeBienvenue()));
+    const x = el("button", "msg-x", "×");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer le message");
+    const barre = el("i", "msg-barre");
+    barre.style.animationDuration = "6500ms";
+    e.append(corps, x, barre);
+    e.insertBefore(e.querySelector(".msg-avatar"), e.firstChild);
+    e.addEventListener("click", () => { z.innerHTML = ""; });
+    z.appendChild(e);
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, 6500);
+  }
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
   const FAV_CLE = "bj_favoris";
