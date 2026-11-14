@@ -1249,7 +1249,9 @@
     const distincts = new Set(pushTokens.map(t => t.uid)).size;
     const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
     const g = el("div", "tuiles");
-    g.append(tuile(pushTokens.length, "Appareils inscrits"), tuile(distincts, "Utilisateurs joignables"));
+    const auj = new Date().toISOString().slice(0, 10);
+    const mails = pushEtat && pushEtat.jourMails === auj ? (pushEtat.mailsJour || 0) : 0;
+    g.append(tuile(pushTokens.length, "Appareils inscrits"), tuile(distincts, "Utilisateurs joignables"), tuile(mails + " / 450", "E-mails aujourd'hui"));
     z.appendChild(g);
 
     const dernier = pushEtat && pushEtat.maj && pushEtat.maj.toMillis ? pushEtat.maj.toMillis() : 0;

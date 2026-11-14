@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261114-0440">
-<meta name="build-notes" content="Session permanente : tu restes connecté(e) tant que tu ne te déconnectes pas, avec un accueil personnalisé.">
+<meta name="build" content="20261114-0957">
+<meta name="build-notes" content="Alertes par e-mail en plus des notifications, avec option de désactivation dans le profil.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1081,6 +1081,7 @@
             </div>
             <div id="dom-liste"></div>
             <label class="check"><input type="checkbox" id="dom-alertes"> <span>Recevoir les alertes de missions de mes domaines</span></label>
+            <label class="check"><input type="checkbox" id="dom-alertes-email"> <span>Recevoir aussi les alertes par e-mail</span></label>
             <button id="dom-enregistrer" type="button">Enregistrer mes domaines</button>
           </div>
           <div id="champs-edit"></div>
@@ -4003,6 +4004,7 @@
       liste.appendChild(ligne);
     });
     $("dom-alertes").checked = profil.alertes !== false;
+    $("dom-alertes-email").checked = profil.alertesEmail !== false;
   }
   $("dom-enregistrer").addEventListener("click", async () => {
     if (!user || !domEdition) return;
@@ -4010,9 +4012,10 @@
     const formations = {};
     domaines.forEach(k => { const t = String(domEdition.form[k] || "").trim().slice(0, 100); if (t) formations[k] = t; });
     const alertes = $("dom-alertes").checked;
+    const alertesEmail = $("dom-alertes-email").checked;
     try {
-      await updateDoc(doc(db, "users", user.uid), { domaines, formations, alertes });
-      profil = { ...profil, domaines, formations, alertes };
+      await updateDoc(doc(db, "users", user.uid), { domaines, formations, alertes, alertesEmail });
+      profil = { ...profil, domaines, formations, alertes, alertesEmail };
       domEdition = null;
       afficherMessage("Domaines enregistrés|Tu seras prévenu(e) des missions qui te correspondent.", "succes");
       afficher();
