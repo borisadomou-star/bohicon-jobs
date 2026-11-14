@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261114-0957">
-<meta name="build-notes" content="Alertes par e-mail en plus des notifications, avec option de désactivation dans le profil.">
+<meta name="build" content="20261114-1731">
+<meta name="build-notes" content="Accueil des nouveaux inscrits : présentation de Bohicon Jobs, notification et e-mail de bienvenue.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -728,6 +728,18 @@
   .msg-avatar{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;font-size:1.15rem;font-weight:700;box-shadow:0 10px 18px -10px rgba(11,107,58,.9)}
   .msg.bienvenue .msg-corps b{font-size:1rem}
   .msg.bienvenue .msg-barre{background:linear-gradient(90deg,#fcd116,#12995a);opacity:.9}
+
+  /* Présentation de bienvenue */
+  .dlg.pres{max-height:88vh;padding:22px 20px 16px;overflow:auto;text-align:left}
+  .dlg.pres .dlg-titre,.dlg.pres .dlg-msg{text-align:center}
+  .pres-logo{display:flex;align-items:center;justify-content:center;width:56px;height:56px;margin:0 auto 12px;border-radius:18px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;font-size:1.2rem;font-weight:800;box-shadow:0 14px 24px -12px rgba(11,107,58,.9)}
+  .pres-ligne{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;padding:12px;border:1px solid #e4ede7;border-radius:16px;background:#f8fbf9}
+  .pres-ico{flex:none;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:#e7f5ed;color:#0f7a45}
+  .pres-ico svg{width:21px;height:21px}
+  .pres-ligne b{display:block;font-size:.9rem}
+  .pres-ligne span{display:block;margin-top:2px;font-size:.8rem;line-height:1.45;color:var(--gris)}
+  .dlg.pres .dlg-actions{margin-top:14px}
+  .dlg.pres > .lien{display:block;width:100%;margin:10px 0 0;font-size:.85rem}
 
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
@@ -2644,9 +2656,9 @@
     try {
       const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
-      profil = data;
+      profil = { ...data, createdAt: { toMillis: () => Date.now() } };
       $("i-mdp").value = "";
-      afficherMessage("Compte créé|Bienvenue sur Bohicon Jobs.", "info");
+      nouvelInscrit = true;
       choisirOnglet("resume");
     } catch (e) {
       console.error(e);
@@ -2656,6 +2668,11 @@
     user = auth.currentUser;
     btn.disabled = false; btn.textContent = "Créer mon compte";
     majUI();
+    if (nouvelInscrit){
+      nouvelInscrit = false;
+      lsEcrire("bj_bienvenue", String(Date.now()));
+      setTimeout(afficherPresentation, 500);
+    }
   });
 
   $("btn-profil").addEventListener("click", async () => {
@@ -2874,6 +2891,11 @@
   function calculerNotifs(){
     if (!user || !profilOk()) return [];
     const liste = [];
+    const cree = profil && profil.createdAt && typeof profil.createdAt.toMillis === "function" ? profil.createdAt.toMillis() : 0;
+    if (cree && Date.now() - cree < 7 * 24 * 3600 * 1000){
+      liste.push({ cle: "bienvenue", ms: cree, type: "moi",
+        texte: "Bienvenue sur Bohicon Jobs ! Publie ou trouve de petits travaux près de chez toi : parcours les missions, propose-toi et suis tes candidatures dans Mon espace." });
+    }
     const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
     candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).forEach(c => liste.push({
       cle: "recu:" + c.id, ms: dateMs(c), type: "recu", missionId: c.missionId,
@@ -4112,6 +4134,53 @@
 
   // ---------- Accueil personnalisé : connexion et retour ----------
   let bienvenue = null;
+  let nouvelInscrit = false;
+
+  // Présentation de Bohicon Jobs, affichée une seule fois après l'inscription
+  function afficherPresentation(){
+    if (!user) return;
+    const prenom = String((profil && profil.prenom) || "").trim();
+    const fond = document.createElement("div");
+    fond.className = "dlg-fond";
+    const boite = document.createElement("div");
+    boite.className = "dlg pres";
+    boite.setAttribute("role", "dialog");
+    boite.setAttribute("aria-modal", "true");
+    boite.appendChild(el("div", "pres-logo", "BJ"));
+    boite.appendChild(el("h3", "dlg-titre", "Bienvenue sur Bohicon Jobs" + (prenom ? ", " + prenom : "")));
+    boite.appendChild(el("p", "dlg-msg", "La plateforme gratuite des petits travaux à Bohicon, Abomey, Covè, Zogbodomey et Djidja."));
+    [['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>', "Publier", "Décris ta mission et fixe ton prix : notre équipe la vérifie avant de la rendre visible."],
+     ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>', "Trouver", "Parcours les missions près de chez toi, propose-toi et suis tes candidatures."],
+     ['<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>', "En confiance", "Missions vérifiées, avis des utilisateurs, et contact WhatsApp seulement après confirmation."]].forEach(([ico, t, d]) => {
+      const l = el("div", "pres-ligne");
+      const i = el("span", "pres-ico"); i.innerHTML = ico;
+      const tx = el("div"); tx.append(el("b", "", t), el("span", "", d));
+      l.append(i, tx);
+      boite.appendChild(l);
+    });
+    const touche = e => { if (e.key === "Escape"){ e.stopPropagation(); fermer(); } };
+    const fermer = () => { document.removeEventListener("keydown", touche, true); fond.remove(); };
+    const rang = el("div", "dlg-actions");
+    if (etatPush() === "default"){
+      const b2 = el("button", "dlg-btn sec", "Activer les alertes");
+      b2.type = "button";
+      b2.addEventListener("click", () => { fermer(); activerPush(); });
+      rang.appendChild(b2);
+    }
+    const b1 = el("button", "dlg-btn ok", "Découvrir les missions");
+    b1.type = "button";
+    b1.addEventListener("click", () => { fermer(); fermerEspace(); defiler($("missions")); });
+    rang.appendChild(b1);
+    boite.appendChild(rang);
+    const plusTard = el("button", "lien", "Plus tard");
+    plusTard.type = "button";
+    plusTard.addEventListener("click", fermer);
+    boite.appendChild(plusTard);
+    fond.appendChild(boite);
+    fond.addEventListener("click", e => { if (e.target === fond) fermer(); });
+    document.addEventListener("keydown", touche, true);
+    document.body.appendChild(fond);
+  }
   function planifierBienvenue(){
     const mode = bienvenue;
     bienvenue = null;
