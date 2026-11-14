@@ -18,6 +18,40 @@ const derniere = etat.exists && etat.data().derniere ? etat.data().derniere : Ti
 let envoyes = 0;
 
 const ms = t => (t && typeof t.toMillis === "function" ? t.toMillis() : 0);
+
+// ---------- Alertes ciblées : missions de mon domaine ----------
+const CATEGORIES = {
+  menage: "Ménage et nettoyage", livraison: "Livraison et courses", jardinage: "Jardinage et extérieur",
+  bricolage: "Bricolage et réparation", cuisine: "Cuisine et événements", domicile: "Aide à domicile",
+  transport: "Déménagement et transport", cours: "Cours et soutien scolaire", informatique: "Informatique et bureautique"
+};
+// Si l'utilisateur n'a pas choisi de domaine, on le déduit de sa profession
+const MOTS = {
+  cuisine: ["cuisin", "traiteur", "patiss", "boulang", "restaur", "chef", "serveu", "barman"],
+  livraison: ["livreur", "coursier", "zemidjan", "taxi moto"],
+  transport: ["chauffeur", "demenag", "manutention", "transporteur"],
+  menage: ["menag", "nettoy", "entretien"],
+  jardinage: ["jardin", "agricult", "paysan", "cultivateur", "eleveur"],
+  bricolage: ["plomb", "electric", "macon", "menuis", "soudeur", "peintre", "mecanic", "carreleur", "bricol"],
+  cours: ["enseign", "professeur", "tuteur", "instituteur", "formateur"],
+  informatique: ["informat", "develop", "comptab", "secretar", "bureaut", "graphi"],
+  domicile: ["nounou", "aide a domicile", "aide menager", "infirm", "aide-soignant", "aide soignant", "garde d"]
+};
+const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function domainesDe(u){
+  const s = new Set(Array.isArray(u.domaines) ? u.domaines : []);
+  const prof = norm(u.profession);
+  for (const [cat, mots] of Object.entries(MOTS)) if (mots.some(m => prof.includes(m))) s.add(cat);
+  return s;
+}
+let tousUsers = null;
+async function utilisateurs(){
+  if (!tousUsers){
+    const s = await db.collection("users").limit(2000).get();
+    tousUsers = s.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return tousUsers;
+}
 const court = (t, n = 60) => { const s = String(t || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
 
 async function jetonsDe(uids){
@@ -98,6 +132,31 @@ for (const d of ms2.docs){
       maj.pushRefus = true;
     }
   } else if (m.pushRefus){ maj.pushRefus = false; }
+  // Alertes de domaine : les profils formés sont prévenus en premier, les autres un peu plus tard
+  const publique = m.statut === "disponible" && m.valide !== false && CATEGORIES[m.categorie];
+  if (publique && (!m.pushDom1 || !m.pushDom2)){
+    const t0 = ms(m.valideLe) || ms(m.createdAt);
+    const recente = MAINTENANT - t0 < 24 * 3600 * 1000;
+    if (!recente || AMORCAGE){
+      maj.pushDom1 = true; maj.pushDom2 = true;
+    } else {
+      const libre = u => u.id !== m.uid && !u.suspendu && u.alertes !== false;
+      const titreAlerte = "Nouvelle mission dans ton domaine";
+      const infos = court(m.titre, 50) + " · " + CATEGORIES[m.categorie] + " · " + (m.ville || "") + " · " + Number(m.prix || 0).toLocaleString("fr-FR") + " FCFA";
+      const tous = await utilisateurs();
+      const formes = tous.filter(u => libre(u) && u.formations && u.formations[m.categorie]);
+      if (!m.pushDom1){
+        if (formes.length) await envoyer(formes.slice(0, 150).map(u => u.id), titreAlerte, infos + ". Ta formation correspond : tu es prioritaire.", lien);
+        maj.pushDom1 = true;
+      }
+      if (!m.pushDom2 && MAINTENANT - t0 >= 15 * 60 * 1000){
+        const dejaFormes = new Set(formes.map(u => u.id));
+        const interesses = tous.filter(u => libre(u) && !dejaFormes.has(u.id) && domainesDe(u).has(m.categorie));
+        if (interesses.length) await envoyer(interesses.slice(0, 150).map(u => u.id), titreAlerte, infos + ".", lien);
+        maj.pushDom2 = true;
+      }
+    }
+  }
   if (m.statut === "a_confirmer"){
     if (!m.pushDeclare){
       if (!AMORCAGE){
