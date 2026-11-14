@@ -103,12 +103,12 @@ async function courriel(uids, sujet, corps, lien, extras = {}){
   for (const u of profils){
     if (courriels >= PLAFOND_RUN || jourCourriels + courriels >= PLAFOND_JOUR) return;
     if (!u.email || u.suspendu || u.alertesEmail === false) continue;
-    const donnees = { prenom: u.prenom, titre: sujet, intro: corps, lignes: extras.lignes, bouton: extras.bouton, lien: lien || SITE };
+    const donnees = { prenom: u.prenom, titre: extras.titre || sujet, intro: corps, lignes: extras.lignes, bouton: extras.bouton, lien: lien || SITE };
     try {
       await transport.sendMail({
         from: '"Bohicon Jobs" <' + process.env.GMAIL_USER + ">",
         to: u.email,
-        subject: sujet + " · Bohicon Jobs",
+        subject: extras.sujetMail || (sujet + " · Bohicon Jobs"),
         text: (u.prenom ? "Bonjour " + u.prenom + ",\n\n" : "") + corps + "\n\n" + (lien || SITE),
         html: courrielHtml(donnees)
       });
@@ -246,6 +246,41 @@ for (const d of ms2.docs){
       maj.pushDeclare = true;
     }
   } else if (m.pushDeclare){ maj.pushDeclare = false; }
+  if (Object.keys(maj).length) await d.ref.update(maj);
+}
+
+// ---------- Bienvenue : présentation de Bohicon Jobs aux nouveaux inscrits ----------
+const PRESENTATION = {
+  intro: "Bohicon Jobs est la plateforme gratuite qui met en relation les habitants de Bohicon, Abomey, Covè, Zogbodomey et Djidja pour de petits travaux rémunérés. Voici l'essentiel pour bien démarrer.",
+  lignes: [
+    ["Publier", "décris ta mission et fixe ton prix : notre équipe la vérifie avant de la rendre visible"],
+    ["Trouver", "parcours les missions près de chez toi, propose-toi et suis tes candidatures"],
+    ["En confiance", "missions vérifiées, avis des utilisateurs, contact WhatsApp seulement après confirmation"],
+    ["Astuce", "indique tes domaines et ta formation dans ton profil pour recevoir les missions qui te correspondent"]
+  ]
+};
+const inscrits = await db.collection("users").orderBy("createdAt", "desc").limit(200).get();
+for (const d of inscrits.docs){
+  const u = { id: d.id, ...d.data() };
+  const maj = {};
+  const recent = MAINTENANT - ms(u.createdAt) < 48 * 3600 * 1000;
+  if (!u.mailBienvenue){
+    if (!recent || AMORCAGE || !u.email || u.alertesEmail === false) maj.mailBienvenue = true;
+    else if (transport){
+      const avant = courriels;
+      await courriel([u.id], "Bienvenue sur Bohicon Jobs", PRESENTATION.intro, SITE, {
+        titre: "Bienvenue sur Bohicon Jobs", sujetMail: "Bienvenue sur Bohicon Jobs", bouton: "Découvrir les missions", lignes: PRESENTATION.lignes
+      });
+      if (courriels > avant) maj.mailBienvenue = true;
+    }
+  }
+  if (!u.pushBienvenue){
+    if (!recent || AMORCAGE) maj.pushBienvenue = true;
+    else if ((await jetonsDe([u.id])).length){
+      await envoyer([u.id], "Bienvenue sur Bohicon Jobs", "Publie ou trouve de petits travaux près de chez toi, en toute confiance. Découvre les missions du moment.", SITE);
+      maj.pushBienvenue = true;
+    }
+  }
   if (Object.keys(maj).length) await d.ref.update(maj);
 }
 
