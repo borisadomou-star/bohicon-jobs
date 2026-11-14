@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261113-2210">
-<meta name="build-notes" content="En-tête premium : nouveau design de la barre du haut, du slogan et des informations défilantes.">
+<meta name="build" content="20261113-2235">
+<meta name="build-notes" content="Domaines et formations : alertes de missions ciblées, priorité aux profils formés et barre d'infos plus lisible.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -698,6 +698,31 @@
   .an-fermer svg{width:12px;height:12px}
   @media (prefers-reduced-motion: reduce){.an-ico,.rs-texte{animation:none}}
 
+  /* Domaines, formations et priorité */
+  .c-haut .chip-pour{order:1}
+  .chip-pour{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid #f1d98a;border-radius:999px;background:#fff7dd;color:#7a5600;font-size:.72rem;font-weight:700}
+  .chip-pour svg{width:14px;height:14px;flex:none}
+  .chip-pour.formation{border-color:#bfe3c4;background:#e8f6ea;color:#1b6b2f}
+  .formation-ligne{display:flex;align-items:center;gap:7px;margin:6px 0 2px;padding:7px 10px;border-radius:12px;background:#eef8f2;color:#0d5a33;font-size:.8rem;font-weight:600}
+  .formation-ligne svg{flex:none;width:16px;height:16px}
+  .dom-carte{margin-bottom:14px;padding:14px;border:1px solid #cfe8d9;border-radius:18px;background:linear-gradient(135deg,#f3fbf6,#e8f6ee)}
+  .dom-tete{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .dom-ligne{margin-bottom:8px}
+  .dom-chip{display:block;width:100%;margin:0;padding:11px 14px;border:1.5px solid #dfe9e3;border-radius:14px;background:#fff;color:var(--encre);font-size:.9rem;font-weight:600;text-align:left;box-shadow:none}
+  .dom-chip.on{border-color:var(--vert2);background:linear-gradient(135deg,#f1faf5,#e3f4ea);color:var(--vert-fonce)}
+  .dom-formation{margin:6px 0 0;padding:11px 14px;border:1.5px solid #dfe9e3;border-radius:12px;background:#fff;font-size:.86rem}
+  #dom-enregistrer{margin-top:8px}
+
+  /* Barre d'informations : fond sombre et texte blanc, couleur réservée à l'étiquette */
+  .annonce{--acc:#7db3ff;background:linear-gradient(90deg,#0d131b 0%,#18212d 100%);border-top:2px solid var(--acc);border-bottom:1px solid rgba(255,255,255,.08);color:#fff;font-size:.9rem;font-weight:600;letter-spacing:.01em}
+  .annonce.info{--acc:#7db3ff;background:linear-gradient(90deg,#0d131b 0%,#16212f 100%)}
+  .annonce.important{--acc:#ffb84d;background:linear-gradient(90deg,#1c1309 0%,#2c1d0c 100%)}
+  .annonce.succes{--acc:#5eea9b;background:linear-gradient(90deg,#08150e 0%,#0e2619 100%)}
+  .annonce .an-badge{border-color:transparent;background:var(--acc);color:#0b1220;font-weight:800}
+  .annonce .defile-texte{color:#fff}
+  .annonce .an-lien{background:var(--acc);color:#0b1220}
+  .annonce .an-fermer{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.1)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1042,6 +1067,15 @@
             <span class="pi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>
             <div class="pi-txt"><b>Notifications</b><small id="push-etat">…</small></div>
             <button id="push-bouton" class="mini" type="button">Activer</button>
+          </div>
+          <div class="dom-carte" id="dom-carte">
+            <div class="dom-tete">
+              <span class="pi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.8V16c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2"/><path d="M21.5 9.5v5"/></svg></span>
+              <div class="pi-txt"><b>Domaines et formations</b><small>Choisis tes domaines : tu es prévenu(e) des nouvelles missions correspondantes. Une formation adaptée te donne la priorité.</small></div>
+            </div>
+            <div id="dom-liste"></div>
+            <label class="check"><input type="checkbox" id="dom-alertes"> <span>Recevoir les alertes de missions de mes domaines</span></label>
+            <button id="dom-enregistrer" type="button">Enregistrer mes domaines</button>
           </div>
           <div id="champs-edit"></div>
           <button id="btn-edit" type="button">Enregistrer mes informations</button>
@@ -1954,7 +1988,7 @@
   // ---------- Liste des intéressés (visible par l'auteur) ----------
   function remplirInteresses(m, zone, cpt){
     zone.innerHTML = "";
-    const recues = candidaturesRecues.filter(c => c.missionId === m.id).sort((a, b) => dateMs(a) - dateMs(b));
+    const recues = candidaturesRecues.filter(c => c.missionId === m.id).sort((a, b) => (b.formation ? 1 : 0) - (a.formation ? 1 : 0) || dateMs(a) - dateMs(b));
     if (!recues.length){ zone.textContent = "Personne pour l'instant."; return; }
     const dispo = st(m) === "disponible";
     recues.forEach(c => {
@@ -1968,6 +2002,12 @@
         choisi ? "Choisi(e)" : (c.statut === "refusee" ? "Refusé(e)" : "")
       ].filter(Boolean).join(" · ")));
 
+      if (c.formation){
+        const fl = el("div", "formation-ligne");
+        fl.innerHTML = SVG_DIPLOME;
+        fl.appendChild(document.createTextNode("Formation adaptée : " + c.formation));
+        ligne.appendChild(fl);
+      }
       const prenomC = String(c.nom || "").split(" ")[0];
       if (choisi){
         if (c.confirmee){
@@ -2036,7 +2076,7 @@
       candidats.forEach(c => {
         const l = el("div", "choix-ligne");
         const g = el("div", "choix-txt");
-        g.appendChild(el("b", "", c.nom + (c.profession ? " · " + c.profession : "")));
+        g.appendChild(el("b", "", c.nom + (c.profession ? " · " + c.profession : "") + (c.formation ? " · Formation adaptée" : "")));
         const n = cpt.parTravailleur[c.uid] || 0;
         g.appendChild(el("small", "", [
           n ? pluriel(n, "mission") + " réalisée" + (n > 1 ? "s" : "") : "Aucune mission réalisée",
@@ -2064,7 +2104,7 @@
   // Le candidat retenu tarde à confirmer : l'auteur peut attribuer la mission à un autre candidat
   async function reattribuer(m, cpt){
     const actuel = candidaturesRecues.find(x => x.id === m.id + "_" + m.workerUid);
-    const autres = candidaturesRecues.filter(x => x.missionId === m.id && x.uid !== m.workerUid && x.statut === "en_attente");
+    const autres = candidaturesRecues.filter(x => x.missionId === m.id && x.uid !== m.workerUid && x.statut === "en_attente").sort((a, b) => (b.formation ? 1 : 0) - (a.formation ? 1 : 0));
     if (!autres.length){
       afficherMessage("Aucun autre candidat|Personne d'autre ne s'est proposé pour cette mission. Tu peux la remettre en disponible.", "info");
       return;
@@ -2091,6 +2131,12 @@
   }
 
   // ---------- Carte d'une mission ----------
+  const SVG_DIPLOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.8V16c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2"/><path d="M21.5 9.5v5"/></svg>';
+  const domainesUser = () => (profil && Array.isArray(profil.domaines)) ? profil.domaines : [];
+  const formationPour = cat => (profil && profil.formations && profil.formations[cat]) ? String(profil.formations[cat]) : "";
+  // 2 : formation adaptée · 1 : domaine choisi · 0 : sans lien
+  const scoreMission = m => (user && m.uid !== user.uid) ? (formationPour(m.categorie) ? 2 : (domainesUser().includes(m.categorie) ? 1 : 0)) : 0;
+
   const SVG_MINI = { pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>', cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4"/><path d="M16 3v4"/></svg>', lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>', user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>' };
   const SVG_PARTAGE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5.5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="18.5" r="2.6"/><path d="M8.3 10.7l7.4-3.9"/><path d="M8.3 13.3l7.4 3.9"/></svg>';
   function infoIcone(icone, texte){
@@ -2140,6 +2186,16 @@
       ce.appendChild(document.createTextNode(verifiee ? "Entreprise vérifiée" : "Entreprise"));
       ce.title = verifiee ? "Entreprise vérifiée par l'équipe Bohicon Jobs" : "Mission publiée au nom d'une entreprise";
       haut.appendChild(ce);
+    }
+    if (statut === "disponible"){
+      const sc = scoreMission(m);
+      if (sc){
+        const pt = el("span", "chip-pour" + (sc === 2 ? " formation" : ""));
+        if (sc === 2) pt.innerHTML = SVG_DIPLOME;
+        pt.appendChild(document.createTextNode(sc === 2 ? "Formation adaptée" : "Pour toi"));
+        pt.title = sc === 2 ? "Ta formation correspond à cette mission : tu es prioritaire" : "Cette mission correspond à l'un de tes domaines";
+        haut.appendChild(pt);
+      }
     }
     if (cat) haut.appendChild(el("span", "chip-cat", cat[1] + " " + cat[2]));
     if (statut !== "disponible") haut.appendChild(el("span", "badge b-" + statut, LIBELLES[statut]));
@@ -2348,6 +2404,7 @@
                   missionId: m.id, uid: user.uid, auteurUid: m.uid,
                   nom: nomCourt(profil), profession: profil.profession, tel: profil.tel,
                   titre: m.titre, prix: m.prix, ville: m.ville,
+                  formation: formationPour(m.categorie).slice(0, 100),
                   statut: "en_attente", createdAt: serverTimestamp()
                 });
               } catch (e) {
@@ -2479,6 +2536,7 @@
     if (tri === "urgentes") items = items.slice().sort((a, b) => (b.quand === "urgent") - (a.quand === "urgent"));
     else if (tri === "prix-asc") items = items.slice().sort((a, b) => Number(a.prix || 0) - Number(b.prix || 0));
     else if (tri === "prix-desc") items = items.slice().sort((a, b) => Number(b.prix || 0) - Number(a.prix || 0));
+    else if (tri === "recentes" && user && domainesUser().length) items = items.slice().sort((a, b) => scoreMission(b) - scoreMission(a));
     $("compteur-res").textContent = items.length + " mission" + (items.length > 1 ? "s" : "");
     const filtreActif = q || f || cat || px || typ || tri !== "recentes" || fs !== "disponible";
     $("btn-reset-filtres").classList.toggle("cache", !filtreActif);
@@ -2733,6 +2791,7 @@
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
     ["resume", "histo", "cands", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
     if (t === "profil" && profil) remplir("e-", profil);
+    if (t === "profil"){ domEdition = null; rendreDomaines(); }
     if (t === "publier") majFormPublication();
     const actif = document.querySelector(".onglet.on");
     if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
@@ -3938,6 +3997,53 @@
   new MutationObserver(() => { if (!planifie){ planifie = true; requestAnimationFrame(brancherTous); } })
     .observe(document.body, { childList: true, subtree: true });
   brancherTous();
+
+  // ---------- Domaines et formations ----------
+  let domEdition = null;
+  function rendreDomaines(){
+    const liste = $("dom-liste");
+    liste.innerHTML = "";
+    if (!user || !profil) return;
+    if (!domEdition) domEdition = { sel: new Set(domainesUser()), form: { ...(profil.formations || {}) } };
+    CATEGORIES.filter(c => c[0] !== "autre").forEach(([cle, , libelle]) => {
+      const on = domEdition.sel.has(cle);
+      const ligne = el("div", "dom-ligne" + (on ? " on" : ""));
+      const b = el("button", "dom-chip" + (on ? " on" : ""), libelle);
+      b.type = "button";
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.addEventListener("click", () => { if (on) domEdition.sel.delete(cle); else domEdition.sel.add(cle); rendreDomaines(); });
+      ligne.appendChild(b);
+      if (on){
+        const champ = document.createElement("input");
+        champ.className = "dom-formation";
+        champ.maxLength = 100;
+        champ.placeholder = "Formation ou diplôme (facultatif) : ex. CAP Cuisine";
+        champ.value = domEdition.form[cle] || "";
+        champ.addEventListener("input", () => { domEdition.form[cle] = champ.value; });
+        ligne.appendChild(champ);
+      }
+      liste.appendChild(ligne);
+    });
+    $("dom-alertes").checked = profil.alertes !== false;
+  }
+  $("dom-enregistrer").addEventListener("click", async () => {
+    if (!user || !domEdition) return;
+    const domaines = Array.from(domEdition.sel);
+    const formations = {};
+    domaines.forEach(k => { const t = String(domEdition.form[k] || "").trim().slice(0, 100); if (t) formations[k] = t; });
+    const alertes = $("dom-alertes").checked;
+    try {
+      await updateDoc(doc(db, "users", user.uid), { domaines, formations, alertes });
+      profil = { ...profil, domaines, formations, alertes };
+      domEdition = null;
+      afficherMessage("Domaines enregistrés|Tu seras prévenu(e) des missions qui te correspondent.", "succes");
+      afficher();
+      rendreDomaines();
+    } catch (e) {
+      console.error(e);
+      afficherMessage("Enregistrement impossible. Réessaie.");
+    }
+  });
 
   // ---------- Notifications push ----------
   const VAPID_KEY = "BEv0WvenTvJ_ONNS9B5CBoYlWLys_YyOvoHdVllRaM0aOojBlyGhhgs6zShHnBUAT-9JeQpHK79YQfKNVehsR_Q";

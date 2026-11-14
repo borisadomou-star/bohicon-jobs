@@ -1214,6 +1214,7 @@
       g.appendChild(titre);
       g.appendChild(el("div", "h-sous", [c.profession || cu.profession, cu.ville, cu.role].filter(Boolean).join(" · ")));
       g.appendChild(el("div", "h-sous", "Tél. : " + (c.tel || cu.tel || "—") + " · E-mail : " + (cu.email || "—")));
+      if (c.formation) g.appendChild(el("div", "h-sous", "Formation adaptée : " + c.formation));
       g.appendChild(el("div", "h-sous", "Mission : « " + (c.titre || (m && m.titre) || "—") + " » · " + fcfa(c.prix || (m && m.prix)) + (c.ville ? " · " + c.ville : "")));
       g.appendChild(el("div", "h-sous", "Auteur : " + (nomDe(au) || "—") + (au.tel ? " (" + au.tel + ")" : "") + " · mission " + (m ? LIB_MISSION[st(m)] : "supprimée")));
       const t = ms(c);
