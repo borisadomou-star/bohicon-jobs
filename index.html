@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261114-1731">
-<meta name="build-notes" content="Accueil des nouveaux inscrits : présentation de Bohicon Jobs, notification et e-mail de bienvenue.">
+<meta name="build" content="20261115-0424">
+<meta name="build-notes" content="Données de la plateforme réservées aux utilisateurs connectés.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -741,6 +741,67 @@
   .dlg.pres .dlg-actions{margin-top:14px}
   .dlg.pres > .lien{display:block;width:100%;margin:10px 0 0;font-size:.85rem}
 
+  /* ===== Page d'accès plein écran ===== */
+  body.verrou-acces{overflow:hidden}
+  .ecran-chargement{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;background:radial-gradient(80% 60% at 72% 8%,rgba(252,209,22,.2),rgba(252,209,22,0) 60%),linear-gradient(160deg,#021209 0%,#06311c 55%,#0a5a32 100%);transition:opacity .4s ease,visibility .4s}
+  .ecran-chargement.fini{opacity:0;visibility:hidden;pointer-events:none}
+  .chg-logo{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:26px;background:#fff;color:#0a5a32;font-size:1.9rem;font-weight:800;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);animation:chg-pouls 1.8s ease-in-out infinite}
+  .chg-anneau{position:absolute;width:130px;height:130px;border:2px solid rgba(252,209,22,.3);border-top-color:#fcd116;border-radius:50%;animation:chg-tour 1.1s linear infinite}
+  @keyframes chg-pouls{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  @keyframes chg-tour{to{transform:rotate(360deg)}}
+
+  .ecran-acces{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:#fff}
+  .acces-hero{position:relative;display:flex;flex-direction:column;flex:none;min-height:min(46vh,430px);padding:26px 24px 70px;overflow:hidden;color:#fff;
+    background:radial-gradient(60% 50% at 86% 8%,rgba(252,209,22,.3) 0%,rgba(252,209,22,0) 62%),radial-gradient(70% 60% at 8% 96%,rgba(18,153,90,.5) 0%,rgba(18,153,90,0) 66%),linear-gradient(160deg,#021209 0%,#06311c 42%,#0a5a32 76%,#0f7a45 100%)}
+  .acces-hero::before{content:"";position:absolute;right:-130px;top:-130px;width:420px;height:420px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 60px rgba(255,255,255,.035),0 0 0 130px rgba(255,255,255,.025),0 0 0 210px rgba(255,255,255,.018);pointer-events:none}
+  .acces-hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);pointer-events:none}
+  .acces-reseau{position:absolute;right:-24px;top:34px;z-index:1;width:min(64%,310px);opacity:.75}
+  .nd{animation:nd-pouls 2.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+  .nd.d2{animation-delay:1.2s}
+  @keyframes nd-pouls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.5)}}
+  .acces-orbe{position:absolute;border-radius:50%;filter:blur(42px);pointer-events:none}
+  .acces-orbe.o1{left:-70px;bottom:-60px;width:230px;height:230px;background:rgba(18,153,90,.55);animation:orbe 14s ease-in-out infinite}
+  .acces-orbe.o2{right:8%;top:22%;width:180px;height:180px;background:rgba(252,209,22,.2);animation:orbe 18s ease-in-out infinite reverse}
+  @keyframes orbe{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,-20px)}}
+  .acces-marque{position:relative;z-index:2;display:flex;align-items:center;gap:12px}
+  .acces-logo{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:16px;background:#fff;color:#0a5a32;font-size:1.1rem;font-weight:800;box-shadow:0 16px 30px -14px rgba(0,0,0,.6)}
+  .acces-marque b{font-size:1.35rem;letter-spacing:-.02em;color:#fff}
+  .acces-marque b i{font-style:normal;color:#fcd116}
+  .acces-texte{position:relative;z-index:2;margin-top:auto;padding-top:46px}
+  .acces-sur{display:block;margin-bottom:10px;font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fcd116}
+  .acces-texte h1{margin:0;font-size:clamp(2rem,9vw,2.8rem);font-weight:800;line-height:1.05;letter-spacing:-.03em;color:#fff}
+  .acces-texte h1 em{font-style:normal;background:linear-gradient(90deg,#fcd116,#ffe98a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+  .acces-points{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
+  .acces-points li{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.08);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-size:.76rem;font-weight:600}
+  .acces-points svg{flex:none;width:14px;height:14px;color:#fcd116}
+  .acces-feuille{position:relative;z-index:3;flex:1;margin-top:-34px;padding:28px 22px 28px;border-radius:30px 30px 0 0;background:#fff;box-shadow:0 -24px 50px -26px rgba(2,18,9,.55)}
+  .acces-label{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#12261b}
+  .acces-bouclier{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 10px 18px -10px rgba(11,107,58,.9)}
+  .acces-bouclier svg{width:18px;height:18px}
+  .acces-titre{display:block;margin:0 0 6px;font-size:2rem;font-weight:800;letter-spacing:-.03em;color:#0b1a12}
+  .acces-titre::before{display:none}
+  .acces-sous{margin:0 0 22px;font-size:.9rem;line-height:1.55;color:#7b8a82}
+  #ecran-acces .champ input,#ecran-acces .champ select{background-color:#f8faf9}
+  #ecran-acces #btn-reset{display:block;width:auto;margin:6px 0 18px auto;padding:4px 0;color:#12261b;font-size:.88rem;font-weight:700}
+  #ecran-acces #btn-connexion,#ecran-acces #btn-inscription{padding:17px 18px;border-radius:16px;font-size:1.02rem}
+  #ecran-acces #btn-vers-inscription{border-radius:16px}
+  .acces-pied{margin:22px 0 0;font-size:.74rem;text-align:center;color:#8a988f}
+  .acces-pied a{color:var(--vert);font-weight:600}
+  .ecran-acces.mode-inscription .acces-hero{min-height:230px;padding-bottom:62px}
+  .ecran-acces.mode-inscription .acces-points{display:none}
+  .ecran-acces.mode-inscription .acces-texte{padding-top:26px}
+  .ecran-acces.mode-inscription .acces-texte h1{font-size:1.6rem}
+  @media (min-width:900px){
+    .ecran-acces{display:grid;grid-template-columns:1.15fr 1fr;overflow:hidden}
+    .acces-hero{min-height:100vh;padding:44px 56px}
+    .acces-texte h1{font-size:3.4rem}
+    .acces-feuille{display:block;margin:0;padding:52px 56px;border-radius:0;box-shadow:none;overflow-y:auto}
+    .ecran-acces.mode-inscription .acces-hero{min-height:100vh}
+    .ecran-acces.mode-inscription .acces-points{display:flex}
+    .ecran-acces.mode-inscription .acces-texte h1{font-size:2.4rem}
+  }
+  @media (prefers-reduced-motion: reduce){.chg-logo,.chg-anneau,.nd,.acces-orbe{animation:none}}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -913,6 +974,69 @@
   <p><a id="lien-admin" class="cache" href="admin.html">⚙️ Administration</a></p>
 </footer>
 
+<div id="ecran-chargement" class="ecran-chargement" aria-hidden="true">
+  <div class="chg-anneau"></div>
+  <div class="chg-logo">BJ</div>
+</div>
+
+<div id="ecran-acces" class="ecran-acces cache" role="main" aria-label="Accès à Bohicon Jobs">
+  <section class="acces-hero">
+    <svg class="acces-reseau" viewBox="0 0 300 260" fill="none" aria-hidden="true">
+      <g stroke="rgba(255,255,255,.28)" stroke-width="1">
+        <path d="M40 60L120 30L210 70L260 140L190 200L100 170L40 60Z"/>
+        <path d="M120 30L100 170"/><path d="M210 70L190 200"/><path d="M40 60L190 200"/><path d="M120 30L260 140"/>
+      </g>
+      <g fill="#ffffff"><circle cx="40" cy="60" r="3.5"/><circle cx="120" cy="30" r="3"/><circle cx="260" cy="140" r="3.5"/><circle cx="100" cy="170" r="3"/></g>
+      <g stroke="rgba(252,209,22,.4)"><circle cx="210" cy="70" r="14"/><circle cx="190" cy="200" r="12"/></g>
+      <g fill="#fcd116"><circle class="nd" cx="210" cy="70" r="5"/><circle class="nd d2" cx="190" cy="200" r="4"/></g>
+    </svg>
+    <i class="acces-orbe o1"></i><i class="acces-orbe o2"></i>
+    <div class="acces-marque"><span class="acces-logo">BJ</span><b>Bohicon <i>Jobs</i></b></div>
+    <div class="acces-texte">
+      <span class="acces-sur">Plateforme d'opportunités</span>
+      <h1>Les opportunités.<br><em>À portée de main.</em></h1>
+      <ul class="acces-points">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Inscription gratuite</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Missions vérifiées</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Près de chez toi</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="acces-feuille">
+    <div id="bloc-connexion">
+      <div class="acces-label"><span class="acces-bouclier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Accès sécurisé</div>
+      <h2 class="acces-titre">Connexion</h2>
+      <p class="acces-sous">Renseigne tes identifiants pour accéder à ton espace Bohicon Jobs.</p>
+      <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
+      <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
+      <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
+      <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+      <button id="btn-connexion">Se connecter</button>
+      <div class="ou"><span>ou</span></div>
+      <button id="btn-vers-inscription" class="sec">Créer un compte gratuit</button>
+    </div>
+
+    <div id="bloc-inscription" class="cache">
+      <div class="acces-label"><span class="acces-bouclier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Inscription gratuite</div>
+      <h2 class="acces-titre">Créer un compte</h2>
+      <p class="acces-sous">Rejoins la communauté Bohicon Jobs en deux minutes.</p>
+      <div class="sect">
+        <div class="sect-titre"><span class="sect-num">1</span>Accès au compte</div>
+        <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="i-email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
+        <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="i-mdp" type="password" placeholder="6 caractères minimum" autocomplete="new-password"></label>
+        <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
+      </div>
+      <div id="champs-inscription"></div>
+      <button id="btn-inscription">Créer mon compte</button>
+      <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.5h.01"/></svg>Tes informations sont protégées. Ton adresse n'est jamais montrée aux autres.</p>
+      <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
+    </div>
+
+    <p class="acces-pied">En continuant, tu acceptes les <a href="confidentialite.html" target="_blank" rel="noopener">conditions d'utilisation</a>.</p>
+  </section>
+</div>
+
 <nav class="nav-bas" aria-label="Navigation principale">
   <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.4L12 4.8l6.5 5.6V19a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg></span>Accueil</button>
   <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="currentColor" fill-opacity=".2" stroke="none"/><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>Missions</button>
@@ -951,40 +1075,6 @@
       <button id="btn-fermer-espace" class="btn-accueil" type="button">← Retour à l'accueil</button>
     </div>
     <div id="espace">
-
-      <!-- Connexion -->
-      <div class="card form-carte" id="bloc-connexion">
-        <div class="form-tete">
-          <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span>
-          <div><h2>Bon retour parmi nous</h2><p>Connecte-toi pour publier des missions ou te proposer.</p></div>
-        </div>
-        <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
-        <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
-        <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
-        <button id="btn-connexion">Se connecter</button>
-        <div class="ou"><span>ou</span></div>
-        <button id="btn-vers-inscription" class="sec">Créer un compte gratuit</button>
-        <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
-        <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Connexion sécurisée par Google Firebase</p>
-      </div>
-
-      <!-- Inscription -->
-      <div class="card form-carte cache" id="bloc-inscription">
-        <div class="form-tete">
-          <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M2.5 20c0-4 3.5-6 7.5-6"/><path d="M18 8v6"/><path d="M15 11h6"/></svg></span>
-          <div><h2>Crée ton compte</h2><p>Gratuit, en 2 minutes. Rejoins la communauté Bohicon Jobs.</p></div>
-        </div>
-        <div class="sect">
-          <div class="sect-titre"><span class="sect-num">1</span>Accès au compte</div>
-          <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="i-email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
-          <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="i-mdp" type="password" placeholder="6 caractères minimum" autocomplete="new-password"></label>
-          <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
-        </div>
-        <div id="champs-inscription"></div>
-        <button id="btn-inscription">Créer mon compte</button>
-        <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Tes informations sont protégées. Ton adresse n'est jamais montrée aux autres.</p>
-        <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
-      </div>
 
       <!-- Profil à compléter -->
       <div class="card cache" id="bloc-profil">
@@ -1990,6 +2080,9 @@
   function majUI(){
     const connecte = !!user;
     const complet = profilOk();
+    $("ecran-acces").classList.toggle("cache", connecte);
+    $("ecran-acces").classList.toggle("mode-inscription", vueInscription);
+    document.body.classList.toggle("verrou-acces", !connecte);
     $("bloc-connexion").classList.toggle("cache", connecte || vueInscription);
     $("bloc-inscription").classList.toggle("cache", connecte || !vueInscription);
     $("bloc-profil").classList.toggle("cache", !(connecte && !complet && !enInscription));
@@ -2584,9 +2677,21 @@
     }
   }
 
+  // Données de la plateforme : lues seulement par un utilisateur connecté
+  const demarragesPublics = [];
+  let arretsPublics = [];
+  function demarrerDonneesPubliques(){
+    if (arretsPublics.length) return;
+    demarragesPublics.forEach(f => arretsPublics.push(f()));
+  }
+  function arreterDonneesPubliques(){
+    arretsPublics.forEach(f => { try { f(); } catch (e) { /* ignoré */ } });
+    arretsPublics = [];
+  }
+
   // ---------- Missions en temps réel ----------
   const q = query(missionsRef, orderBy("createdAt", "desc"), limit(200));
-  onSnapshot(q, snap => {
+  demarragesPublics.push(() => onSnapshot(q, snap => {
     missions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     charges.missions = true;
     afficher();
@@ -2596,12 +2701,14 @@
     console.error(err);
     afficherMessage("Impossible de charger les missions. Vérifie ta connexion et réessaie.");
     $("liste").innerHTML = "";
-  });
+  }));
 
   // ---------- Authentification ----------
   onAuthStateChanged(auth, async u => {
     user = u;
     profil = null;
+    if (u) demarrerDonneesPubliques();
+    else { arreterDonneesPubliques(); missions = []; }
     if (u && !enInscription){
       try {
         const s = await getDoc(doc(db, "users", u.uid));
@@ -2622,8 +2729,10 @@
       } catch (e) { /* pas administrateur */ }
     }
     majUI();
+    $("ecran-chargement").classList.add("fini");
     if (u && !enInscription && !profilOk()) ouvrirEspace();
     if (u && !enInscription && profilOk()) planifierBienvenue();
+    if (u && /mission=/.test(location.hash)) setTimeout(ouvrirLienDirect, 1800);
     if (LIEN_DIRECT && !lienDirectFait){
       lienDirectFait = true;
       if (!u){
@@ -2636,6 +2745,10 @@
 
   $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
   $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
+  setTimeout(() => $("ecran-chargement").classList.add("fini"), 5000);
+  $("email").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("mdp").focus(); } });
+  $("mdp").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("btn-connexion").click(); } });
+  $("ecran-acces").addEventListener("click", e => { if (e.target.closest("#btn-vers-inscription, #btn-vers-connexion")) $("ecran-acces").scrollTo({ top: 0 }); });
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
@@ -2699,6 +2812,9 @@
     try { const j = localStorage.getItem("bj_push_jeton"); if (j && user) await deleteDoc(doc(db, "pushTokens", j)); } catch (e) { /* ignoré */ }
     try { localStorage.removeItem("bj_push_jeton"); } catch (e) { /* ignoré */ }
     await signOut(auth);
+    fermerEspace(true);
+    fermerPro(true);
+    window.scrollTo(0, 0);
     afficherMessage("Déconnexion réussie|À bientôt ! Les alertes sont suspendues sur cet appareil jusqu'à ta prochaine connexion.", "info");
   };
   $("btn-deconnexion").addEventListener("click", deconnecter);
@@ -2817,6 +2933,7 @@
   }
 
   function ouvrirEspace(onglet){
+    if (!user) return;
     if (proOuvert) fermerPro(true);
     const v = $("vue-espace");
     v.style.top = document.querySelector(".topbar").offsetHeight + "px";
@@ -4393,7 +4510,7 @@
     }
   }
 
-  onSnapshot(query(collection(db, "bannieres"), limit(30)), snap => {
+  demarragesPublics.push(() => onSnapshot(query(collection(db, "bannieres"), limit(30)), snap => {
     bannieresDB = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     bannieresChargees = true;
     construireSlider(bannieresActives());
@@ -4401,7 +4518,7 @@
     console.error(err);
     bannieresChargees = true;
     construireSlider(BANNIERES_DEFAUT);
-  });
+  }));
   setTimeout(() => { if (!bannieresChargees) construireSlider(BANNIERES_DEFAUT); }, 3000);
 
   // ---------- Annonce en haut du site (publiée depuis l'espace administrateur) ----------
@@ -4444,14 +4561,14 @@
     });
     z.appendChild(x);
   }
-  onSnapshot(doc(db, "config", "annonce"), s => { annonceDB = s.exists() ? s.data() : null; afficherAnnonce(); }, err => console.error(err));
+  demarragesPublics.push(() => onSnapshot(doc(db, "config", "annonce"), s => { annonceDB = s.exists() ? s.data() : null; afficherAnnonce(); }, err => console.error(err)));
 
   // Entreprises dont le badge « vérifiée » a été accordé par l'administrateur
-  onSnapshot(query(collection(db, "entreprises"), where("verifiee", "==", true), limit(300)), snap => {
+  demarragesPublics.push(() => onSnapshot(query(collection(db, "entreprises"), where("verifiee", "==", true), limit(300)), snap => {
     entreprisesVerifiees = new Set(snap.docs.map(d => d.id));
     afficher();
     if (proOuvert && !proSaisie) rendrePro();
-  }, err => console.error(err));
+  }, err => console.error(err)));
 </script>
 </body>
 </html>
