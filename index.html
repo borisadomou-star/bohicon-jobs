@@ -2795,7 +2795,6 @@
   $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
   $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
   setTimeout(() => $("ecran-chargement").classList.add("fini"), 5000);
-  $("form-connexion").addEventListener("submit", e => e.preventDefault());
   $("form-inscription").addEventListener("submit", e => e.preventDefault());
   if (lireEmailMemorise()) $("email").value = lireEmailMemorise();
   if (navigator.credentials && window.PasswordCredential) $("btn-compte-enregistre").classList.remove("cache");
@@ -2807,17 +2806,40 @@
   });
   $("ecran-acces").addEventListener("click", e => { if (e.target.closest("#btn-vers-inscription, #btn-vers-connexion")) $("ecran-acces").scrollTo({ top: 0 }); });
 
-  $("btn-connexion").addEventListener("click", async () => {
+  $("form-connexion").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btn = $("btn-connexion");
+    if (btn.disabled) return;
+
+    const adresse = $("email").value.trim();
+    const secret = $("mdp").value;
     afficherMessage("");
+
+    if (!adresse || !secret) {
+      afficherMessage("Veuillez renseigner votre adresse e-mail et votre mot de passe.");
+      return;
+    }
+
+    const ancienTexte = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Connexion en cours…";
     bienvenue = "connexion";
-    noterActivite();
+
     try {
-      const adresse = $("email").value.trim(), secret = $("mdp").value;
+      noterActivite();
       await signInWithEmailAndPassword(auth, adresse, secret);
       try { localStorage.setItem("bj_email", adresse); } catch (e) { /* ignoré */ }
       proposerEnregistrement(adresse, secret);
       $("mdp").value = "";
-    } catch (e) { bienvenue = null; console.error(e); afficherMessage(texteErreurAuth(e)); }
+    } catch (e) {
+      bienvenue = null;
+      console.error("Erreur de connexion Bohicon Jobs :", e);
+      afficherMessage(texteErreurAuth(e));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = ancienTexte;
+    }
   });
 
   $("btn-inscription").addEventListener("click", async () => {
