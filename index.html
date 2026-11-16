@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261115-0424">
-<meta name="build-notes" content="Données de la plateforme réservées aux utilisateurs connectés.">
+<meta name="build" content="20261116-0853">
+<meta name="build-notes" content="Correction : le site se charge de nouveau correctement.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -802,6 +802,47 @@
   }
   @media (prefers-reduced-motion: reduce){.chg-logo,.chg-anneau,.nd,.acces-orbe{animation:none}}
 
+  /* ===== Centre de notifications ===== */
+  .cloche svg{width:22px;height:22px}
+  .fond-notifs{position:fixed;inset:0;z-index:118;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  #panneau-notifs{position:fixed;top:auto;right:0;bottom:0;left:0;z-index:119;display:flex;flex-direction:column;width:min(100%,560px);max-height:86vh;margin:0 auto;padding:10px 0 0;overflow:hidden;border-radius:26px 26px 0 0;background:#fff;box-shadow:0 -24px 60px -20px rgba(6,30,19,.6);animation:sh-monte .26s cubic-bezier(.2,.9,.3,1.05) both}
+  @media (min-width:721px){#panneau-notifs{bottom:24px;border-radius:26px}}
+  .nt-poignee{align-self:center;flex:none;width:44px;height:5px;margin:2px 0 8px;border-radius:999px;background:#dfe7e2}
+  .nt-tete{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;padding:4px 18px 6px}
+  .nt-titre{display:flex;align-items:center;gap:10px;margin:0;font-size:1.2rem;letter-spacing:-.01em}
+  .nt-titre::before{display:none}
+  .nt-compte{padding:3px 10px;border-radius:999px;background:#fdecea;color:#b3261e;font-size:.7rem;font-weight:700;letter-spacing:0}
+  .nt-fermer{display:flex;align-items:center;justify-content:center;width:34px;height:34px;margin:0;padding:0;border:0;border-radius:50%;background:#eef3f0;color:#52645a;box-shadow:none}
+  .nt-fermer svg{width:16px;height:16px}
+  .nt-barre{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;padding:6px 18px 10px}
+  .nt-onglets{display:flex;gap:4px;padding:4px;border-radius:999px;background:#eef3f0}
+  .nt-onglet{width:auto;margin:0;padding:8px 14px;border-radius:999px;background:transparent;color:#5f7468;font-size:.8rem;font-weight:600;white-space:nowrap;box-shadow:none}
+  .nt-onglet.on{background:#fff;color:var(--vert-fonce);box-shadow:0 6px 14px -8px rgba(8,69,42,.6)}
+  .nt-tout{width:auto;margin:0;padding:6px 4px;background:none;color:var(--vert);font-size:.8rem;font-weight:700;box-shadow:none}
+  .nt-liste{flex:1;min-height:0;padding:0 14px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain}
+  .nt-jour{margin:12px 6px 6px;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a988f}
+  .nt-item{position:relative;display:flex;align-items:flex-start;gap:12px;width:100%;margin:0 0 8px;padding:13px 14px;border:1px solid #edf1ee;border-radius:18px;background:#f7f9f8;color:#6b7c72;text-align:left;box-shadow:none;transition:transform .12s ease}
+  .nt-item:active{transform:scale(.985)}
+  .nt-item.nonlu{border-color:#cfe8d9;background:#f1faf5;color:var(--encre);box-shadow:inset 4px 0 0 var(--vert2)}
+  .nt-ico{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:13px;background:#e7f5ed;color:#0f7a45}
+  .nt-ico svg{width:21px;height:21px}
+  .ton-info .nt-ico{background:#e6eefc;color:#1a4fa0}
+  .ton-alerte .nt-ico{background:#fff3dc;color:#8f5a00}
+  .ton-danger .nt-ico{background:#fdecea;color:#a12a20}
+  .nt-item.lu .nt-ico{opacity:.7}
+  .nt-corps{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .nt-corps b{font-size:.92rem;font-weight:600;line-height:1.3;color:#33463b}
+  .nt-item.nonlu .nt-corps b{font-weight:800;color:var(--encre)}
+  .nt-texte{font-size:.83rem;line-height:1.45}
+  .nt-corps small{margin-top:3px;font-size:.72rem;font-weight:600;color:#8a988f}
+  .nt-item.nonlu .nt-corps small{color:var(--vert)}
+  .nt-point{flex:none;width:10px;height:10px;margin-top:6px;border-radius:50%;background:#e0352b;box-shadow:0 0 0 4px rgba(224,53,43,.15)}
+  .nt-chevron{flex:none;margin-top:8px;color:#b4c0b9}
+  .nt-chevron svg{width:16px;height:16px}
+  .nt-vide{display:flex;flex-direction:column;align-items:center;gap:4px;padding:36px 20px;text-align:center}
+  .nt-vide b{font-size:1rem;color:var(--encre)}
+  .nt-vide span{font-size:.84rem;color:var(--gris)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -872,12 +913,13 @@
   <a class="marque" href="#haut"><span class="logo">BJ</span><span class="marque-texte"><b>Bohicon <i>Jobs</i></b></span></a>
   <button class="btn-pro" id="btn-pro" type="button" aria-label="Espace entreprises"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2"/><path d="M8 12h2"/><path d="M8 16h2"/><path d="M3 21h18"/></svg><span>Entreprises</span></button>
   <div class="droite">
-    <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications">🔔<span class="pastille cache" id="cloche-n">0</span></button>
+    <button class="cloche cache" id="btn-cloche" type="button" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="pastille cache" id="cloche-n">0</span></button>
     <button class="btn-espace" id="btn-mon-espace" type="button">👤 Mon espace</button>
   </div>
 </div>
 
 <div id="message" class="message-flottant" role="status" aria-live="polite"></div>
+<div id="fond-notifs" class="fond-notifs cache"></div>
 <div id="panneau-notifs" class="panneau cache" role="dialog" aria-label="Notifications"></div>
 <div id="toast" class="toast cache" role="status" aria-live="polite"></div>
 
@@ -1008,27 +1050,32 @@
       <div class="acces-label"><span class="acces-bouclier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Accès sécurisé</div>
       <h2 class="acces-titre">Connexion</h2>
       <p class="acces-sous">Renseigne tes identifiants pour accéder à ton espace Bohicon Jobs.</p>
-      <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
-      <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
-      <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
-      <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
-      <button id="btn-connexion">Se connecter</button>
+      <form id="form-connexion" autocomplete="on" novalidate>
+        <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" name="email" type="email" placeholder="exemple@gmail.com" autocomplete="username" inputmode="email"></label>
+        <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" name="password" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
+        <label class="check"><input type="checkbox" id="voir-mdp"> <span>Afficher le mot de passe</span></label>
+        <button id="btn-reset" class="lien" type="button">Mot de passe oublié ?</button>
+        <button id="btn-connexion" type="submit">Se connecter</button>
+      </form>
+      <button id="btn-compte-enregistre" class="sec cache" type="button">Se connecter avec un compte enregistré</button>
       <div class="ou"><span>ou</span></div>
-      <button id="btn-vers-inscription" class="sec">Créer un compte gratuit</button>
+      <button id="btn-vers-inscription" class="sec" type="button">Créer un compte gratuit</button>
     </div>
 
     <div id="bloc-inscription" class="cache">
       <div class="acces-label"><span class="acces-bouclier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Inscription gratuite</div>
       <h2 class="acces-titre">Créer un compte</h2>
       <p class="acces-sous">Rejoins la communauté Bohicon Jobs en deux minutes.</p>
-      <div class="sect">
-        <div class="sect-titre"><span class="sect-num">1</span>Accès au compte</div>
-        <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="i-email" type="email" placeholder="exemple@gmail.com" autocomplete="email"></label>
-        <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="i-mdp" type="password" placeholder="6 caractères minimum" autocomplete="new-password"></label>
-        <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
-      </div>
-      <div id="champs-inscription"></div>
-      <button id="btn-inscription">Créer mon compte</button>
+      <form id="form-inscription" autocomplete="on" novalidate>
+        <div class="sect">
+          <div class="sect-titre"><span class="sect-num">1</span>Accès au compte</div>
+          <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="i-email" name="email" type="email" placeholder="exemple@gmail.com" autocomplete="username" inputmode="email"></label>
+          <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="i-mdp" name="password" type="password" placeholder="6 caractères minimum" autocomplete="new-password"></label>
+          <label class="check"><input type="checkbox" id="voir-i-mdp"> <span>Afficher le mot de passe</span></label>
+        </div>
+        <div id="champs-inscription"></div>
+        <button id="btn-inscription" type="submit">Créer mon compte</button>
+      </form>
       <p class="form-garantie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.5h.01"/></svg>Tes informations sont protégées. Ton adresse n'est jamais montrée aux autres.</p>
       <button id="btn-vers-connexion" class="lien" type="button">J'ai déjà un compte</button>
     </div>
@@ -2705,6 +2752,8 @@
 
   // ---------- Authentification ----------
   onAuthStateChanged(auth, async u => {
+    if (u && connexionPerimee()){ signOut(auth).catch(() => {}); return; }
+    if (u) noterActivite();
     user = u;
     profil = null;
     if (u) demarrerDonneesPubliques();
@@ -2746,15 +2795,27 @@
   $("btn-vers-inscription").addEventListener("click", () => { afficherMessage(""); vueInscription = true; majUI(); });
   $("btn-vers-connexion").addEventListener("click", () => { afficherMessage(""); vueInscription = false; majUI(); });
   setTimeout(() => $("ecran-chargement").classList.add("fini"), 5000);
-  $("email").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("mdp").focus(); } });
-  $("mdp").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); $("btn-connexion").click(); } });
+  $("form-connexion").addEventListener("submit", e => e.preventDefault());
+  $("form-inscription").addEventListener("submit", e => e.preventDefault());
+  if (lireEmailMemorise()) $("email").value = lireEmailMemorise();
+  if (navigator.credentials && window.PasswordCredential) $("btn-compte-enregistre").classList.remove("cache");
+  $("btn-compte-enregistre").addEventListener("click", async () => {
+    try {
+      const c = await navigator.credentials.get({ password: true, mediation: "required" });
+      if (c && c.id && c.password){ $("email").value = c.id; $("mdp").value = c.password; $("btn-connexion").click(); }
+    } catch (e) { /* choix annulé */ }
+  });
   $("ecran-acces").addEventListener("click", e => { if (e.target.closest("#btn-vers-inscription, #btn-vers-connexion")) $("ecran-acces").scrollTo({ top: 0 }); });
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
     bienvenue = "connexion";
+    noterActivite();
     try {
-      await signInWithEmailAndPassword(auth, $("email").value.trim(), $("mdp").value);
+      const adresse = $("email").value.trim(), secret = $("mdp").value;
+      await signInWithEmailAndPassword(auth, adresse, secret);
+      try { localStorage.setItem("bj_email", adresse); } catch (e) { /* ignoré */ }
+      proposerEnregistrement(adresse, secret);
       $("mdp").value = "";
     } catch (e) { bienvenue = null; console.error(e); afficherMessage(texteErreurAuth(e)); }
   });
@@ -2767,7 +2828,11 @@
     btn.disabled = true; btn.textContent = "Création du compte…";
     enInscription = true;
     try {
-      const cred = await createUserWithEmailAndPassword(auth, $("i-email").value.trim(), $("i-mdp").value);
+      noterActivite();
+      const adresseI = $("i-email").value.trim(), secretI = $("i-mdp").value;
+      const cred = await createUserWithEmailAndPassword(auth, adresseI, secretI);
+      try { localStorage.setItem("bj_email", adresseI); } catch (e) { /* ignoré */ }
+      proposerEnregistrement(adresseI, secretI);
       await setDoc(doc(db, "users", cred.user.uid), { ...data, email: cred.user.email, createdAt: serverTimestamp(), ...(codeParrain() ? { ref: codeParrain() } : {}) });
       profil = { ...data, createdAt: { toMillis: () => Date.now() } };
       $("i-mdp").value = "";
@@ -2812,6 +2877,7 @@
     try { const j = localStorage.getItem("bj_push_jeton"); if (j && user) await deleteDoc(doc(db, "pushTokens", j)); } catch (e) { /* ignoré */ }
     try { localStorage.removeItem("bj_push_jeton"); } catch (e) { /* ignoré */ }
     await signOut(auth);
+    $("mdp").value = "";
     fermerEspace(true);
     fermerPro(true);
     window.scrollTo(0, 0);
@@ -3004,59 +3070,82 @@
   function sauverVues(){
     try { localStorage.setItem(cleStockage(), JSON.stringify([...vues])); } catch (e) { /* stockage indisponible */ }
   }
+  // Heure à laquelle chaque notification est arrivée sur cet appareil (pour l'ordre d'arrivée)
+  let arrivees = {};
+  const cleArrivees = () => "bj_arr_" + (user ? user.uid : "");
+  function chargerArrivees(){
+    try { arrivees = JSON.parse(localStorage.getItem(cleArrivees()) || "{}") || {}; } catch (e) { arrivees = {}; }
+  }
+  function sauverArrivees(){
+    try { localStorage.setItem(cleArrivees(), JSON.stringify(arrivees)); } catch (e) { /* stockage indisponible */ }
+  }
 
+  // Chaque notification : titre, détail, icône, ton et destination (le menu concerné)
+  const ICONES_NOTIF = { recu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M2.5 20c0-4 3.5-6 7.5-6"/><path d="M18 8v6"/><path d="M15 11h6"/></svg>', ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>', non: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6"/><path d="M15 9l-6 6"/></svg>', attente: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>', etoile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z"/></svg>', fin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 5h12l-2 4 2 4H5"/></svg>', valide: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>', bienvenue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg>' };
   function calculerNotifs(){
     if (!user || !profilOk()) return [];
     const liste = [];
     const cree = profil && profil.createdAt && typeof profil.createdAt.toMillis === "function" ? profil.createdAt.toMillis() : 0;
     if (cree && Date.now() - cree < 7 * 24 * 3600 * 1000){
-      liste.push({ cle: "bienvenue", ms: cree, type: "moi",
-        texte: "Bienvenue sur Bohicon Jobs ! Publie ou trouve de petits travaux près de chez toi : parcours les missions, propose-toi et suis tes candidatures dans Mon espace." });
+      liste.push({ cle: "bienvenue", ms: cree, ico: "bienvenue", ton: "succes", titre: "Bienvenue sur Bohicon Jobs",
+        texte: "Publie ou trouve de petits travaux près de chez toi : parcours les missions, propose-toi et suis tes candidatures dans ton espace.",
+        nav: { k: "missions" } });
     }
     const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
     candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).forEach(c => liste.push({
-      cle: "recu:" + c.id, ms: dateMs(c), type: "recu", missionId: c.missionId,
-      texte: "🙋 Nouveau candidat pour « " + c.titre + " » : " + c.nom + (c.profession ? " (" + c.profession + ")" : "")
+      cle: "recu:" + c.id, ms: dateMs(c), ico: "recu", ton: "info", titre: "Nouveau candidat",
+      texte: c.nom + (c.profession ? " (" + c.profession + ")" : "") + " s'est proposé(e) pour « " + c.titre + " ».",
+      nav: { k: "recu", id: c.missionId }
     }));
     mesCandidatures.forEach(c => {
       const e = etatCandidature(c);
-      if (e.startsWith("Retenue")) liste.push({ cle: "ret:" + c.id, ms: 0, type: "carte", missionId: c.missionId, texte: c.confirmee ? "✅ Mission « " + c.titre + " » confirmée : tu peux écrire à l'auteur sur WhatsApp." : "🎉 Tu as été choisi(e) pour « " + c.titre + " » : confirme la mission pour pouvoir échanger sur WhatsApp." });
-      else if (e === "Refusée") liste.push({ cle: "ref:" + c.id, ms: 0, type: "moi", texte: "❌ Ta candidature pour « " + c.titre + " » n'a pas été retenue" });
-      else if (e === "Non retenue") liste.push({ cle: "non:" + c.id, ms: 0, type: "moi", texte: "La mission « " + c.titre + " » a été attribuée à quelqu'un d'autre" });
+      if (e.startsWith("Retenue")) liste.push(c.confirmee
+        ? { cle: "ret:" + c.id, ms: 0, ico: "ok", ton: "succes", titre: "Mission confirmée", texte: "Tu as confirmé « " + c.titre + " » : tu peux écrire à l'auteur sur WhatsApp.", nav: { k: "espace", onglet: "cands", filtre: "retenues" } }
+        : { cle: "ret:" + c.id, ms: 0, ico: "ok", ton: "succes", titre: "Tu as été retenu(e)", texte: "Confirme la mission « " + c.titre + " » pour pouvoir échanger sur WhatsApp.", nav: { k: "espace", onglet: "cands", filtre: "retenues" } });
+      else if (e === "Refusée") liste.push({ cle: "ref:" + c.id, ms: 0, ico: "non", ton: "danger", titre: "Candidature non retenue", texte: "Ta candidature pour « " + c.titre + " » n'a pas été retenue.", nav: { k: "espace", onglet: "cands", filtre: "closes" } });
+      else if (e === "Non retenue") liste.push({ cle: "non:" + c.id, ms: 0, ico: "non", ton: "alerte", titre: "Mission attribuée", texte: "« " + c.titre + " » a été attribuée à une autre personne.", nav: { k: "espace", onglet: "cands", filtre: "closes" } });
     });
     mesRealisees.filter(m => m.uid !== user.uid && st(m) === "terminee").forEach(m => liste.push({
-      cle: "fin:" + m.id, ms: dateMs(m), type: "moi",
-      texte: "✔️ La mission « " + m.titre + " » est terminée : +10 points et " + fcfa(m.prix) + " de gains indicatifs."
+      cle: "fin:" + m.id, ms: dateMs(m), ico: "fin", ton: "succes", titre: "Mission terminée",
+      texte: "« " + m.titre + " » est terminée : +10 points et " + fcfa(m.prix) + " de gains indicatifs.",
+      nav: { k: "espace", onglet: "histo", histo: "realisee" }
     }));
     mesPubliees.filter(m => st(m) === "a_confirmer" && m.declarePar === "travailleur").forEach(m => liste.push({
-      cle: "conf:" + m.id + ":t", ms: 0, type: "carte", missionId: m.id,
-      texte: "⏳ " + (m.workerNom || "Le travailleur") + " déclare avoir terminé « " + m.titre + " » : confirme la fin de la mission."
+      cle: "conf:" + m.id + ":t", ms: 0, ico: "attente", ton: "alerte", titre: "Fin de mission à confirmer",
+      texte: (m.workerNom || "Le travailleur") + " déclare avoir terminé « " + m.titre + " ». Confirme la fin de la mission.",
+      nav: { k: "carte", id: m.id }
     }));
     mesRealisees.filter(m => m.uid !== user.uid && st(m) === "a_confirmer" && m.declarePar === "auteur").forEach(m => liste.push({
-      cle: "conf:" + m.id + ":a", ms: 0, type: "carte", missionId: m.id,
-      texte: "⏳ " + (m.auteur || "L'auteur") + " déclare « " + m.titre + " » terminée : confirme-la."
+      cle: "conf:" + m.id + ":a", ms: 0, ico: "attente", ton: "alerte", titre: "Fin de mission à confirmer",
+      texte: (m.auteur || "L'auteur") + " déclare « " + m.titre + " » terminée. Confirme-la à ton tour.",
+      nav: { k: "carte", id: m.id }
     }));
     avisTous.filter(a => a.pour === user.uid).forEach(a => liste.push({
-      cle: "avis:" + a.id, ms: dateMs(a), type: "histo",
-      texte: "⭐ " + (a.deNom || "Quelqu'un") + " t'a laissé un avis (" + a.note + "/5) pour « " + a.titre + " »"
+      cle: "avis:" + a.id, ms: dateMs(a), ico: "etoile", ton: "info", titre: "Nouvel avis reçu",
+      texte: (a.deNom || "Quelqu'un") + " t'a laissé un avis (" + a.note + "/5) pour « " + a.titre + " ».",
+      nav: { k: "espace", onglet: "resume" }
     }));
     mesPubliees.concat(mesRealisees.filter(m => m.uid !== user.uid)).forEach(m => {
       const cible = cibleAvis(m);
-      if (cible) liste.push({ cle: "noter:" + m.id, ms: dateMs(m), type: "histo", texte: "⭐ Mission terminée : laisse un avis à " + cible.nom + "." });
+      if (cible) liste.push({ cle: "noter:" + m.id, ms: dateMs(m), ico: "etoile", ton: "alerte", titre: "Donne ton avis",
+        texte: "Mission terminée : laisse un avis à " + cible.nom + ".", nav: { k: "espace", onglet: "histo", histo: "tout" } });
     });
     candidaturesRecues.filter(c => c.confirmee && c.statut === "acceptee").forEach(c => liste.push({
-      cle: "conf2:" + c.id, ms: 0, type: "carte", missionId: c.missionId,
-      texte: "✅ " + c.nom + " a confirmé la mission « " + c.titre + " » : vous pouvez vous écrire sur WhatsApp."
+      cle: "conf2:" + c.id, ms: 0, ico: "ok", ton: "succes", titre: "Candidat confirmé",
+      texte: c.nom + " a confirmé « " + c.titre + " » : vous pouvez vous écrire sur WhatsApp.",
+      nav: { k: "carte", id: c.missionId }
     }));
     mesPubliees.filter(m => m.valide === true && m.valideLe).forEach(m => liste.push({
-      cle: "val:" + m.id, ms: dateMs(m), type: "carte", missionId: m.id,
-      texte: "✅ Ta mission « " + m.titre + " » a été validée : elle est visible par tous."
+      cle: "val:" + m.id, ms: dateMs(m), ico: "valide", ton: "succes", titre: "Mission publiée",
+      texte: "Ta mission « " + m.titre + " » a été validée et elle est visible par tous.",
+      nav: { k: "espace", onglet: "histo", histo: "publiee" }
     }));
     mesPubliees.filter(m => m.valide === false && m.refusMotif).forEach(m => liste.push({
-      cle: "refus:" + m.id, ms: 0, type: "carte", missionId: m.id,
-      texte: "❌ Ta mission « " + m.titre + " » a été refusée : " + m.refusMotif
+      cle: "refus:" + m.id, ms: 0, ico: "non", ton: "danger", titre: "Mission refusée",
+      texte: "« " + m.titre + " » a été refusée : " + m.refusMotif,
+      nav: { k: "carte", id: m.id }
     }));
-    return liste.sort((a, b) => b.ms - a.ms);
+    return liste;
   }
 
   function afficherToast(texte){
@@ -3075,20 +3164,27 @@
       $("nav-badge").classList.add("cache");
       document.title = TITRE_BASE;
       $("panneau-notifs").classList.add("cache");
+      $("fond-notifs").classList.add("cache");
       return;
     }
     if (!vuInit){
       if (!Object.values(charges).every(Boolean)) return;
       const existait = chargerVues();
+      chargerArrivees();
       if (!existait){ calculerNotifs().forEach(n => vues.add(n.cle)); sauverVues(); }
       dernieresCles = new Set(calculerNotifs().map(n => n.cle));
       vuInit = true;
     }
     const liste = calculerNotifs();
+    let majArr = false;
+    const cles = new Set(liste.map(n => n.cle));
+    liste.forEach(n => { if (!(n.cle in arrivees)){ arrivees[n.cle] = vues.has(n.cle) ? 0 : Date.now(); majArr = true; } });
+    Object.keys(arrivees).forEach(k => { if (!cles.has(k)){ delete arrivees[k]; majArr = true; } });
+    if (majArr) sauverArrivees();
     const nonLus = liste.filter(n => !vues.has(n.cle));
     const nouvelles = nonLus.filter(n => !dernieresCles.has(n.cle));
     dernieresCles = new Set(liste.map(n => n.cle));
-    if (nouvelles.length) afficherToast(nouvelles.length === 1 ? nouvelles[0].texte : "🔔 " + nouvelles.length + " nouvelles notifications");
+    if (nouvelles.length) afficherToast(nouvelles.length === 1 ? nouvelles[0].titre + " : " + nouvelles[0].texte : nouvelles.length + " nouvelles notifications");
     const p = $("cloche-n");
     p.textContent = nonLus.length > 9 ? "9+" : String(nonLus.length);
     p.classList.toggle("cache", !nonLus.length);
@@ -3098,47 +3194,128 @@
     if (!$("panneau-notifs").classList.contains("cache")) rendrePanneau(liste);
   }
 
+  let filtreNotifs = "toutes";
+  const MOIS_COURTS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  function tempsRelatif(t){
+    if (!t) return "";
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+    if (s < 60) return "à l'instant";
+    const mn = Math.round(s / 60);
+    if (mn < 60) return "il y a " + mn + " min";
+    const hh = Math.round(mn / 60);
+    if (hh < 24) return "il y a " + hh + " h";
+    const d = new Date(t);
+    return d.getDate() + " " + MOIS_COURTS[d.getMonth()];
+  }
+  function jourNotif(t){
+    if (!t) return "Plus anciennes";
+    const d = new Date(t), auj = new Date();
+    const debut = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diff = Math.round((debut(auj) - debut(d)) / 86400000);
+    if (diff <= 0) return "Aujourd'hui";
+    if (diff === 1) return "Hier";
+    return d.getDate() + " " + MOIS_COURTS[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  // Ouvre le menu qui correspond à la notification
+  function naviguerNotif(nav){
+    if (!nav) return;
+    if (nav.k === "missions"){ fermerEspace(); defiler($("missions")); return; }
+    if (nav.k === "recu"){
+      fermerEspace();
+      ouverts.add(nav.id);
+      afficher();
+      defiler(document.querySelector('[data-id="' + nav.id + '"]') || $("missions"));
+      return;
+    }
+    if (nav.k === "carte"){
+      fermerEspace();
+      reinitialiserFiltres();
+      $("filtre-statut").value = "toutes";
+      missionForcee = nav.id;
+      afficher();
+      defiler(document.querySelector('[data-id="' + nav.id + '"]') || $("missions"));
+      return;
+    }
+    if (nav.k === "espace"){
+      if (nav.filtre) filtreMesCands = nav.filtre;
+      if (nav.histo){ $("histo-filtre").value = nav.histo; majHisto(); }
+      ouvrirEspace(nav.onglet);
+      if (nav.onglet === "cands") majCandidatures();
+    }
+  }
+
   function rendrePanneau(liste){
     const z = $("panneau-notifs");
     z.innerHTML = "";
-    const tete = el("div", "tete-notifs");
-    tete.appendChild(el("h2", "", "Notifications"));
-    const tout = el("button", "lien", "Tout marquer comme lu");
-    tout.type = "button";
-    tout.addEventListener("click", e => { e.stopPropagation(); marquerTout(); });
-    tete.appendChild(tout);
+    const tous = liste.map(n => ({ n, t: n.ms || arrivees[n.cle] || 0, lu: vues.has(n.cle) })).sort((a, b) => b.t - a.t);
+    const nonLus = tous.filter(x => !x.lu).length;
+
+    z.appendChild(el("span", "nt-poignee"));
+    const tete = el("div", "nt-tete");
+    const titre = el("h2", "nt-titre", "Notifications");
+    if (nonLus) titre.appendChild(el("span", "nt-compte", nonLus + (nonLus > 1 ? " non lues" : " non lue")));
+    tete.appendChild(titre);
+    const fermerB = el("button", "nt-fermer");
+    fermerB.type = "button";
+    fermerB.setAttribute("aria-label", "Fermer");
+    fermerB.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>';
+    fermerB.addEventListener("click", e => { e.stopPropagation(); fermerPanneau(); });
+    tete.appendChild(fermerB);
     z.appendChild(tete);
-    if (!liste.length){ z.appendChild(el("div", "vide", "Aucune notification pour l'instant.")); return; }
-    liste.slice().sort((a, b) => (vues.has(a.cle) ? 1 : 0) - (vues.has(b.cle) ? 1 : 0) || b.ms - a.ms).slice(0, 30).forEach(n => {
-      const lu = vues.has(n.cle);
-      const l = el("div", "notif " + (lu ? "lu" : "nonlu"));
-      l.appendChild(el("span", "pt"));
-      const c = el("div");
-      c.appendChild(el("div", "", sansEmoji(n.texte)));
-      if (n.ms) c.appendChild(el("small", "", dateTexte(n.ms)));
-      l.appendChild(c);
-      l.addEventListener("click", () => {
-        fermerPanneau();
-        if (n.type === "recu" || n.type === "carte") fermerEspace();
-        if (n.type === "recu"){
-          ouverts.add(n.missionId);
-          afficher();
-          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
-          defiler(cible || $("missions"));
-        } else if (n.type === "carte"){
-          reinitialiserFiltres();
-          $("filtre-statut").value = "toutes";
-          afficher();
-          const cible = document.querySelector('[data-id="' + n.missionId + '"]');
-          defiler(cible || $("missions"));
-        } else if (n.type === "histo"){
-          ouvrirEspace("histo");
-        } else {
-          ouvrirEspace("resume");
-        }
-      });
-      z.appendChild(l);
+
+    const barre = el("div", "nt-barre");
+    const onglets = el("div", "nt-onglets");
+    [["toutes", "Toutes (" + tous.length + ")"], ["nonlues", "Non lues (" + nonLus + ")"]].forEach(([k, l]) => {
+      const b = el("button", "nt-onglet" + (filtreNotifs === k ? " on" : ""), l);
+      b.type = "button";
+      b.addEventListener("click", e => { e.stopPropagation(); filtreNotifs = k; rendrePanneau(calculerNotifs()); });
+      onglets.appendChild(b);
     });
+    barre.appendChild(onglets);
+    if (nonLus){
+      const tout = el("button", "nt-tout", "Tout marquer comme lu");
+      tout.type = "button";
+      tout.addEventListener("click", e => { e.stopPropagation(); marquerTout(); });
+      barre.appendChild(tout);
+    }
+    z.appendChild(barre);
+
+    const zone = el("div", "nt-liste");
+    const visibles = filtreNotifs === "nonlues" ? tous.filter(x => !x.lu) : tous;
+    if (!visibles.length){
+      const v = el("div", "nt-vide");
+      v.appendChild(el("b", "", filtreNotifs === "nonlues" ? "Tout est à jour" : "Aucune notification"));
+      v.appendChild(el("span", "", filtreNotifs === "nonlues" ? "Tu as lu toutes tes notifications." : "Les nouveautés de tes missions et candidatures apparaîtront ici."));
+      zone.appendChild(v);
+    }
+    let jourCourant = null;
+    visibles.slice(0, 60).forEach(({ n, t, lu }) => {
+      const jour = jourNotif(t);
+      if (jour !== jourCourant){ zone.appendChild(el("div", "nt-jour", jour)); jourCourant = jour; }
+      const it = el("button", "nt-item ton-" + (n.ton || "info") + (lu ? " lu" : " nonlu"));
+      it.type = "button";
+      const ic = el("span", "nt-ico");
+      ic.innerHTML = ICONES_NOTIF[n.ico] || ICONES_NOTIF.ok;
+      const corps = el("span", "nt-corps");
+      corps.appendChild(el("b", "", n.titre));
+      corps.appendChild(el("span", "nt-texte", n.texte));
+      if (t) corps.appendChild(el("small", "", tempsRelatif(t)));
+      it.append(ic, corps);
+      const fin = el("span", lu ? "nt-chevron" : "nt-point");
+      if (lu) fin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+      it.appendChild(fin);
+      it.addEventListener("click", e => {
+        e.stopPropagation();
+        vues.add(n.cle);
+        sauverVues();
+        fermerPanneau();
+        majNotifs();
+        naviguerNotif(n.nav);
+      });
+      zone.appendChild(it);
+    });
+    z.appendChild(zone);
   }
 
   function marquerTout(){
@@ -3146,8 +3323,13 @@
     sauverVues();
     majNotifs();
   }
+  let defilementAvant = "";
   function ouvrirPanneau(){
     $("toast").classList.add("cache");
+    filtreNotifs = "toutes";
+    defilementAvant = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    $("fond-notifs").classList.remove("cache");
     $("panneau-notifs").classList.remove("cache");
     rendrePanneau(calculerNotifs());
   }
@@ -3155,7 +3337,8 @@
     const p = $("panneau-notifs");
     if (p.classList.contains("cache")) return;
     p.classList.add("cache");
-    marquerTout();
+    $("fond-notifs").classList.add("cache");
+    document.body.style.overflow = defilementAvant;
   }
 
   $("btn-cloche").addEventListener("click", e => {
@@ -3163,10 +3346,7 @@
     if ($("panneau-notifs").classList.contains("cache")) ouvrirPanneau(); else fermerPanneau();
   });
   $("toast").addEventListener("click", e => { e.stopPropagation(); ouvrirPanneau(); });
-  document.addEventListener("click", e => {
-    const p = $("panneau-notifs");
-    if (!p.classList.contains("cache") && !p.contains(e.target)) fermerPanneau();
-  });
+  $("fond-notifs").addEventListener("click", fermerPanneau);
   document.addEventListener("keydown", e => { if (e.key === "Escape") fermerPanneau(); });
 
   // ---------- Retours des testeurs ----------
@@ -3347,8 +3527,46 @@
   $("nav-espace").addEventListener("click", () => ouvrirEspace());
   document.querySelectorAll(".nav-item").forEach(b => b.addEventListener("click", () => { if (navigator.vibrate) navigator.vibrate(8); }));
 
-  // Session permanente : l'utilisateur reste connecté tant qu'il ne se déconnecte pas lui-même.
-  try { localStorage.removeItem("bj_activite"); } catch (e) { /* ignoré */ }
+  // ---------- Sécurité : déconnexion silencieuse après plusieurs heures d'inactivité ----------
+  const INACTIVITE_H = Number(window.CONFIG && window.CONFIG.INACTIVITE_HEURES) > 0 ? Number(window.CONFIG.INACTIVITE_HEURES) : 6;
+  const INACTIVITE_MS = INACTIVITE_H * 3600 * 1000;
+  const ACT_CLE = "bj_activite";
+  function noterActivite(){
+    try { localStorage.setItem(ACT_CLE, String(Date.now())); } catch (e) { /* stockage indisponible */ }
+  }
+  function connexionPerimee(){
+    try {
+      const der = Number(localStorage.getItem(ACT_CLE) || 0);
+      return der > 0 && Date.now() - der > INACTIVITE_MS;
+    } catch (e) { return false; }
+  }
+  // Sans message : le site revient simplement à la page d'accès
+  function deconnexionSilencieuse(){
+    fermerEspace(true);
+    fermerPro(true);
+    fermerPanneau();
+    signOut(auth).catch(() => { /* ignoré */ });
+  }
+  function verifierInactivite(){
+    if (user && connexionPerimee()) deconnexionSilencieuse();
+  }
+  let derniereNote = 0;
+  ["click", "keydown", "touchstart", "scroll", "mousemove"].forEach(ev => window.addEventListener(ev, () => {
+    const t = Date.now();
+    if (t - derniereNote > 30000){ derniereNote = t; if (user) noterActivite(); }
+  }, { passive: true }));
+  setInterval(verifierInactivite, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierInactivite(); });
+
+  // ---------- Reconnexion facile : le gestionnaire de mots de passe du navigateur ----------
+  function lireEmailMemorise(){ try { return localStorage.getItem("bj_email") || ""; } catch (e) { return ""; } }
+  async function proposerEnregistrement(adresse, secret){
+    try {
+      if (navigator.credentials && window.PasswordCredential){
+        await navigator.credentials.store(new PasswordCredential({ id: adresse, password: secret, name: adresse }));
+      }
+    } catch (e) { /* le navigateur propose déjà l'enregistrement de lui-même */ }
+  }
 
   $("icone-garantie").innerHTML = SVG_VERIF;
 
