@@ -102,7 +102,7 @@ async function courriel(uids, sujet, corps, lien, extras = {}){
   const profils = await usersParIds(ids);
   for (const u of profils){
     if (courriels >= PLAFOND_RUN || jourCourriels + courriels >= PLAFOND_JOUR) return;
-    if (!u.email || u.suspendu || u.alertesEmail === false) continue;
+    if (!u.email || u.suspendu || (u.alertesEmail === false && !extras.transactionnel)) continue;
     const donnees = { prenom: u.prenom, titre: extras.titre || sujet, intro: corps, lignes: extras.lignes, bouton: extras.bouton, lien: lien || SITE };
     try {
       await transport.sendMail({
@@ -282,6 +282,65 @@ for (const d of inscrits.docs){
     }
   }
   if (Object.keys(maj).length) await d.ref.update(maj);
+}
+
+// ---------- Recrutements : e-mails et notifications à chaque étape ----------
+const NIVEAUX_FR = ["Aucun diplôme exigé", "BEPC / CEP", "Baccalauréat", "Bac+2 (BTS, DUT)", "Bac+3 (Licence)", "Bac+5 (Master)", "Doctorat"];
+const RECENT_RECRUT = 5 * 24 * 3600 * 1000;
+const T = { transactionnel: true };
+
+const offresSnap = await db.collection("offres").orderBy("createdAt", "desc").limit(200).get();
+for (const d of offresSnap.docs){
+  const o = d.data();
+  const maj = {};
+  const recente = MAINTENANT - ms(o.createdAt) < RECENT_RECRUT;
+  if (o.valide === true && !o.mailValide){
+    if (recente) await notifier([o.uid], "Votre offre d'emploi est publiée", "L'offre « " + o.titre + " » a été validée : elle est maintenant visible des candidats éligibles. Vous serez prévenu(e) à chaque candidature.", SITE,
+      { ...T, titre: "Offre d'emploi publiée", bouton: "Ouvrir mes recrutements", lignes: [["Poste", o.titre], ["Contrat", o.contrat || "—"], ["Ville", o.ville || "—"]] });
+    maj.mailValide = true;
+  }
+  if (o.valide === false && o.refusMotif && !o.mailRefus){
+    if (recente) await notifier([o.uid], "Votre offre d'emploi n'a pas été validée", "L'offre « " + o.titre + " » n'a pas pu être publiée. Motif : " + o.refusMotif + ". Vous pouvez la corriger et la soumettre de nouveau.", SITE,
+      { ...T, titre: "Offre non validée", bouton: "Ouvrir Bohicon Jobs", lignes: [["Poste", o.titre], ["Motif", o.refusMotif]] });
+    maj.mailRefus = true;
+  }
+  if (Object.keys(maj).length) await d.ref.update(maj);
+}
+
+const postulations = await db.collection("postulations").orderBy("createdAt", "desc").limit(300).get();
+for (const d of postulations.docs){
+  const q = d.data();
+  if (q.notifStatut === q.statut) continue;
+  const recente = MAINTENANT - ms(q.createdAt) < RECENT_RECRUT;
+  if (recente){
+    const base = [["Poste", q.offreTitre], ["Entreprise", q.entrepriseNom || "—"]];
+    const cand = [q.uid], ent = [q.entrepriseUid];
+    if (q.statut === "recue"){
+      await notifier(cand, "Candidature reçue", "Votre candidature au poste « " + q.offreTitre + " » chez " + q.entrepriseNom + " a bien été reçue. Vous serez informé(e) par e-mail à chaque étape du recrutement.", SITE,
+        { ...T, titre: "Votre candidature a bien été reçue", bouton: "Suivre ma candidature", lignes: base.concat([["Statut", "Reçue"]]) });
+      await notifier(ent, "Nouvelle candidature", (q.anonyme ? "Une candidature anonyme" : q.nom) + " a postulé au poste « " + q.offreTitre + " ». Le candidat remplit tous vos critères de sélection.", SITE,
+        { ...T, titre: "Nouvelle candidature reçue", bouton: "Ouvrir le tableau de suivi", lignes: [["Poste", q.offreTitre], ["Diplôme", NIVEAUX_FR[q.niveau || 0]], ["Expérience", (q.experience || 0) + " an(s)"]] });
+    } else if (q.statut === "etude"){
+      await notifier(cand, "Votre dossier est en cours d'étude", "L'entreprise " + q.entrepriseNom + " étudie actuellement votre candidature au poste « " + q.offreTitre + " ».", SITE,
+        { ...T, titre: "Dossier en cours d'étude", bouton: "Suivre ma candidature", lignes: base.concat([["Statut", "En étude"]]) });
+    } else if (q.statut === "preselection"){
+      await notifier(cand, "Vous êtes présélectionné(e)", "Bonne nouvelle : votre candidature au poste « " + q.offreTitre + " » a été présélectionnée par " + q.entrepriseNom + ".", SITE,
+        { ...T, titre: "Vous êtes présélectionné(e)", bouton: "Suivre ma candidature", lignes: base.concat([["Statut", "Présélectionné(e)"]]) });
+    } else if (q.statut === "entretien"){
+      await notifier(cand, "Entretien programmé", q.entrepriseNom + " vous invite à un entretien pour le poste « " + q.offreTitre + " ».", SITE,
+        { ...T, titre: "Entretien programmé", bouton: "Voir les détails", lignes: base.concat([["Entretien", q.entretien || "À confirmer"]]) });
+    } else if (q.statut === "retenue"){
+      await notifier(cand, "Candidature retenue", "Félicitations : " + q.entrepriseNom + " a retenu votre candidature pour le poste « " + q.offreTitre + " ». L'entreprise vous contactera pour la suite." + (q.messageCandidat ? " Message : " + q.messageCandidat : ""), SITE,
+        { ...T, titre: "Candidature retenue", bouton: "Ouvrir Bohicon Jobs", lignes: base.concat([["Statut", "Retenu(e)"]]) });
+    } else if (q.statut === "refusee"){
+      await notifier(cand, "Décision concernant votre candidature", "L'entreprise " + q.entrepriseNom + " n'a pas retenu votre candidature au poste « " + q.offreTitre + " ». Par souci de transparence, le motif vous est communiqué.", SITE,
+        { ...T, titre: "Décision concernant votre candidature", bouton: "Voir les offres", lignes: base.concat([["Motif", q.motif || "Non précisé"]]).concat(q.messageCandidat ? [["Message", q.messageCandidat]] : []) });
+    } else if (q.statut === "retiree"){
+      await notifier(ent, "Candidature retirée", (q.anonyme ? "Un candidat" : q.nom) + " a retiré sa candidature au poste « " + q.offreTitre + " ».", SITE,
+        { ...T, titre: "Candidature retirée", bouton: "Ouvrir le tableau de suivi", lignes: [["Poste", q.offreTitre]] });
+    }
+  }
+  await d.ref.update({ notifStatut: q.statut });
 }
 
 // ---------- Nouvelles inscriptions : prévenir les administrateurs ----------
