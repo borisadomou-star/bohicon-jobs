@@ -235,6 +235,7 @@
       <button class="onglet" data-t="inscriptions" type="button" id="onglet-inscr">Inscriptions</button>
       <button class="onglet" data-t="missions" type="button">Missions</button>
       <button class="onglet" data-t="cands" type="button" id="onglet-cands">Candidatures</button>
+      <button class="onglet" data-t="recrut" type="button" id="onglet-recrut">Recrutements</button>
       <button class="onglet" data-t="validation" type="button" id="onglet-validation">À valider</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
@@ -257,6 +258,8 @@
       <div id="compteurs-inscr" class="tuiles"></div>
       <div id="liste-inscr"></div>
     </div>
+
+    <div id="t-recrut" class="card cache"></div>
 
     <div id="t-cands" class="card cache">
       <h2>Suivi des candidatures</h2>
@@ -480,6 +483,7 @@
   let entreprisesV = new Set();
   let recents = [], premierRecents = true, premierCands = true, filtreCands = "attente";
   let pushTokens = [], pushEtat = null;
+  let offresAdm = [], postulAdm = [];
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
 
@@ -1294,7 +1298,51 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); rendrePush(); }
+  // ---------- Recrutements : validation des offres d'emploi ----------
+  function rendreRecrut(){
+    const z = $("t-recrut");
+    z.innerHTML = "";
+    z.appendChild(el("h2", "", "Recrutements"));
+    const msO = o => (o.createdAt && o.createdAt.toMillis ? o.createdAt.toMillis() : 0);
+    const aValider = offresAdm.filter(o => o.valide !== true && !o.refusMotif).length;
+    $("onglet-recrut").textContent = "Recrutements" + (aValider ? " (" + aValider + ")" : "");
+    const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+    const g = el("div", "tuiles");
+    g.append(tuile(offresAdm.filter(o => o.valide === true && o.statut === "ouverte").length, "Offres ouvertes"), tuile(aValider, "À valider"),
+      tuile(postulAdm.length, "Candidatures"), tuile(postulAdm.filter(p => p.statut === "retenue").length, "Candidats retenus"));
+    z.appendChild(g);
+    if (!offresAdm.length){ z.appendChild(el("div", "vide", "Aucune offre d'emploi pour le moment.")); return; }
+    const NIV = ["Aucun diplôme exigé", "BEPC / CEP", "Baccalauréat", "Bac+2", "Bac+3 (Licence)", "Bac+5 (Master)", "Doctorat"];
+    offresAdm.slice().sort((x, y) => msO(y) - msO(x)).forEach(o => {
+      const ligne = el("div", "rang");
+      const gg = el("div");
+      const titre = el("div", "h-titre", o.titre || "Offre");
+      const etat = o.valide === true ? (o.statut === "ouverte" ? "Ouverte" : o.statut === "pourvue" ? "Pourvue" : "Fermée") : (o.refusMotif ? "Refusée" : "À valider");
+      titre.appendChild(el("span", "badge " + (o.valide === true ? "b-disponible" : o.refusMotif ? "b-refusee" : "b-attente"), etat));
+      gg.appendChild(titre);
+      gg.appendChild(el("div", "h-sous", (o.entrepriseNom || "—") + " · " + (o.contrat || "") + " · " + (o.ville || "")));
+      gg.appendChild(el("div", "h-sous", "Critères : " + (NIV[o.diplomeMin || 0]) + " · " + (o.experienceMin || 0) + " an(s) · " + ((o.competencesOblLib || []).join(", ") || "aucune compétence obligatoire") + (o.anonyme ? " · évaluation anonyme" : "")));
+      const mes = postulAdm.filter(p => p.offreId === o.id);
+      gg.appendChild(el("div", "h-sous", mes.length + " candidature(s) · " + mes.filter(p => p.statut === "retenue").length + " retenue(s) · " + mes.filter(p => p.statut === "refusee").length + " refusée(s)"));
+      if (o.refusMotif) gg.appendChild(el("div", "h-sous", "Motif du refus : " + o.refusMotif));
+      const btns = el("div", "btns");
+      if (o.valide !== true){
+        btns.appendChild(bouton("Valider", "mini", async () => {
+          await updateDoc(doc(db, "offres", o.id), { valide: true, valideLe: serverTimestamp(), refusMotif: "" });
+          toastAdmin("Offre validée : l'entreprise sera prévenue par e-mail.");
+        }));
+        btns.appendChild(bouton("Refuser", "sec mini", async () => {
+          const motif = ((await demander("Ce motif sera communiqué à l'entreprise.", { titre: "Refuser l'offre", ok: "Refuser", danger: true, champ: { placeholder: "Motif du refus", valeur: "Offre non conforme", max: 120 } })) || "").trim();
+          if (!motif) return;
+          await updateDoc(doc(db, "offres", o.id), { valide: false, refusMotif: motif });
+        }));
+      }
+      ligne.append(gg, btns);
+      z.appendChild(ligne);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); rendrePush(); rendreRecrut(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -1314,7 +1362,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; pushTokens = []; pushEtat = null; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; pushTokens = []; pushEtat = null; offresAdm = []; postulAdm = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1350,6 +1398,8 @@
     unsubs.push(onSnapshot(query(collection(db, "entreprises"), limit(500)), s => { entreprisesV = new Set(s.docs.filter(d => d.data().verifiee === true).map(d => d.id)); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "pushTokens"), limit(500)), s => { pushTokens = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "pushEtat"), s => { pushEtat = s.exists() ? s.data() : null; rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "offres"), limit(300)), s => { offresAdm = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "postulations"), limit(500)), s => { postulAdm = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
       annonceAdmin = s.exists() ? s.data() : null;
       if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
@@ -1399,7 +1449,7 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "inscriptions", "cands", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs", "push"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "inscriptions", "cands", "recrut", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs", "push"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-cands").addEventListener("input", rendreCandidatures);

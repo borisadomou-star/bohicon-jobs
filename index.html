@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261116-0853">
-<meta name="build-notes" content="Correction : le site se charge de nouveau correctement.">
+<meta name="build" content="20261117-0216">
+<meta name="build-notes" content="Nouveau : offres d'emploi, éligibilité automatique et suivi des candidatures pour les entreprises.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -843,6 +843,55 @@
   .nt-vide b{font-size:1rem;color:var(--encre)}
   .nt-vide span{font-size:.84rem;color:var(--gris)}
 
+  /* ===== Recrutement ===== */
+  .carte-emplois{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 14px;padding:14px 16px;border:1px solid #cfe0d6;border-radius:20px;background:linear-gradient(135deg,#ffffff,#eef8f2);color:var(--encre);text-align:left;box-shadow:0 14px 28px -22px rgba(8,69,42,.6)}
+  .ce-ico{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff}
+  .ce-ico svg{width:22px;height:22px}
+  .ce-txt{flex:1;min-width:0}
+  .ce-txt b{display:block;font-size:.95rem}
+  .ce-txt small{display:block;margin-top:2px;font-size:.78rem;line-height:1.4;color:var(--gris)}
+  .ce-fleche{flex:none;font-size:1.3rem;color:var(--vert)}
+  #t-emplois .cc-chips{margin-bottom:12px}
+  .rec-carte{margin-bottom:12px;padding:14px;border:1px solid #e4ede7;border-radius:18px;background:#fff;box-shadow:0 10px 24px -18px rgba(8,69,42,.45)}
+  .rec-haut{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .rec-contrat{font-size:.74rem;font-weight:700;color:var(--gris)}
+  .rec-titre{margin:0 0 4px;font-size:1.02rem;font-weight:700;line-height:1.3;color:var(--encre)}
+  .rec-meta{margin-bottom:6px;font-size:.82rem;line-height:1.45;color:var(--gris)}
+  .rec-desc{margin:6px 0;font-size:.86rem;line-height:1.5;color:#33463b}
+  .rec-sous-titre{margin:10px 0 6px;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
+  .rec-criteres{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .rec-crit{padding:4px 10px;border:1px solid #dfe9e3;border-radius:999px;background:#f6f9f7;font-size:.74rem;font-weight:600;color:#33463b}
+  .rec-crit.ok{border-color:#bfe3c4;background:#e8f6ea;color:#1b6b2f}
+  .rec-crit.ok::before{content:"\2713\00a0"}
+  .rec-crit.ko{border-color:#f5cfcc;background:#fdecea;color:#a12a20}
+  .rec-crit.ko::before{content:"\2715\00a0"}
+  .rec-crit.bonus{border-color:#f1d98a;background:#fff7dd;color:#7a5600}
+  .rec-pied{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+  .rec-pied .mini{width:auto;margin:0}
+  .rec-score{font-size:.8rem;font-weight:700;color:var(--vert)}
+  .rec-nonelig{font-size:.8rem;font-weight:600;color:#a12a20}
+  .rec-note{margin:6px 0 10px;padding:9px 12px;border-radius:12px;background:#eef8f2;color:#0d5a33;font-size:.8rem;line-height:1.45}
+  .rec-aide{margin:0 0 12px;font-size:.82rem;line-height:1.5;color:var(--gris)}
+  .rec-avertissement{margin:8px 0 14px;padding:12px 14px;border:1px solid #f6dfb0;border-radius:14px;background:#fff6e5;color:#7a5200;font-size:.82rem;line-height:1.5}
+  .rec-transparence{margin:14px 0;padding:14px;border:1px solid #cfe8d9;border-radius:18px;background:linear-gradient(135deg,#f3fbf6,#e8f6ee);font-size:.84rem;line-height:1.5}
+  .rec-transparence b{display:block;margin-bottom:8px;font-size:.92rem;color:#0d5a33}
+  .rec-ligne-t{margin-bottom:5px;color:#33463b}
+  .rec-compteurs{display:flex;flex-wrap:wrap;gap:6px}
+  .rec-pastille{padding:4px 10px;border-radius:999px;background:#e7f5ed;color:#0d6b3c;font-size:.74rem;font-weight:700}
+  .rec-pastille.vide{background:#eef1f0;color:#55655d}
+  .rec-tri{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 12px;font-size:.8rem;color:var(--gris)}
+  .rec-tri-b{width:auto;margin:0;padding:6px 12px;border:1.5px solid #dfe9e3;border-radius:999px;background:#fff;color:var(--gris);font-size:.78rem;font-weight:600;box-shadow:none}
+  .rec-tri-b.on{border-color:var(--vert);background:var(--vert);color:#fff}
+  .rec-frise{display:grid;gap:4px;margin:8px 0}
+  .rec-etape{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#33463b}
+  .rec-etape i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--vert2)}
+  .rec-etape.refusee i{background:#c0392b}
+  .rec-etape.retiree i{background:#9aa8a0}
+  .rec-etape small{margin-left:auto;color:var(--gris)}
+  .rec-motifs{display:grid;gap:6px;margin:0 0 12px}
+  .rec-motif{width:100%;margin:0;padding:12px 14px;border:1.5px solid #dfe9e3;border-radius:14px;background:#fff;color:var(--encre);font-size:.88rem;font-weight:600;text-align:left;box-shadow:none}
+  .rec-motif.on{border-color:var(--vert2);background:#f1faf5;color:var(--vert-fonce)}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1137,6 +1186,7 @@
           <button class="onglet on" data-t="resume" type="button">📊 Résumé</button>
           <button class="onglet" data-t="histo" type="button">🕘 Historique</button>
           <button class="onglet" data-t="cands" type="button" id="onglet-cands">📨 Candidatures</button>
+          <button class="onglet" data-t="emplois" type="button" id="onglet-emplois">💼 Emplois</button>
           <button class="onglet" data-t="publier" type="button" id="onglet-publier">➕ Publier</button>
           <button class="onglet" data-t="profil" type="button">👤 Profil</button>
           <button class="onglet" data-t="aide" type="button">❓ Aide</button>
@@ -1149,6 +1199,8 @@
         </div>
 
         <div id="t-resume"></div>
+
+        <div id="t-emplois" class="cache"></div>
 
         <div id="t-cands" class="cache">
           <div id="alerte-cands"></div>
@@ -2725,6 +2777,7 @@
   }
 
   // Données de la plateforme : lues seulement par un utilisateur connecté
+  const RECRUT = {};   // fonctions du module de recrutement (facultatives : le site fonctionne sans)
   const demarragesPublics = [];
   let arretsPublics = [];
   function demarrerDonneesPubliques(){
@@ -2756,8 +2809,8 @@
     if (u) noterActivite();
     user = u;
     profil = null;
-    if (u) demarrerDonneesPubliques();
-    else { arreterDonneesPubliques(); missions = []; }
+    if (u){ demarrerDonneesPubliques(); if (RECRUT.demarrer) RECRUT.demarrer(); }
+    else { arreterDonneesPubliques(); missions = []; if (RECRUT.arreter) RECRUT.arreter(); }
     if (u && !enInscription){
       try {
         const s = await getDoc(doc(db, "users", u.uid));
@@ -2990,7 +3043,8 @@
     if (t === "cands" && !peutPostuler()) t = "resume";
     $("push-invite").dataset.onglet = t;
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x.dataset.t === t));
-    ["resume", "histo", "cands", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
+    ["resume", "histo", "cands", "emplois", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
+    if (t === "emplois" && RECRUT.majEmplois) RECRUT.majEmplois();
     if (t === "profil" && profil) remplir("e-", profil);
     if (t === "profil"){ domEdition = null; rendreDomaines(); }
     if (t === "publier") majFormPublication();
@@ -4078,7 +4132,7 @@
     }
 
     const ong = el("div", "pro-onglets");
-    [["dash", "Tableau de bord"], ["modeles", "Modèles"], ["profil", "Ma fiche"]].forEach(([k, t]) => {
+    [["dash", "Tableau de bord"], ["modeles", "Modèles"], ["recrut", "Mes recrutements"], ["profil", "Ma fiche"]].forEach(([k, t]) => {
       const b = el("button", "pro-onglet" + (proOnglet === k ? " on" : ""), t);
       b.type = "button";
       b.addEventListener("click", () => { proOnglet = k; rendrePro(); });
@@ -4086,6 +4140,11 @@
     });
     z.appendChild(ong);
 
+    if (proOnglet === "recrut"){
+      if (RECRUT.rendrePro) RECRUT.rendrePro(z, ent);
+      else z.appendChild(el("div", "vide", "Cette fonction est momentanément indisponible."));
+      return;
+    }
     if (proOnglet === "profil"){
       proSaisie = true;
       z.appendChild(formEntreprise(ent));
@@ -4787,6 +4846,546 @@
     afficher();
     if (proOuvert && !proSaisie) rendrePro();
   }, err => console.error(err)));
+
+  // ==================== RECRUTEMENT : « Mes recrutements » (entreprises) et « Emplois » (candidats) ====================
+  // Ce bloc est isolé : s'il échoue, le reste du site continue de fonctionner normalement.
+  try {
+    const NIVEAUX = ["Aucun diplôme exigé", "BEPC / CEP", "Baccalauréat", "Bac+2 (BTS, DUT)", "Bac+3 (Licence)", "Bac+5 (Master)", "Doctorat"];
+    const CONTRATS = ["CDI", "CDD", "Stage", "Freelance / mission", "Temps partiel"];
+    const VILLES_REC = ["Bohicon", "Abomey", "Covè", "Zogbodomey", "Djidja", "Autre"];
+    const STATUTS_REC = { recue: "Reçue", etude: "En étude", preselection: "Présélectionné(e)", entretien: "Entretien", retenue: "Retenu(e)", refusee: "Non retenu(e)", retiree: "Retirée" };
+    const ETAPES_REC = ["recue", "etude", "preselection", "entretien", "retenue", "refusee", "retiree"];
+    const FINAUX_REC = ["retenue", "refusee", "retiree"];
+    const MOTIFS_REFUS = ["Un autre profil correspond mieux au poste", "Entretien non concluant", "Dossier incomplet", "Le poste est pourvu", "Autre motif"];
+    const FILTRES_DOSSIERS = [["tout", "Toutes"], ["recue", "Reçues"], ["etude", "En étude"], ["preselection", "Présélection"], ["entretien", "Entretien"], ["retenue", "Retenues"], ["refusee", "Non retenues"]];
+
+    let offresOuvertes = [], mesOffres = [], mesPostulations = [], postulationsRecues = [], arretsRecrut = [];
+    let vueEmplois = "offres", recVue = "liste", recOffreId = null, recFiltre = "tout", recTri = "arrivee", modeleOffre = null;
+
+    // ---------- utilitaires ----------
+    const normComp = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      .replace(/[^a-z0-9+#. ]/g, " ").replace(/\s+/g, " ").trim().slice(0, 40);
+    function parserCompetences(texte, max){
+      const vus = new Set(), sortie = [];
+      String(texte || "").split(/[,;\n]/).forEach(x => {
+        const lib = x.trim().slice(0, 40), n = normComp(lib);
+        if (n && !vus.has(n)){ vus.add(n); sortie.push({ n, lib }); }
+      });
+      return sortie.slice(0, max || 15);
+    }
+    const msDe = t => (t && typeof t.toMillis === "function") ? t.toMillis() : (typeof t === "number" ? t : 0);
+    const niveauLib = n => NIVEAUX[Math.max(0, Math.min(6, Number(n) || 0))];
+    const cvDe = () => (profil && profil.cv && typeof profil.cv === "object") ? profil.cv : null;
+    const jourHeure = t => t ? new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) + " à " + new Date(t).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "";
+    const offreExpiree = o => Number(o.limiteMs || 0) > 0 && Date.now() > Number(o.limiteMs);
+    const lireDocs = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // ---------- éligibilité et score (mêmes règles que celles contrôlées par la base de données) ----------
+    function calculScore(o, niveau, exp, bonus){
+      const souh = (o.competencesSouh || []).length;
+      const min = Number(o.diplomeMin || 0), expMin = Number(o.experienceMin || 0);
+      const s = 60 + 20 * (souh ? bonus / souh : 1) + 10 * Math.min(1, Math.max(0, niveau - min) / 2) + 10 * Math.min(1, Math.max(0, exp - expMin) / 5);
+      return Math.round(s);
+    }
+    function evaluerEligibilite(o, cv){
+      const c = cv || {};
+      const niveau = Number(c.niveau || 0), exp = Number(c.experience || 0);
+      const comp = new Set(Array.isArray(c.competences) ? c.competences : []);
+      const criteres = [];
+      const min = Number(o.diplomeMin || 0);
+      criteres.push({ libelle: min ? NIVEAUX[min] + " minimum" : "Tous niveaux de diplôme", ok: niveau >= min });
+      const expMin = Number(o.experienceMin || 0);
+      if (expMin) criteres.push({ libelle: expMin + " an" + (expMin > 1 ? "s" : "") + " d'expérience minimum", ok: exp >= expMin });
+      (o.competencesObl || []).forEach((n, i) => criteres.push({ libelle: (o.competencesOblLib || [])[i] || n, ok: comp.has(n) }));
+      const bonus = (o.competencesSouh || []).filter(n => comp.has(n)).length;
+      return { ok: criteres.every(x => x.ok), criteres, score: calculScore(o, niveau, exp, bonus) };
+    }
+    const scorePostulation = (o, p) => calculScore(o, Number(p.niveau || 0), Number(p.experience || 0),
+      (o.competencesSouh || []).filter(n => (p.competences || []).includes(n)).length);
+
+    // ---------- données en temps réel ----------
+    function rafraichir(){
+      try {
+        if (!$("t-emplois").classList.contains("cache")) rendreEmplois();
+        if (proOuvert && proOnglet === "recrut" && !proSaisie) rendrePro();
+        majCarteEmplois();
+      } catch (e) { console.error("Recrutement :", e); }
+    }
+    RECRUT.demarrer = () => {
+      if (arretsRecrut.length || !user) return;
+      const err = e => console.error("Recrutement :", e);
+      arretsRecrut = [
+        onSnapshot(query(collection(db, "offres"), where("valide", "==", true), where("statut", "==", "ouverte"), limit(200)), s => { offresOuvertes = lireDocs(s); rafraichir(); }, err),
+        onSnapshot(query(collection(db, "offres"), where("uid", "==", user.uid)), s => { mesOffres = lireDocs(s); rafraichir(); }, err),
+        onSnapshot(query(collection(db, "postulations"), where("uid", "==", user.uid)), s => { mesPostulations = lireDocs(s); rafraichir(); }, err),
+        onSnapshot(query(collection(db, "postulations"), where("entrepriseUid", "==", user.uid)), s => { postulationsRecues = lireDocs(s); rafraichir(); }, err)
+      ];
+    };
+    RECRUT.arreter = () => {
+      arretsRecrut.forEach(f => { try { f(); } catch (e) { /* ignoré */ } });
+      arretsRecrut = []; offresOuvertes = []; mesOffres = []; mesPostulations = []; postulationsRecues = [];
+    };
+    RECRUT.majEmplois = () => rendreEmplois();
+
+    // ---------- carte d'accès sur l'accueil ----------
+    function majCarteEmplois(){
+      const cible = $("missions");
+      if (!cible || !cible.parentNode) return;
+      let c = document.getElementById("carte-emplois");
+      if (!c){
+        c = document.createElement("button");
+        c.type = "button";
+        c.id = "carte-emplois";
+        c.className = "carte-emplois";
+        c.innerHTML = '<span class="ce-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></span><span class="ce-txt"><b>Offres d\'emploi</b><small></small></span><span class="ce-fleche">&rarr;</span>';
+        c.addEventListener("click", () => { vueEmplois = "offres"; ouvrirEspace("emplois"); });
+        cible.parentNode.insertBefore(c, cible);
+      }
+      const n = offresOuvertes.filter(o => !offreExpiree(o)).length;
+      c.querySelector("small").textContent = n
+        ? n + " offre" + (n > 1 ? "s" : "") + " ouverte" + (n > 1 ? "s" : "") + " : vérifie ton éligibilité en un instant."
+        : "Les entreprises publient leurs offres ici. Renseigne ton profil professionnel pour être prêt(e).";
+    }
+
+    // ---------- frise des étapes (transparence pour le candidat) ----------
+    function frise(p){
+      const z = el("div", "rec-frise");
+      const h = p.horodatages || {};
+      ETAPES_REC.filter(k => h[k]).sort((a, b) => h[a] - h[b]).forEach(k => {
+        const l = el("div", "rec-etape " + k);
+        l.appendChild(el("i", ""));
+        const t = el("span", "", STATUTS_REC[k]);
+        l.appendChild(t);
+        l.appendChild(el("small", "", jourHeure(h[k])));
+        z.appendChild(l);
+      });
+      return z;
+    }
+    const classeStatut = s => ({ recue: "b-attribuee", etude: "b-a_confirmer", preselection: "b-a_confirmer", entretien: "b-a_confirmer", retenue: "b-disponible", refusee: "b-refus", retiree: "b-gris" })[s] || "b-gris";
+
+    // =====================================================================
+    //  CÔTÉ CANDIDAT : onglet « Emplois » de Mon espace
+    // =====================================================================
+    function rendreEmplois(){
+      const z = $("t-emplois");
+      z.innerHTML = "";
+      if (!user) return;
+      const visibles = offresOuvertes.filter(o => !offreExpiree(o)).sort((a, b) => msDe(b.createdAt) - msDe(a.createdAt));
+      const chips = el("div", "cc-chips");
+      [["offres", "Offres (" + visibles.length + ")"], ["postul", "Mes candidatures (" + mesPostulations.length + ")"], ["profil", "Mon profil pro"]].forEach(([k, l]) => {
+        const b = el("button", "cc-chip" + (vueEmplois === k ? " on" : ""), l);
+        b.type = "button";
+        b.addEventListener("click", () => { vueEmplois = k; rendreEmplois(); });
+        chips.appendChild(b);
+      });
+      z.appendChild(chips);
+      if (vueEmplois === "profil"){ formProfilPro(z); return; }
+      if (vueEmplois === "postul"){ listePostulations(z); return; }
+      if (!cvDe()){
+        const a = el("div", "info attente", "Renseigne ton profil professionnel (diplôme, expérience, compétences) : le site vérifiera automatiquement ton éligibilité à chaque offre.");
+        a.appendChild(bouton("Compléter mon profil pro", "mini", async () => { vueEmplois = "profil"; rendreEmplois(); }));
+        z.appendChild(a);
+      }
+      if (!visibles.length){
+        z.appendChild(el("div", "vide", "Aucune offre d'emploi ouverte pour le moment. Reviens bientôt."));
+        return;
+      }
+      visibles.forEach(o => z.appendChild(carteOffre(o)));
+    }
+
+    function carteOffre(o){
+      const c = el("div", "rec-carte");
+      const haut = el("div", "rec-haut");
+      const verifiee = entreprisesVerifiees.has(o.uid);
+      const ent = el("span", "chip-entr" + (verifiee ? " verifiee" : ""));
+      ent.innerHTML = verifiee ? SVG_VERIF : SVG_ENTR;
+      ent.appendChild(document.createTextNode(o.entrepriseNom || "Entreprise"));
+      haut.append(ent, el("span", "rec-contrat", o.contrat || ""));
+      c.appendChild(haut);
+      c.appendChild(el("h3", "rec-titre", o.titre));
+      const meta = [o.ville, o.salaire, Number(o.limiteMs || 0) ? "Jusqu'au " + dateTexte(o.limiteMs) : ""].filter(Boolean).join(" · ");
+      if (meta) c.appendChild(el("div", "rec-meta", meta));
+      c.appendChild(el("p", "rec-desc", o.description));
+
+      const cv = cvDe();
+      const ev = evaluerEligibilite(o, cv);
+      c.appendChild(el("div", "rec-sous-titre", "Critères de sélection"));
+      const liste = el("div", "rec-criteres");
+      ev.criteres.forEach(x => liste.appendChild(el("span", "rec-crit " + (cv ? (x.ok ? "ok" : "ko") : ""), x.libelle)));
+      (o.competencesSouhLib || []).forEach(l => liste.appendChild(el("span", "rec-crit bonus", l + " (atout)")));
+      c.appendChild(liste);
+      if (o.anonyme) c.appendChild(el("div", "rec-note", "Évaluation anonyme : ton identité n'est révélée à l'entreprise qu'à partir de la présélection."));
+
+      const pied = el("div", "rec-pied");
+      const deja = mesPostulations.find(p => p.offreId === o.id);
+      if (o.uid === user.uid) pied.appendChild(el("span", "badge b-gris", "Votre offre"));
+      else if (deja){
+        pied.appendChild(el("span", "badge " + classeStatut(deja.statut), "Candidature : " + STATUTS_REC[deja.statut]));
+        pied.appendChild(bouton("Suivre", "sec mini", async () => { vueEmplois = "postul"; rendreEmplois(); }));
+      } else if (!cv){
+        pied.appendChild(bouton("Compléter mon profil pro", "sec mini", async () => { vueEmplois = "profil"; rendreEmplois(); }));
+      } else if (ev.ok){
+        pied.appendChild(el("span", "rec-score", "Éligible · correspondance " + ev.score + " %"));
+        pied.appendChild(bouton("Postuler", "mini", async () => postuler(o)));
+      } else {
+        pied.appendChild(el("span", "rec-nonelig", "Non éligible : " + ev.criteres.filter(x => !x.ok).length + " critère(s) non rempli(s)"));
+      }
+      c.appendChild(pied);
+      return c;
+    }
+
+    async function postuler(o){
+      const cv = cvDe();
+      if (!cv){ vueEmplois = "profil"; rendreEmplois(); afficherMessage("Profil professionnel requis|Renseigne ton profil professionnel avant de postuler.", "info"); return; }
+      if (!evaluerEligibilite(o, cv).ok){ afficherMessage("Critères non remplis|Ton profil ne remplit pas toutes les conditions de cette offre."); return; }
+      const lettre = await demander("Tu peux ajouter un court message à l'entreprise (facultatif).", {
+        titre: "Postuler : " + o.titre, ok: "Envoyer ma candidature", champ: { placeholder: "Pourquoi ce poste t'intéresse ?", max: 500 }
+      });
+      if (lettre === null) return;
+      const nom = ((profil.prenom || "") + " " + (profil.nom || "")).trim();
+      await setDoc(doc(db, "postulations", o.id + "_" + user.uid), {
+        uid: user.uid, offreId: o.id, entrepriseUid: o.uid, offreTitre: o.titre, entrepriseNom: o.entrepriseNom || "", anonyme: !!o.anonyme,
+        statut: "recue", nom, profession: profil.profession || "", tel: profil.tel || "", email: user.email || "",
+        niveau: Number(cv.niveau || 0), diplome: cv.diplome || "", experience: Number(cv.experience || 0),
+        competences: cv.competences || [], competencesLib: cv.competencesLib || [], resume: cv.resume || "",
+        lettre: String(lettre).slice(0, 500), horodatages: { recue: Date.now() }, createdAt: serverTimestamp()
+      });
+      afficherMessage("Candidature envoyée|L'entreprise a reçu ton dossier. Tu seras informé(e) par e-mail à chaque étape.", "succes");
+    }
+
+    function listePostulations(z){
+      if (!mesPostulations.length){
+        z.appendChild(el("div", "vide", "Tu n'as pas encore postulé. Parcours les offres d'emploi pour envoyer ta première candidature."));
+        return;
+      }
+      mesPostulations.slice().sort((a, b) => msDe(b.createdAt) - msDe(a.createdAt)).forEach(p => {
+        const c = el("div", "rec-carte");
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + classeStatut(p.statut), STATUTS_REC[p.statut] || p.statut), el("span", "rec-contrat", dateTexte(msDe(p.createdAt))));
+        c.appendChild(haut);
+        c.appendChild(el("h3", "rec-titre", p.offreTitre));
+        c.appendChild(el("div", "rec-meta", p.entrepriseNom || ""));
+        c.appendChild(frise(p));
+        if (p.statut === "entretien" && p.entretien) c.appendChild(el("div", "info", "Entretien : " + p.entretien));
+        if (p.statut === "refusee"){
+          c.appendChild(el("div", "erreur", "Motif communiqué par l'entreprise : " + (p.motif || "non précisé") + (p.messageCandidat ? ". " + p.messageCandidat : "")));
+        }
+        if (p.statut === "retenue") c.appendChild(el("div", "info", "Félicitations : l'entreprise a retenu ta candidature. Elle te contactera pour la suite." + (p.messageCandidat ? " " + p.messageCandidat : "")));
+        if (!FINAUX_REC.includes(p.statut)){
+          const act = el("div", "rec-pied");
+          act.appendChild(bouton("Retirer ma candidature", "sec mini", async () => {
+            if (!(await confirmer("L'entreprise sera informée. Tu ne pourras pas postuler de nouveau à cette offre.", { titre: "Retirer ma candidature", ok: "Retirer", danger: true }))) return;
+            await updateDoc(doc(db, "postulations", p.id), { statut: "retiree", ["horodatages.retiree"]: Date.now(), maj: serverTimestamp() });
+            afficherMessage("Candidature retirée|L'entreprise a été informée.", "succes");
+          }));
+          c.appendChild(act);
+        }
+        z.appendChild(c);
+      });
+    }
+
+    function formProfilPro(z){
+      const cv = cvDe() || {};
+      const f = el("div", "rec-form");
+      f.innerHTML = '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Ton profil professionnel</div>'
+        + '<p class="rec-aide">Ces informations servent à vérifier automatiquement ton éligibilité. Elles sont envoyées à une entreprise seulement quand tu postules.</p>'
+        + '<label class="champ"><span>Plus haut diplôme obtenu</span><select class="ic ic-tag" id="pp-niveau"></select></label>'
+        + '<label class="champ"><span>Intitulé du diplôme <small>facultatif</small></span><input class="ic ic-briefcase" id="pp-diplome" maxlength="80" placeholder="Ex : Licence en gestion"></label>'
+        + '<label class="champ"><span>Années d\'expérience</span><input class="ic ic-clock" id="pp-exp" type="number" min="0" max="50" inputmode="numeric" placeholder="Ex : 3"></label>'
+        + '<label class="champ"><span>Compétences <small>sépare-les par des virgules</small></span><textarea id="pp-comp" rows="3" maxlength="400" placeholder="Ex : comptabilité, Excel, relation client"></textarea></label>'
+        + '<label class="champ"><span>Présentation courte <small>facultatif</small></span><textarea id="pp-resume" rows="3" maxlength="300" placeholder="Ton parcours en quelques lignes"></textarea></label></div>';
+      const sel = f.querySelector("#pp-niveau");
+      NIVEAUX.forEach((l, i) => { const o = el("option", "", i === 0 ? "Aucun diplôme" : l); o.value = String(i); sel.appendChild(o); });
+      sel.value = String(Number(cv.niveau || 0));
+      f.querySelector("#pp-diplome").value = cv.diplome || "";
+      f.querySelector("#pp-exp").value = cv.experience != null ? String(cv.experience) : "";
+      f.querySelector("#pp-comp").value = (cv.competencesLib || cv.competences || []).join(", ");
+      f.querySelector("#pp-resume").value = cv.resume || "";
+      f.appendChild(bouton("Enregistrer mon profil professionnel", "", async () => {
+        const exp = parseInt(f.querySelector("#pp-exp").value, 10);
+        if (isNaN(exp) || exp < 0 || exp > 50){ afficherMessage("Expérience invalide|Indique un nombre d'années entre 0 et 50."); return; }
+        const comp = parserCompetences(f.querySelector("#pp-comp").value, 15);
+        const nouveau = {
+          niveau: parseInt(sel.value, 10) || 0, diplome: f.querySelector("#pp-diplome").value.trim().slice(0, 80), experience: exp,
+          competences: comp.map(x => x.n), competencesLib: comp.map(x => x.lib), resume: f.querySelector("#pp-resume").value.trim().slice(0, 300)
+        };
+        await updateDoc(doc(db, "users", user.uid), { cv: nouveau });
+        profil = { ...profil, cv: nouveau };
+        afficherMessage("Profil enregistré|Ton éligibilité aux offres est vérifiée automatiquement.", "succes");
+        vueEmplois = "offres";
+        rendreEmplois();
+      }));
+      z.appendChild(f);
+    }
+
+    // =====================================================================
+    //  CÔTÉ ENTREPRISE : « Mes recrutements » dans l'espace entreprises
+    // =====================================================================
+    const libelleStatutOffre = o => o.valide !== true ? (o.refusMotif ? "Refusée" : "En attente de validation") : ({ ouverte: "Ouverte", fermee: "Fermée", pourvue: "Pourvue" })[o.statut] || o.statut;
+    const classeOffre = o => o.valide !== true ? (o.refusMotif ? "b-refus" : "b-attribuee") : (o.statut === "ouverte" ? "b-disponible" : "b-gris");
+
+    RECRUT.rendrePro = (z, ent) => {
+      if (recVue === "form"){ proSaisie = true; z.appendChild(formOffre(ent, modeleOffre)); return; }
+      if (recVue === "dossiers"){
+        const o = mesOffres.find(x => x.id === recOffreId);
+        if (o){ vueDossiers(z, o); return; }
+        recVue = "liste";
+      }
+      vueListeOffres(z, ent);
+    };
+
+    function vueListeOffres(z, ent){
+      const recues = postulationsRecues;
+      const tuiles = el("div", "tuiles");
+      const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+      tuiles.append(
+        tuile(mesOffres.filter(o => o.valide === true && o.statut === "ouverte").length, "Offres ouvertes"),
+        tuile(recues.length, "Candidatures reçues"),
+        tuile(recues.filter(p => p.statut === "recue").length, "À traiter"),
+        tuile(recues.filter(p => p.statut === "retenue").length, "Candidats retenus")
+      );
+      z.appendChild(tuiles);
+      z.appendChild(bouton("Publier une offre d'emploi", "", async () => { modeleOffre = null; recVue = "form"; rendrePro(); }));
+      const t = el("div", "rec-transparence");
+      t.appendChild(el("b", "", "Un recrutement transparent et équitable"));
+      [["Critères fixés une fois", "ils ne peuvent plus être modifiés après publication : tous les candidats sont jugés pareil."],
+       ["Éligibilité automatique", "seuls les candidats qui remplissent vos critères peuvent postuler."],
+       ["Décisions motivées", "un refus doit toujours être justifié : le candidat reçoit le motif."],
+       ["Suivi par e-mail", "candidats et entreprise sont prévenus à chaque étape."]].forEach(([a, b]) => {
+        const l = el("div", "rec-ligne-t"); l.append(el("strong", "", a + " : "), document.createTextNode(b)); t.appendChild(l);
+      });
+      z.appendChild(t);
+      z.appendChild(el("div", "pro-titre", "Mes offres d'emploi"));
+      if (!mesOffres.length){ z.appendChild(el("div", "vide", "Aucune offre pour l'instant. Publie ta première offre pour recevoir des candidatures qualifiées.")); return; }
+      mesOffres.slice().sort((a, b) => msDe(b.createdAt) - msDe(a.createdAt)).forEach(o => {
+        const c = el("div", "rec-carte");
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + classeOffre(o), libelleStatutOffre(o)), el("span", "rec-contrat", o.contrat || ""));
+        c.appendChild(haut);
+        c.appendChild(el("h3", "rec-titre", o.titre));
+        c.appendChild(el("div", "rec-meta", [o.ville, o.salaire, Number(o.limiteMs || 0) ? "Jusqu'au " + dateTexte(o.limiteMs) : ""].filter(Boolean).join(" · ")));
+        if (o.valide !== true && o.refusMotif) c.appendChild(el("div", "erreur", "Offre refusée par l'équipe : " + o.refusMotif));
+        if (o.valide !== true && !o.refusMotif) c.appendChild(el("div", "info attente", "En attente de validation par notre équipe : elle sera visible des candidats ensuite."));
+        const mes = recues.filter(p => p.offreId === o.id);
+        const comptes = el("div", "rec-compteurs");
+        [["recue", "reçue(s)"], ["etude", "en étude"], ["preselection", "présélection"], ["entretien", "entretien"], ["retenue", "retenu(s)"], ["refusee", "refusé(s)"]].forEach(([k, l]) => {
+          const n = mes.filter(p => p.statut === k).length;
+          if (n) comptes.appendChild(el("span", "rec-pastille", n + " " + l));
+        });
+        if (!mes.length) comptes.appendChild(el("span", "rec-pastille vide", "Aucune candidature"));
+        c.appendChild(comptes);
+        const act = el("div", "rec-pied");
+        act.appendChild(bouton("Candidatures (" + mes.length + ")", "mini", async () => { recVue = "dossiers"; recOffreId = o.id; recFiltre = "tout"; rendrePro(); }));
+        if (o.valide === true){
+          if (o.statut === "ouverte"){
+            act.appendChild(bouton("Marquer pourvue", "sec mini", async () => { await updateDoc(doc(db, "offres", o.id), { statut: "pourvue" }); }));
+            act.appendChild(bouton("Fermer", "sec mini", async () => { await updateDoc(doc(db, "offres", o.id), { statut: "fermee" }); }));
+          } else {
+            act.appendChild(bouton("Rouvrir", "sec mini", async () => { await updateDoc(doc(db, "offres", o.id), { statut: "ouverte" }); }));
+          }
+        }
+        act.appendChild(bouton("Dupliquer", "sec mini", async () => { modeleOffre = o; recVue = "form"; rendrePro(); }));
+        c.appendChild(act);
+        z.appendChild(c);
+      });
+    }
+
+    function formOffre(ent, modele){
+      const m = modele || {};
+      const f = el("div", "rec-form");
+      f.appendChild(bouton("← Retour à mes recrutements", "sec mini", async () => { modeleOffre = null; recVue = "liste"; rendrePro(); }));
+      f.insertAdjacentHTML("beforeend",
+        '<div class="rec-avertissement">Les critères de sélection sont définis une seule fois : <b>ils ne pourront plus être modifiés après la publication</b>, pour garantir l\'équité entre les candidats. Ton offre est vérifiée par notre équipe avant d\'être visible.</div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Le poste</div>'
+        + '<label class="champ"><span>Intitulé du poste</span><input class="ic ic-briefcase" id="of-titre" maxlength="80" placeholder="Ex : Comptable"></label>'
+        + '<label class="champ"><span>Type de contrat</span><select class="ic ic-tag" id="of-contrat"></select></label>'
+        + '<label class="champ"><span>Ville</span><select class="ic ic-pin" id="of-ville"></select></label>'
+        + '<label class="champ"><span>Description des missions</span><textarea id="of-desc" rows="5" maxlength="800" placeholder="Missions, conditions de travail, horaires…"></textarea></label>'
+        + '<label class="champ"><span>Rémunération <small>facultatif</small></span><input class="ic ic-cash" id="of-salaire" maxlength="60" placeholder="Ex : 120 000 FCFA / mois"></label>'
+        + '<label class="champ"><span>Date limite de candidature <small>facultatif</small></span><input class="ic ic-calendar" id="of-limite" type="date"></label></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">2</span>Critères de sélection</div>'
+        + '<label class="champ"><span>Diplôme minimum exigé</span><select class="ic ic-tag" id="of-niveau"></select></label>'
+        + '<label class="champ"><span>Intitulé de diplôme souhaité <small>indicatif, facultatif</small></span><input class="ic ic-briefcase" id="of-diplome" maxlength="80" placeholder="Ex : Comptabilité et gestion"></label>'
+        + '<label class="champ"><span>Années d\'expérience minimum</span><input class="ic ic-clock" id="of-exp" type="number" min="0" max="30" inputmode="numeric" placeholder="0"></label>'
+        + '<label class="champ"><span>Compétences obligatoires <small>8 maximum, séparées par des virgules</small></span><textarea id="of-obl" rows="2" maxlength="300" placeholder="Ex : comptabilité, Excel"></textarea></label>'
+        + '<label class="champ"><span>Compétences souhaitées (atouts) <small>facultatif, non bloquant</small></span><textarea id="of-souh" rows="2" maxlength="300" placeholder="Ex : anglais, logiciel Sage"></textarea></label></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">3</span>Équité</div>'
+        + '<label class="check"><input type="checkbox" id="of-anonyme"> <span>Évaluation anonyme : masquer l\'identité des candidats (nom et contacts) jusqu\'à la présélection</span></label></div>');
+      const sc = f.querySelector("#of-contrat"), sv = f.querySelector("#of-ville"), sn = f.querySelector("#of-niveau");
+      CONTRATS.forEach(c => { const o = el("option", "", c); o.value = c; sc.appendChild(o); });
+      VILLES_REC.forEach(c => { const o = el("option", "", c); o.value = c; sv.appendChild(o); });
+      NIVEAUX.forEach((c, i) => { const o = el("option", "", c); o.value = String(i); sn.appendChild(o); });
+      f.querySelector("#of-titre").value = m.titre || "";
+      sc.value = m.contrat || "CDI";
+      sv.value = m.ville || (profil && profil.ville) || "Bohicon";
+      f.querySelector("#of-desc").value = m.description || "";
+      f.querySelector("#of-salaire").value = m.salaire || "";
+      sn.value = String(Number(m.diplomeMin || 0));
+      f.querySelector("#of-diplome").value = m.diplomeLibelle || "";
+      f.querySelector("#of-exp").value = m.experienceMin != null ? String(m.experienceMin) : "0";
+      f.querySelector("#of-obl").value = (m.competencesOblLib || []).join(", ");
+      f.querySelector("#of-souh").value = (m.competencesSouhLib || []).join(", ");
+      f.querySelector("#of-anonyme").checked = !!m.anonyme;
+      f.appendChild(bouton("Soumettre l'offre pour validation", "", async () => {
+        const titre = f.querySelector("#of-titre").value.trim();
+        const description = f.querySelector("#of-desc").value.trim();
+        const experienceMin = parseInt(f.querySelector("#of-exp").value, 10) || 0;
+        if (titre.length < 3){ afficherMessage("Intitulé manquant|Indique l'intitulé du poste (3 caractères minimum)."); return; }
+        if (description.length < 20){ afficherMessage("Description trop courte|Décris le poste en 20 caractères minimum."); return; }
+        if (experienceMin < 0 || experienceMin > 30){ afficherMessage("Expérience invalide|Indique un nombre d'années entre 0 et 30."); return; }
+        const obl = parserCompetences(f.querySelector("#of-obl").value, 8), souh = parserCompetences(f.querySelector("#of-souh").value, 8);
+        const dateLim = f.querySelector("#of-limite").value;
+        const limiteMs = dateLim ? new Date(dateLim + "T23:59:59").getTime() : 0;
+        if (limiteMs && limiteMs < Date.now()){ afficherMessage("Date limite dépassée|Choisis une date à venir."); return; }
+        if (!(await confirmer("Une fois publiée, l'offre ne pourra plus voir ses critères modifiés. Vérifie-les avant de continuer.", { titre: "Soumettre l'offre", ok: "Soumettre" }))) return;
+        await setDoc(doc(collection(db, "offres")), {
+          uid: user.uid, entrepriseNom: ent.nom, secteur: ent.secteur || "", titre, description,
+          contrat: sc.value, ville: sv.value, salaire: f.querySelector("#of-salaire").value.trim().slice(0, 60), limiteMs,
+          diplomeMin: parseInt(sn.value, 10) || 0, diplomeLibelle: f.querySelector("#of-diplome").value.trim().slice(0, 80), experienceMin,
+          competencesObl: obl.map(x => x.n), competencesOblLib: obl.map(x => x.lib), competencesSouh: souh.map(x => x.n), competencesSouhLib: souh.map(x => x.lib),
+          anonyme: f.querySelector("#of-anonyme").checked, statut: "ouverte", valide: !!estAdminUtilisateur, createdAt: serverTimestamp()
+        });
+        afficherMessage("Offre soumise|Notre équipe la vérifie avant de la rendre visible. Tu seras prévenu(e) par e-mail.", "succes");
+        modeleOffre = null;
+        recVue = "liste";
+        rendrePro();
+      }));
+      return f;
+    }
+
+    // ---------- tableau de suivi des candidatures d'une offre ----------
+    async function changerStatut(p, statut, extras){
+      await updateDoc(doc(db, "postulations", p.id), Object.assign({ statut, ["horodatages." + statut]: Date.now(), maj: serverTimestamp() }, extras || {}));
+    }
+    function modalRefus(nom){
+      return new Promise(resolve => {
+        const fond = document.createElement("div");
+        fond.className = "dlg-fond";
+        const boite = document.createElement("div");
+        boite.className = "dlg pres";
+        boite.setAttribute("role", "dialog");
+        boite.appendChild(el("h3", "dlg-titre", "Refuser la candidature"));
+        boite.appendChild(el("p", "dlg-msg", "Le motif choisi sera communiqué à " + nom + ", par souci de transparence."));
+        let choix = "";
+        const liste = el("div", "rec-motifs");
+        MOTIFS_REFUS.forEach(m => {
+          const b = el("button", "rec-motif", m);
+          b.type = "button";
+          b.addEventListener("click", () => { choix = m; liste.querySelectorAll(".rec-motif").forEach(x => x.classList.toggle("on", x === b)); });
+          liste.appendChild(b);
+        });
+        boite.appendChild(liste);
+        const msg = document.createElement("textarea");
+        msg.className = "dlg-champ";
+        msg.rows = 3; msg.maxLength = 300;
+        msg.placeholder = "Message au candidat (facultatif)";
+        boite.appendChild(msg);
+        const rang = el("div", "dlg-actions");
+        const ann = el("button", "dlg-btn sec", "Annuler"); ann.type = "button";
+        const ok = el("button", "dlg-btn ok", "Refuser"); ok.type = "button";
+        const fermer = v => { fond.remove(); resolve(v); };
+        ann.addEventListener("click", () => fermer(null));
+        ok.addEventListener("click", () => {
+          if (!choix){ afficherMessage("Motif requis|Choisis un motif : un refus doit toujours être justifié."); return; }
+          fermer({ motif: choix, message: msg.value.trim() });
+        });
+        rang.append(ann, ok);
+        boite.appendChild(rang);
+        fond.appendChild(boite);
+        fond.addEventListener("click", e => { if (e.target === fond) fermer(null); });
+        document.body.appendChild(fond);
+      });
+    }
+
+    function vueDossiers(z, o){
+      z.appendChild(bouton("← Mes offres", "sec mini", async () => { recVue = "liste"; rendrePro(); }));
+      z.appendChild(el("h3", "rec-titre", o.titre));
+      const criteres = [];
+      criteres.push(Number(o.diplomeMin || 0) ? NIVEAUX[o.diplomeMin] + " minimum" : "Tous niveaux de diplôme");
+      if (Number(o.experienceMin || 0)) criteres.push(o.experienceMin + " an(s) d'expérience minimum");
+      (o.competencesOblLib || []).forEach(c => criteres.push(c));
+      z.appendChild(el("div", "rec-note", "Critères appliqués à tous les candidats : " + criteres.join(" · ")));
+      if (o.anonyme) z.appendChild(el("div", "rec-note", "Évaluation anonyme activée : les identités sont masquées jusqu'à la présélection."));
+
+      const tous = postulationsRecues.filter(p => p.offreId === o.id).sort((a, b) => msDe(a.createdAt) - msDe(b.createdAt));
+      const rang = new Map(tous.map((p, i) => [p.id, i + 1]));
+      const chips = el("div", "cc-chips");
+      FILTRES_DOSSIERS.forEach(([k, l]) => {
+        const n = k === "tout" ? tous.length : tous.filter(p => p.statut === k).length;
+        const b = el("button", "cc-chip" + (recFiltre === k ? " on" : ""), l + " (" + n + ")");
+        b.type = "button";
+        b.addEventListener("click", () => { recFiltre = k; rendrePro(); });
+        chips.appendChild(b);
+      });
+      z.appendChild(chips);
+      const tri = el("div", "rec-tri");
+      tri.appendChild(document.createTextNode("Trier par : "));
+      [["arrivee", "Ordre d'arrivée"], ["score", "Correspondance"]].forEach(([k, l]) => {
+        const b = el("button", "rec-tri-b" + (recTri === k ? " on" : ""), l);
+        b.type = "button";
+        b.addEventListener("click", () => { recTri = k; rendrePro(); });
+        tri.appendChild(b);
+      });
+      z.appendChild(tri);
+
+      let liste = recFiltre === "tout" ? tous : tous.filter(p => p.statut === recFiltre);
+      if (recTri === "score") liste = liste.slice().sort((a, b) => scorePostulation(o, b) - scorePostulation(o, a));
+      if (!liste.length){ z.appendChild(el("div", "vide", "Aucune candidature dans cette catégorie.")); return; }
+      liste.forEach(p => z.appendChild(carteDossier(o, p, rang.get(p.id))));
+    }
+
+    function carteDossier(o, p, numero){
+      const masque = !!o.anonyme && (p.statut === "recue" || p.statut === "etude");
+      const nom = masque ? "Candidat n° " + numero : p.nom;
+      const c = el("div", "rec-carte");
+      const haut = el("div", "rec-haut");
+      haut.append(el("span", "badge " + classeStatut(p.statut), STATUTS_REC[p.statut] || p.statut), el("span", "rec-score", "Correspondance " + scorePostulation(o, p) + " %"));
+      c.appendChild(haut);
+      c.appendChild(el("h3", "rec-titre", nom));
+      const l1 = [niveauLib(p.niveau) + (p.diplome ? " · " + p.diplome : ""), (p.experience || 0) + " an(s) d'expérience"];
+      c.appendChild(el("div", "rec-meta", l1.join(" · ")));
+      const comp = el("div", "rec-criteres");
+      (p.competencesLib || p.competences || []).forEach((l, i) => {
+        const n = (p.competences || [])[i];
+        const type = (o.competencesObl || []).includes(n) ? "ok" : ((o.competencesSouh || []).includes(n) ? "bonus" : "");
+        comp.appendChild(el("span", "rec-crit " + type, l));
+      });
+      c.appendChild(comp);
+      if (p.resume && !masque) c.appendChild(el("p", "rec-desc", p.resume));
+      if (p.lettre) c.appendChild(el("p", "rec-desc", "Message : " + p.lettre));
+      if (!masque){
+        const contact = el("div", "rec-meta", "Tél. : " + (p.tel || "—") + " · E-mail : " + (p.email || "—"));
+        c.appendChild(contact);
+      }
+      c.appendChild(frise(p));
+      if (p.statut === "entretien" && p.entretien) c.appendChild(el("div", "info", "Entretien : " + p.entretien));
+      if (p.statut === "refusee") c.appendChild(el("div", "erreur", "Motif communiqué : " + (p.motif || "—")));
+
+      const act = el("div", "rec-pied");
+      const etape = async (statut, extras, confirmation) => {
+        if (confirmation && !(await confirmer(confirmation.texte, { titre: confirmation.titre, ok: confirmation.ok }))) return;
+        await changerStatut(p, statut, extras);
+      };
+      if (p.statut === "recue") act.appendChild(bouton("Étudier le dossier", "mini", async () => etape("etude")));
+      if (p.statut === "etude") act.appendChild(bouton("Présélectionner", "mini", async () => etape("preselection", null, { titre: "Présélectionner", texte: "Le candidat sera informé par e-mail" + (o.anonyme ? " et son identité vous sera révélée." : "."), ok: "Présélectionner" })));
+      if (p.statut === "preselection") act.appendChild(bouton("Planifier un entretien", "mini", async () => {
+        const quand = await demander("Indique la date, l'heure et le lieu : le candidat les recevra par e-mail.", { titre: "Planifier un entretien", ok: "Envoyer la convocation", champ: { placeholder: "Ex : Jeudi 20 nov. à 10h, bureau de Bohicon", max: 140 } });
+        if (!quand) return;
+        await changerStatut(p, "entretien", { entretien: quand });
+      }));
+      if (p.statut === "preselection" || p.statut === "entretien") act.appendChild(bouton("Retenir", "mini", async () => etape("retenue", null, { titre: "Retenir le candidat", texte: "Le candidat sera informé de ta décision par e-mail.", ok: "Retenir" })));
+      if (!FINAUX_REC.includes(p.statut)) act.appendChild(bouton("Refuser", "sec mini", async () => {
+        const r = await modalRefus(nom);
+        if (!r) return;
+        await changerStatut(p, "refusee", { motif: r.motif, messageCandidat: r.message });
+      }));
+      if (act.children.length) c.appendChild(act);
+      return c;
+    }
+  } catch (e) {
+    console.error("Module de recrutement indisponible :", e);
+  }
+
 </script>
 </body>
 </html>
