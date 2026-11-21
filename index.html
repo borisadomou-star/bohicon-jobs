@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261117-0216">
-<meta name="build-notes" content="Nouveau : offres d'emploi, éligibilité automatique et suivi des candidatures pour les entreprises.">
+<meta name="build" content="20261120-1417">
+<meta name="build-notes" content="Barre d'infos plus fiable, nouveaux métiers, photo de profil et genre.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -146,7 +146,7 @@
   .resultats .lien{width:auto;font-size:.82rem}
 
   .retour-flottant{position:fixed;left:14px;bottom:14px;z-index:60;width:auto;margin:0;padding:11px 16px;border-radius:999px;background:#fff;color:var(--vert);border:1.5px solid var(--vert);box-shadow:0 8px 20px rgba(0,0,0,.25);font-size:.82rem}
-  .overlay{position:fixed;inset:0;background:rgba(8,40,25,.55);z-index:90;display:flex;align-items:flex-end;justify-content:center}
+  .overlay{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(8,40,25,.55);z-index:90;display:flex;align-items:flex-end;justify-content:center}
   .retour-carte{background:#fff;border-radius:22px 22px 0 0;padding:18px;width:min(100%,520px);max-height:92vh;overflow:auto}
   .piege{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 
@@ -354,7 +354,7 @@
 
 
   /* Fenêtres de confirmation : style sobre et professionnel (remplacent celles du navigateur) */
-  .dlg-fond{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,30,19,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .dlg-fond{position:fixed;top:0;right:0;bottom:0;left:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,30,19,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
   .dlg-fond.sortie{animation:dlg-sortie .14s ease both}
   .dlg{width:min(100%,400px);padding:24px 22px 18px;border-radius:22px;background:#fff;box-shadow:0 30px 70px -20px rgba(6,30,19,.65);text-align:center;animation:dlg-entree .22s cubic-bezier(.2,.9,.3,1.15) both}
   .dlg-ico{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:#e7f5ed;color:#0f7a45}
@@ -552,7 +552,7 @@
   .champ select.ic{-webkit-appearance:none;appearance:none;padding-right:44px}
   .champ select.ic.ic-pin{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z'/%3E%3Ccircle cx='12' cy='10' r='2.5'/%3E%3C/svg%3E");background-position:right 16px center,16px center;background-size:18px,20px;background-repeat:no-repeat}
   .champ select.ic.ic-tag{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235d7467' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237d9186' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12V4h8l9 9-8 8-9-9z'/%3E%3Ccircle cx='7.5' cy='8.5' r='1.2'/%3E%3C/svg%3E");background-position:right 16px center,16px center;background-size:18px,20px;background-repeat:no-repeat}
-  .sh-fond{position:fixed;inset:0;z-index:118;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .sh-fond{position:fixed;top:0;right:0;bottom:0;left:0;z-index:118;display:flex;align-items:flex-end;justify-content:center;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
   .sh-fond.sortie{animation:dlg-sortie .14s ease both}
   .sh{display:flex;flex-direction:column;width:min(100%,520px);max-height:78vh;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:26px 26px 0 0;background:#fff;box-shadow:0 -20px 60px -20px rgba(6,30,19,.6);animation:sh-monte .26s cubic-bezier(.2,.9,.3,1.05) both}
   .sh-poignee{align-self:center;width:44px;height:5px;margin:2px 0 12px;border-radius:999px;background:#dfe7e2}
@@ -672,7 +672,7 @@
   /* ===== En-tête premium : barre du haut, slogan et informations défilantes ===== */
   .topbar{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);border-bottom:1px solid rgba(11,107,58,.1);box-shadow:0 10px 26px -18px rgba(6,47,27,.5)}
   .logo{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 18px -10px rgba(11,107,58,.9)}
-  .logo::after{content:"";position:absolute;inset:0 0 55% 0;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0));pointer-events:none}
+  .logo::after{content:"";position:absolute;top:0;right:0;bottom:55%;left:0;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0));pointer-events:none}
   .marque-texte b{color:#0a4d2b;font-weight:800;letter-spacing:-.02em}
   .marque-texte b i{font-style:normal;background:linear-gradient(135deg,#12995a 0%,#c99700 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
   .btn-pro{border:1px solid rgba(252,209,22,.65);background:linear-gradient(135deg,#0a5a32,#12995a);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 12px 22px -12px rgba(11,107,58,.95);letter-spacing:.01em}
@@ -743,18 +743,18 @@
 
   /* ===== Page d'accès plein écran ===== */
   body.verrou-acces{overflow:hidden}
-  .ecran-chargement{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;background:radial-gradient(80% 60% at 72% 8%,rgba(252,209,22,.2),rgba(252,209,22,0) 60%),linear-gradient(160deg,#021209 0%,#06311c 55%,#0a5a32 100%);transition:opacity .4s ease,visibility .4s}
+  .ecran-chargement{position:fixed;top:0;right:0;bottom:0;left:0;z-index:95;display:flex;align-items:center;justify-content:center;background:radial-gradient(80% 60% at 72% 8%,rgba(252,209,22,.2),rgba(252,209,22,0) 60%),linear-gradient(160deg,#021209 0%,#06311c 55%,#0a5a32 100%);transition:opacity .4s ease,visibility .4s}
   .ecran-chargement.fini{opacity:0;visibility:hidden;pointer-events:none}
   .chg-logo{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:26px;background:#fff;color:#0a5a32;font-size:1.9rem;font-weight:800;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);animation:chg-pouls 1.8s ease-in-out infinite}
   .chg-anneau{position:absolute;width:130px;height:130px;border:2px solid rgba(252,209,22,.3);border-top-color:#fcd116;border-radius:50%;animation:chg-tour 1.1s linear infinite}
   @keyframes chg-pouls{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
   @keyframes chg-tour{to{transform:rotate(360deg)}}
 
-  .ecran-acces{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:#fff}
+  .ecran-acces{position:fixed;top:0;right:0;bottom:0;left:0;z-index:90;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:#fff}
   .acces-hero{position:relative;display:flex;flex-direction:column;flex:none;min-height:min(46vh,430px);padding:26px 24px 70px;overflow:hidden;color:#fff;
     background:radial-gradient(60% 50% at 86% 8%,rgba(252,209,22,.3) 0%,rgba(252,209,22,0) 62%),radial-gradient(70% 60% at 8% 96%,rgba(18,153,90,.5) 0%,rgba(18,153,90,0) 66%),linear-gradient(160deg,#021209 0%,#06311c 42%,#0a5a32 76%,#0f7a45 100%)}
   .acces-hero::before{content:"";position:absolute;right:-130px;top:-130px;width:420px;height:420px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 60px rgba(255,255,255,.035),0 0 0 130px rgba(255,255,255,.025),0 0 0 210px rgba(255,255,255,.018);pointer-events:none}
-  .acces-hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);pointer-events:none}
+  .acces-hero::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);mask-image:radial-gradient(90% 80% at 82% 18%,#000 0%,transparent 75%);pointer-events:none}
   .acces-reseau{position:absolute;right:-24px;top:34px;z-index:1;width:min(64%,310px);opacity:.75}
   .nd{animation:nd-pouls 2.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
   .nd.d2{animation-delay:1.2s}
@@ -804,7 +804,7 @@
 
   /* ===== Centre de notifications ===== */
   .cloche svg{width:22px;height:22px}
-  .fond-notifs{position:fixed;inset:0;z-index:118;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
+  .fond-notifs{position:fixed;top:0;right:0;bottom:0;left:0;z-index:118;background:rgba(6,30,19,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:dlg-fond .18s ease both}
   #panneau-notifs{position:fixed;top:auto;right:0;bottom:0;left:0;z-index:119;display:flex;flex-direction:column;width:min(100%,560px);max-height:86vh;margin:0 auto;padding:10px 0 0;overflow:hidden;border-radius:26px 26px 0 0;background:#fff;box-shadow:0 -24px 60px -20px rgba(6,30,19,.6);animation:sh-monte .26s cubic-bezier(.2,.9,.3,1.05) both}
   @media (min-width:721px){#panneau-notifs{bottom:24px;border-radius:26px}}
   .nt-poignee{align-self:center;flex:none;width:44px;height:5px;margin:2px 0 8px;border-radius:999px;background:#dfe7e2}
@@ -892,6 +892,38 @@
   .rec-motif{width:100%;margin:0;padding:12px 14px;border:1.5px solid #dfe9e3;border-radius:14px;background:#fff;color:var(--encre);font-size:.88rem;font-weight:600;text-align:left;box-shadow:none}
   .rec-motif.on{border-color:var(--vert2);background:#f1faf5;color:var(--vert-fonce)}
 
+  /* ===== Barre d'informations : défilement continu, compatible avec tous les mobiles ===== */
+  .annonce{position:relative;overflow:hidden}
+  .annonce .defile{position:relative;flex:1 1 0%;min-width:0;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%)}
+  .defile-piste{display:inline-block;white-space:nowrap;-webkit-animation:defile-boucle 16s linear infinite;animation:defile-boucle 16s linear infinite;-webkit-backface-visibility:hidden;backface-visibility:hidden;will-change:transform}
+  .defile-bloc{position:relative;display:inline-block;box-sizing:border-box;padding-right:2.6rem;white-space:nowrap;font-weight:700;letter-spacing:.01em;color:#fff}
+  .defile-bloc::after{content:"\25C6";position:absolute;right:1rem;top:50%;margin-top:-.5em;font-size:.6em;line-height:1;color:var(--acc)}
+  .annonce .defile.pause .defile-piste{-webkit-animation-play-state:paused;animation-play-state:paused}
+  @-webkit-keyframes defile-boucle{from{-webkit-transform:translate3d(0,0,0)}to{-webkit-transform:translate3d(-50%,0,0)}}
+  @keyframes defile-boucle{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+  .annonce::after{content:"";position:absolute;top:0;bottom:0;left:-90px;width:70px;pointer-events:none;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.16),rgba(255,255,255,0));-webkit-transform:skewX(-20deg);transform:skewX(-20deg);-webkit-animation:annonce-eclat 7s ease-in-out infinite;animation:annonce-eclat 7s ease-in-out infinite}
+  @-webkit-keyframes annonce-eclat{0%{left:-90px}40%,100%{left:110%}}
+  @keyframes annonce-eclat{0%{left:-90px}40%,100%{left:110%}}
+  @media (max-width:370px){.an-etiq{display:none}.an-badge{padding:4px 7px}.annonce{padding:8px}.annonce .an-lien{padding:5px 9px}}
+
+  /* ===== Photo de profil et genre ===== */
+  .avatar.genre-homme,.photo-g.genre-homme,img.genre-homme{box-shadow:0 0 0 2px #fff,0 0 0 4px #4a86e8}
+  .avatar.genre-femme,.photo-g.genre-femme,img.genre-femme{box-shadow:0 0 0 2px #fff,0 0 0 4px #e8588f}
+  img.avatar-photo{padding:0;border:0;border-radius:50%;object-fit:cover;background:#fff}
+  .h-titre .avatar-mini{display:inline-flex;vertical-align:middle;width:28px;height:28px;margin-right:8px;font-size:.75rem}
+  .photo-carte{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:14px;border:1px solid #cfe8d9;border-radius:18px;background:linear-gradient(135deg,#f3fbf6,#e8f6ee)}
+  .photo-g{flex:none;display:flex;align-items:center;justify-content:center;width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;font-size:1.8rem;font-weight:700}
+  img.photo-g.avatar-photo{background:#fff}
+  .photo-txt{flex:1;min-width:0}
+  .photo-txt b{display:block;font-size:.95rem}
+  .photo-txt small{display:block;margin:2px 0 8px;font-size:.78rem;line-height:1.4;color:var(--gris)}
+  .photo-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .photo-actions .mini{width:auto;margin:0}
+  .photo-actions .lien{width:auto;margin:0;padding:2px 4px;font-size:.82rem}
+  .dom-recherche{margin:0 0 8px}
+  .dom-compte{margin:0 2px 8px;font-size:.78rem;font-weight:600;color:var(--vert)}
+  .dom-autre{margin:12px 0 4px}
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -953,7 +985,7 @@
   #fab-haut.on{opacity:1;pointer-events:auto}
   #fab-wa{bottom:80px;background:#128c4a;color:#fff}
 
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}.annonce .defile{white-space:normal}.annonce .defile-texte{animation:none;padding-left:0}.annonce .icone{animation:none}}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}.annonce .icone{animation:none}}
 </style>
 </head>
 <body>
@@ -1275,6 +1307,18 @@
             <div class="pi-txt"><b>Notifications</b><small id="push-etat">…</small></div>
             <button id="push-bouton" class="mini" type="button">Activer</button>
           </div>
+          <div class="photo-carte" id="photo-carte">
+            <div id="photo-apercu"></div>
+            <div class="photo-txt">
+              <b>Photo de profil</b>
+              <small>Une vraie photo rassure les autres utilisateurs. Elle s'affiche sur tes missions et tes candidatures.</small>
+              <div class="photo-actions">
+                <button id="photo-choisir" class="sec mini" type="button">Choisir une photo</button>
+                <button id="photo-retirer" class="lien cache" type="button">Retirer</button>
+              </div>
+            </div>
+            <input id="photo-fichier" type="file" accept="image/*" hidden>
+          </div>
           <div class="dom-carte" id="dom-carte">
             <div class="dom-tete">
               <span class="pi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.8V16c0 1.2 2.5 2.6 5.5 2.6s5.5-1.4 5.5-2.6v-4.2"/><path d="M21.5 9.5v5"/></svg></span>
@@ -1436,6 +1480,7 @@
         <label class="champ"><span>Nom</span><input class="ic ic-user" id="${p}nom" placeholder="Ex : Kossi" maxlength="40" autocomplete="family-name"></label>
       </div>
       <label class="champ"><span>Profession</span><input class="ic ic-briefcase" id="${p}profession" list="professions" placeholder="Couturière, étudiant, chauffeur…" maxlength="60" autocomplete="off"></label>
+      <div class="champ"><span>Je suis</span><select class="ic ic-user" id="${p}genre" data-segments><option value="homme">Homme</option><option value="femme">Femme</option></select></div>
     </div>
     <div class="sect">
       <div class="sect-titre"><span class="sect-num">${debut + 1}</span>Contact et résidence</div>
@@ -1458,6 +1503,7 @@
     ${avecOk ? `<label class="check"><input type="checkbox" id="${p}ok">
       <span>J'ai 18 ans ou plus et j'accepte la <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité et les conditions d'utilisation</a>.</span></label>` : ""}`;
   $("champs-inscription").innerHTML = champs("i-", true, 2);
+  $("i-genre").value = "";
   $("champs-profil").innerHTML = champs("p-");
   $("champs-edit").innerHTML = champs("e-", false);
 
@@ -1469,13 +1515,15 @@
     const ville = $(p + "ville").value;
     const adresse = $(p + "adresse").value.trim();
     const role = $(p + "role").value;
+    const genre = $(p + "genre").value;
     if (prenom.length < 2 || nom.length < 2){ afficherMessage("Entre ton prénom et ton nom."); return null; }
     if (profession.length < 2){ afficherMessage("Indique ta profession."); return null; }
+    if (p === "i-" && !genre){ afficherMessage("Précise si tu es un homme ou une femme."); return null; }
     if (tel.replace(/\D/g, "").length < 8){ afficherMessage("Numéro WhatsApp invalide."); return null; }
     if (!ville){ afficherMessage("Choisis ta ville de résidence."); return null; }
     if (adresse.length < 3){ afficherMessage("Entre ton quartier ou adresse de résidence."); return null; }
     if (exigerOk && !$(p + "ok").checked){ afficherMessage("Tu dois confirmer avoir 18 ans ou plus et accepter l'utilisation de tes informations."); return null; }
-    return { prenom, nom, profession, tel, ville, adresse, role };
+    return { prenom, nom, profession, tel, ville, adresse, role, ...(genre ? { genre } : {}) };
   }
 
 
@@ -1698,11 +1746,33 @@
   }
 
   const CATEGORIES = [
-    ["menage", "🧹", "Ménage et nettoyage"], ["livraison", "🛵", "Livraison et courses"],
-    ["jardinage", "🌿", "Jardinage et extérieur"], ["bricolage", "🔧", "Bricolage et réparation"],
-    ["cuisine", "🍳", "Cuisine et événements"], ["domicile", "🏠", "Aide à domicile"],
-    ["transport", "📦", "Déménagement et transport"], ["cours", "📚", "Cours et soutien scolaire"],
-    ["informatique", "💻", "Informatique et bureautique"], ["autre", "✨", "Autre"]
+    ["menage", "🧹", "Ménage et nettoyage"],
+    ["livraison", "🛵", "Livraison et courses"],
+    ["jardinage", "🌿", "Jardinage et extérieur"],
+    ["bricolage", "🔧", "Bricolage et réparation"],
+    ["cuisine", "🍳", "Cuisine et événements"],
+    ["domicile", "🏠", "Aide à domicile"],
+    ["transport", "🚚", "Déménagement et transport"],
+    ["cours", "📚", "Cours et soutien scolaire"],
+    ["informatique", "💻", "Informatique et bureautique"],
+    ["electricite", "⚡", "Électricité bâtiment"],
+    ["plomberie", "🚰", "Plomberie et sanitaire"],
+    ["maconnerie", "🧱", "Maçonnerie et carrelage"],
+    ["menuiserie", "🪑", "Menuiserie et ébénisterie"],
+    ["peinture", "🎨", "Peinture et finition"],
+    ["soudure", "🔥", "Soudure et métallerie"],
+    ["mecanique", "🛠️", "Mécanique auto et moto"],
+    ["froid", "❄️", "Froid et climatisation"],
+    ["electronique", "📱", "Électronique et dépannage"],
+    ["couture", "🧵", "Couture et stylisme"],
+    ["coiffure", "💇", "Coiffure et esthétique"],
+    ["comptabilite", "📊", "Comptabilité et secrétariat"],
+    ["commerce", "🛍️", "Vente et commerce"],
+    ["securite", "🛡️", "Sécurité et gardiennage"],
+    ["agriculture", "🌾", "Agriculture et élevage"],
+    ["photo", "📷", "Photo, vidéo et événementiel"],
+    ["sante", "🩺", "Santé et soins"],
+    ["autre", "✨", "Autre"]
   ];
   const catInfo = cle => CATEGORIES.find(c => c[0] === cle) || null;
   const normaliser = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -1841,6 +1911,7 @@
     ["prenom", "nom", "profession", "tel", "adresse"].forEach(k => { $(p + k).value = d[k] || ""; });
     $(p + "ville").value = d.ville || "";
     $(p + "role").value = d.role || "les deux";
+    $(p + "genre").value = d.genre || "";
   }
 
   const NIVEAUX = [
@@ -2455,7 +2526,7 @@
       const nbTerminees = cpt.parAuteur[m.uid] || 0;
       const nr = notesPour(m.uid);
       const aut = el("div", "c-auteur");
-      const avt = avatarNode(m.entrepriseNom || m.auteur, m.entrepriseNom ? logoDe(m.uid) : "", "avatar");
+      const avt = avatarNode(m.entrepriseNom || m.auteur, m.entrepriseNom ? logoDe(m.uid) : photoDe(m.uid), "avatar", m.entrepriseNom ? "" : (m.auteurGenre || ""));
       aut.appendChild(avt);
       const t = el("div");
       const nomB = el("b", m.entrepriseNom ? "cliquable" : "", m.entrepriseNom || m.auteur);
@@ -2618,6 +2689,7 @@
                   nom: nomCourt(profil), profession: profil.profession, tel: profil.tel,
                   titre: m.titre, prix: m.prix, ville: m.ville,
                   formation: formationPour(m.categorie).slice(0, 100),
+                  genre: (profil && profil.genre) || "",
                   statut: "en_attente", createdAt: serverTimestamp()
                 });
               } catch (e) {
@@ -3010,6 +3082,7 @@
         uid: user.uid,
         statut: "disponible",
         valide: estAdminUtilisateur,
+        auteurGenre: (profil && profil.genre) || "",
         ...(profil && profil.entreprise && profil.entreprise.nom && $("pub-entreprise").checked
           ? { entrepriseNom: profil.entreprise.nom, entrepriseSecteur: profil.entreprise.secteur || "" } : {}),
         createdAt: serverTimestamp()
@@ -3046,7 +3119,7 @@
     ["resume", "histo", "cands", "emplois", "publier", "profil", "aide"].forEach(k => $("t-" + k).classList.toggle("cache", k !== t));
     if (t === "emplois" && RECRUT.majEmplois) RECRUT.majEmplois();
     if (t === "profil" && profil) remplir("e-", profil);
-    if (t === "profil"){ domEdition = null; rendreDomaines(); }
+    if (t === "profil"){ domEdition = null; rendreDomaines(); rendrePhotoCarte(); if (user) photoDe(user.uid); }
     if (t === "publier") majFormPublication();
     const actif = document.querySelector(".onglet.on");
     if (actif && espaceOuvert && actif.scrollIntoView) actif.scrollIntoView({ block: "nearest", inline: "center" });
@@ -3514,7 +3587,7 @@
     const bas = el("div", "c-bas");
     if (profil){
       const aut = el("div", "c-auteur");
-      aut.appendChild(avatarNode(auNom || "?", ent && $("pub-entreprise").checked && maFicheUid === (user && user.uid) ? maLogo : "", "avatar"));
+      aut.appendChild(avatarNode(auNom || "?", ent && $("pub-entreprise").checked && maFicheUid === (user && user.uid) ? maLogo : (user ? (photosCache.get(user.uid) || "") : ""), "avatar", ent && $("pub-entreprise").checked ? "" : ((profil && profil.genre) || "")));
       const tt = el("div");
       tt.appendChild(el("b", "", auNom));
       tt.appendChild(el("small", "", ent && $("pub-entreprise").checked ? (ent.secteur || "Entreprise") : "Auteur de la mission"));
@@ -3834,15 +3907,95 @@
     return "";
   }
 
-  function avatarNode(nom, logo, classe){
+  // Photos de profil : petites images stockées dans Firestore (pas de stockage de fichiers sur le plan gratuit)
+  const photosCache = new Map();
+  let photoRafraichir = null;
+  function photoDe(uid){
+    if (!uid) return "";
+    if (photosCache.has(uid)) return photosCache.get(uid);
+    photosCache.set(uid, "");
+    getDoc(doc(db, "photos", uid)).then(s => {
+      if (s.exists() && s.data().data){
+        photosCache.set(uid, s.data().data);
+        clearTimeout(photoRafraichir);
+        photoRafraichir = setTimeout(() => { try { afficher(); rendrePhotoCarte(); } catch (e) { /* ignoré */ } }, 150);
+      }
+    }).catch(() => { /* pas de photo */ });
+    return "";
+  }
+  function lirePhoto(fichier){
+    return new Promise((resolve, reject) => {
+      if (!fichier || !/^image\//.test(fichier.type)) return reject(new Error("format"));
+      const url = URL.createObjectURL(fichier);
+      const img = new Image();
+      img.onload = () => {
+        const T = 256;
+        const c = document.createElement("canvas");
+        c.width = T; c.height = T;
+        const ctx = c.getContext("2d");
+        const cote = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width - cote) / 2, (img.height - cote) / 2, cote, cote, 0, 0, T, T);
+        URL.revokeObjectURL(url);
+        let sortie = "";
+        for (const q of [0.82, 0.7, 0.58, 0.45]){
+          sortie = c.toDataURL("image/jpeg", q);
+          if (sortie.length < 60000) break;
+        }
+        resolve(sortie);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("lecture")); };
+      img.src = url;
+    });
+  }
+  function rendrePhotoCarte(){
+    const zone = $("photo-apercu");
+    if (!zone) return;
+    zone.innerHTML = "";
+    const src = user ? (photosCache.get(user.uid) || "") : "";
+    zone.appendChild(avatarNode((profil && profil.prenom) || "?", src, "photo-g", (profil && profil.genre) || ""));
+    $("photo-retirer").classList.toggle("cache", !src);
+  }
+  $("photo-choisir").addEventListener("click", () => $("photo-fichier").click());
+  $("photo-fichier").addEventListener("change", async () => {
+    const f = $("photo-fichier").files && $("photo-fichier").files[0];
+    if (!f || !user) return;
+    try {
+      const data = await lirePhoto(f);
+      await setDoc(doc(db, "photos", user.uid), { data, maj: serverTimestamp() });
+      photosCache.set(user.uid, data);
+      rendrePhotoCarte();
+      afficher();
+      afficherMessage("Photo enregistrée|Elle s'affiche sur ton profil, tes missions et tes candidatures.", "succes");
+    } catch (e){
+      console.error(e);
+      afficherMessage("Photo non enregistrée|Choisis une image PNG ou JPG, puis réessaie.");
+    }
+    $("photo-fichier").value = "";
+  });
+  $("photo-retirer").addEventListener("click", async () => {
+    if (!user) return;
+    try {
+      await deleteDoc(doc(db, "photos", user.uid));
+      photosCache.set(user.uid, "");
+      rendrePhotoCarte();
+      afficher();
+      afficherMessage("Photo retirée|Ton profil affiche de nouveau ton initiale.", "succes");
+    } catch (e){ afficherMessage("Action impossible. Réessaie."); }
+  });
+
+  function avatarNode(nom, logo, classe, genre){
+    const personne = arguments.length > 3;          // photo d'une personne (et non logo d'entreprise)
+    const g = genre === "homme" || genre === "femme" ? " genre-" + genre : "";
     if (logo){
       const i = document.createElement("img");
-      i.className = (classe || "avatar") + " avatar-logo";
+      i.className = (classe || "avatar") + " avatar-logo" + (personne ? " avatar-photo" : "") + g;
       i.src = logo;
-      i.alt = "Logo " + nom;
+      i.alt = (personne ? "Photo de " : "Logo ") + nom;
       return i;
     }
-    return el("span", classe || "avatar", String(nom || "?").trim().charAt(0).toUpperCase());
+    const s = el("span", (classe || "avatar") + g, String(nom || "?").trim().charAt(0).toUpperCase());
+    if (g) s.title = genre === "femme" ? "Femme" : "Homme";
+    return s;
   }
 
   // Redimensionne le logo (carré 256 px, fond blanc) et le convertit en petite image à stocker
@@ -4396,29 +4549,60 @@
   // ---------- Domaines et formations ----------
   let domEdition = null;
   function rendreDomaines(){
-    const liste = $("dom-liste");
-    liste.innerHTML = "";
+    const zone = $("dom-liste");
+    zone.innerHTML = "";
     if (!user || !profil) return;
-    if (!domEdition) domEdition = { sel: new Set(domainesUser()), form: { ...(profil.formations || {}) } };
-    CATEGORIES.filter(c => c[0] !== "autre").forEach(([cle, , libelle]) => {
-      const on = domEdition.sel.has(cle);
-      const ligne = el("div", "dom-ligne" + (on ? " on" : ""));
-      const b = el("button", "dom-chip" + (on ? " on" : ""), libelle);
-      b.type = "button";
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-      b.addEventListener("click", () => { if (on) domEdition.sel.delete(cle); else domEdition.sel.add(cle); rendreDomaines(); });
-      ligne.appendChild(b);
-      if (on){
-        const champ = document.createElement("input");
-        champ.className = "dom-formation";
-        champ.maxLength = 100;
-        champ.placeholder = "Formation ou diplôme (facultatif) : ex. CAP Cuisine";
-        champ.value = domEdition.form[cle] || "";
-        champ.addEventListener("input", () => { domEdition.form[cle] = champ.value; });
-        ligne.appendChild(champ);
-      }
-      liste.appendChild(ligne);
-    });
+    if (!domEdition) domEdition = { sel: new Set(domainesUser()), form: { ...(profil.formations || {}) }, autre: String(profil.domaineAutre || ""), recherche: "" };
+    const rech = document.createElement("input");
+    rech.type = "search";
+    rech.className = "dom-recherche";
+    rech.placeholder = "Rechercher un domaine (plomberie, couture, électricité…)";
+    rech.value = domEdition.recherche;
+    zone.appendChild(rech);
+    const compte = el("div", "dom-compte");
+    zone.appendChild(compte);
+    const grille = el("div", "dom-grille");
+    zone.appendChild(grille);
+    const normaliser = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const dessiner = () => {
+      grille.innerHTML = "";
+      const q = normaliser(domEdition.recherche);
+      const n = domEdition.sel.size;
+      compte.textContent = n ? n + " domaine" + (n > 1 ? "s" : "") + " choisi" + (n > 1 ? "s" : "") : "Aucun domaine choisi pour le moment";
+      CATEGORIES.filter(c => c[0] !== "autre" && (!q || normaliser(c[2]).includes(q))).forEach(([cle, , libelle]) => {
+        const on = domEdition.sel.has(cle);
+        const ligne = el("div", "dom-ligne" + (on ? " on" : ""));
+        const b = el("button", "dom-chip" + (on ? " on" : ""), libelle);
+        b.type = "button";
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.addEventListener("click", () => { if (on) domEdition.sel.delete(cle); else domEdition.sel.add(cle); dessiner(); });
+        ligne.appendChild(b);
+        if (on){
+          const champ = document.createElement("input");
+          champ.className = "dom-formation";
+          champ.maxLength = 100;
+          champ.placeholder = "Formation ou diplôme (facultatif) : ex. CAP Électricité bâtiment";
+          champ.value = domEdition.form[cle] || "";
+          champ.addEventListener("input", () => { domEdition.form[cle] = champ.value; });
+          ligne.appendChild(champ);
+        }
+        grille.appendChild(ligne);
+      });
+      if (!grille.children.length) grille.appendChild(el("div", "vide", "Aucun domaine ne correspond : utilise « Autre métier » ci-dessous."));
+    };
+    rech.addEventListener("input", () => { domEdition.recherche = rech.value; dessiner(); });
+    dessiner();
+    const etiquette = document.createElement("label");
+    etiquette.className = "champ dom-autre";
+    etiquette.appendChild(el("span", "", "Autre métier ou domaine (si tu ne trouves pas le tien)"));
+    const saisie = document.createElement("input");
+    saisie.id = "dom-autre";
+    saisie.maxLength = 60;
+    saisie.placeholder = "Ex : tapissier, vitrier, apiculteur…";
+    saisie.value = domEdition.autre;
+    saisie.addEventListener("input", () => { domEdition.autre = saisie.value; });
+    etiquette.appendChild(saisie);
+    zone.appendChild(etiquette);
     $("dom-alertes").checked = profil.alertes !== false;
     $("dom-alertes-email").checked = profil.alertesEmail !== false;
   }
@@ -4429,9 +4613,10 @@
     domaines.forEach(k => { const t = String(domEdition.form[k] || "").trim().slice(0, 100); if (t) formations[k] = t; });
     const alertes = $("dom-alertes").checked;
     const alertesEmail = $("dom-alertes-email").checked;
+    const domaineAutre = String((domEdition && domEdition.autre) || "").trim().slice(0, 60);
     try {
-      await updateDoc(doc(db, "users", user.uid), { domaines, formations, alertes, alertesEmail });
-      profil = { ...profil, domaines, formations, alertes, alertesEmail };
+      await updateDoc(doc(db, "users", user.uid), { domaines, formations, alertes, alertesEmail, domaineAutre });
+      profil = { ...profil, domaines, formations, alertes, alertesEmail, domaineAutre };
       domEdition = null;
       afficherMessage("Domaines enregistrés|Tu seras prévenu(e) des missions qui te correspondent.", "succes");
       afficher();
@@ -4800,6 +4985,63 @@
 
   // ---------- Annonce en haut du site (publiée depuis l'espace administrateur) ----------
   let annonceDB = null;
+  // Défilement continu de la barre d'informations : même vitesse sur tous les écrans, sans coupure ni arrêt
+  const VITESSE_DEFILE = 55;     // pixels par seconde
+  let defileActif = null;
+  function ajusterDefile(zone, piste){
+    const blocs = piste.children;
+    const largeurZone = zone.clientWidth;
+    if (!largeurZone || blocs.length < 2) return;
+    blocs[0].style.minWidth = "0";
+    blocs[1].style.minWidth = "0";
+    const largeur = Math.max(blocs[0].offsetWidth, largeurZone);
+    blocs[0].style.minWidth = largeur + "px";
+    blocs[1].style.minWidth = largeur + "px";
+    const duree = Math.max(6, largeur / VITESSE_DEFILE) + "s";
+    piste.style.animationDuration = duree;
+    piste.style.webkitAnimationDuration = duree;
+  }
+  function defileJS(zone, piste){
+    piste.style.animation = "none";
+    piste.style.webkitAnimation = "none";
+    let x = 0, dernier = performance.now();
+    const pas = t => {
+      if (!piste.isConnected) return;
+      if (!zone.classList.contains("pause") && !document.hidden){
+        x -= (t - dernier) / 1000 * VITESSE_DEFILE;
+        const demi = piste.scrollWidth / 2;
+        if (demi > 0 && -x >= demi) x += demi;
+        piste.style.transform = "translate3d(" + x + "px,0,0)";
+      }
+      dernier = t;
+      requestAnimationFrame(pas);
+    };
+    requestAnimationFrame(pas);
+  }
+  function lancerDefile(zone, piste){
+    defileActif = { zone, piste };
+    const ajuster = () => ajusterDefile(zone, piste);
+    ajuster();
+    requestAnimationFrame(() => { ajuster(); setTimeout(ajuster, 600); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajuster);
+    let minuteurPause = null;
+    const reprise = () => { zone.classList.remove("pause"); clearTimeout(minuteurPause); };
+    const pause = () => { zone.classList.add("pause"); clearTimeout(minuteurPause); minuteurPause = setTimeout(reprise, 3500); };
+    ["touchstart", "mousedown"].forEach(e => zone.addEventListener(e, pause, { passive: true }));
+    ["touchend", "touchcancel", "mouseup", "mouseleave"].forEach(e => zone.addEventListener(e, reprise, { passive: true }));
+    // sécurité : si l'appareil bloque les animations CSS, le défilement continue en JavaScript
+    setTimeout(() => {
+      if (!piste.isConnected || document.hidden) return;
+      const avant = getComputedStyle(piste).transform;
+      setTimeout(() => {
+        if (!piste.isConnected || document.hidden || zone.classList.contains("pause")) return;
+        if (getComputedStyle(piste).transform === avant) defileJS(zone, piste);
+      }, 700);
+    }, 1500);
+  }
+  window.addEventListener("resize", () => { if (defileActif) ajusterDefile(defileActif.zone, defileActif.piste); });
+  window.addEventListener("orientationchange", () => setTimeout(() => { if (defileActif) ajusterDefile(defileActif.zone, defileActif.piste); }, 300));
+
   function afficherAnnonce(){
     const z = $("annonce");
     z.innerHTML = "";
@@ -4815,13 +5057,20 @@
     const badge = el("span", "an-badge");
     const iconeAn = el("i", "an-ico");
     iconeAn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
-    badge.append(iconeAn, document.createTextNode({ info: "Info", important: "Important", succes: "Nouveau" }[type]));
+    badge.append(iconeAn, el("span", "an-etiq", { info: "Info", important: "Important", succes: "Nouveau" }[type]));
     z.appendChild(badge);
     const zoneTexte = el("div", "defile");
-    const defilant = el("span", "defile-texte", texte);
-    defilant.style.animationDuration = Math.max(10, Math.round(texte.length * 0.22)) + "s";
-    zoneTexte.appendChild(defilant);
+    zoneTexte.setAttribute("role", "marquee");
+    zoneTexte.setAttribute("aria-label", texte);
+    const piste = el("div", "defile-piste");
+    for (let i = 0; i < 2; i++){
+      const bloc = el("span", "defile-bloc", texte);
+      if (i) bloc.setAttribute("aria-hidden", "true");
+      piste.appendChild(bloc);
+    }
+    zoneTexte.appendChild(piste);
     z.appendChild(zoneTexte);
+    lancerDefile(zoneTexte, piste);
     const lien = lienSur(a.lien);
     if (lien){
       const l = el("a", "an-lien", String(a.libelle || "").trim() || "En savoir plus");

@@ -538,6 +538,7 @@
       tuile(retours.filter(r => (r.statut || "nouveau") === "nouveau").length, "Retours non lus"),
       tuile(users.filter(u => u.ref).length, "Inscrits via un ambassadeur"),
       tuile(users.filter(u => u.entreprise && u.entreprise.nom).length + " (" + entreprisesV.size + " vérifiées)", "Entreprises"),
+      tuile(users.filter(u => u.genre === "homme").length + " / " + users.filter(u => u.genre === "femme").length, "Hommes / Femmes"),
       tuile(users.filter(u => ms(u) >= Date.now() - 24 * 3600 * 1000).length, "Inscriptions (24 h)"),
       tuile(cands.filter(c => etatCand(c) === "attente").length, "Candidatures en attente"),
       tuile(missions.filter(m => m.valide === false && !m.refusMotif).length, "Missions à valider"),
@@ -572,6 +573,7 @@
       g.appendChild(el("div", "h-sous", "Tél. : " + (u.tel || "—") + " · E-mail : " + (u.email || "—")));
       const pub = missions.filter(m => m.uid === u.id).length;
       const real = missions.filter(m => m.workerUid === u.id && st(m) === "terminee").length;
+      if (u.genre) g.appendChild(el("div", "h-sous", "Genre : " + (u.genre === "femme" ? "Femme" : "Homme")));
       g.appendChild(el("div", "h-sous", pub + " publiée(s) · " + real + " réalisée(s)"));
       if (u.entreprise && u.entreprise.nom){
         g.appendChild(el("div", "h-sous", "Entreprise : " + u.entreprise.nom + (u.entreprise.secteur ? " · " + u.entreprise.secteur : "") + (entreprisesV.has(u.id) ? " · vérifiée" : " · non vérifiée")));
