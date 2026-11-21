@@ -35,25 +35,51 @@ const ms = t => (t && typeof t.toMillis === "function" ? t.toMillis() : 0);
 const CATEGORIES = {
   menage: "Ménage et nettoyage", livraison: "Livraison et courses", jardinage: "Jardinage et extérieur",
   bricolage: "Bricolage et réparation", cuisine: "Cuisine et événements", domicile: "Aide à domicile",
-  transport: "Déménagement et transport", cours: "Cours et soutien scolaire", informatique: "Informatique et bureautique"
+  transport: "Déménagement et transport", cours: "Cours et soutien scolaire", informatique: "Informatique et bureautique",
+  electricite: "Électricité bâtiment", plomberie: "Plomberie et sanitaire", maconnerie: "Maçonnerie et carrelage",
+  menuiserie: "Menuiserie et ébénisterie", peinture: "Peinture et finition", soudure: "Soudure et métallerie",
+  mecanique: "Mécanique auto et moto", froid: "Froid et climatisation", electronique: "Électronique et dépannage",
+  couture: "Couture et stylisme", coiffure: "Coiffure et esthétique", comptabilite: "Comptabilité et secrétariat",
+  commerce: "Vente et commerce", securite: "Sécurité et gardiennage", agriculture: "Agriculture et élevage",
+  photo: "Photo, vidéo et événementiel", sante: "Santé et soins"
 };
-// Si l'utilisateur n'a pas choisi de domaine, on le déduit de sa profession
+// Si l'utilisateur n'a pas choisi de domaine, on le déduit de sa profession (et de « autre métier »)
 const MOTS = {
   cuisine: ["cuisin", "traiteur", "patiss", "boulang", "restaur", "chef", "serveu", "barman"],
   livraison: ["livreur", "coursier", "zemidjan", "taxi moto"],
   transport: ["chauffeur", "demenag", "manutention", "transporteur"],
   menage: ["menag", "nettoy", "entretien"],
-  jardinage: ["jardin", "agricult", "paysan", "cultivateur", "eleveur"],
-  bricolage: ["plomb", "electric", "macon", "menuis", "soudeur", "peintre", "mecanic", "carreleur", "bricol"],
+  jardinage: ["jardin"],
+  agriculture: ["agricult", "paysan", "cultivateur", "eleveur", "maraich"],
+  bricolage: ["bricol", "reparat", "homme a tout faire"],
+  electricite: ["electric", "bobinag"],
+  plomberie: ["plomb", "sanitaire"],
+  maconnerie: ["macon", "carrel", "betonn", "chantier"],
+  menuiserie: ["menuis", "ebenist", "charpent", "tapissi"],
+  peinture: ["peintre", "peinture", "platr"],
+  soudure: ["soud", "metallier", "ferronn", "chaudronn"],
+  mecanique: ["mecanic", "garagiste", "vulcanis"],
+  froid: ["frigor", "climatis", "froid"],
+  electronique: ["electronic", "depann", "telephone"],
+  couture: ["couturi", "styliste", "tailleur", "stylisme", "couture"],
+  coiffure: ["coiffe", "coiffeu", "esthetic", "maquill", "manucure", "barbier"],
+  comptabilite: ["comptab", "secretar", "gestionn", "bureaut", "assistant"],
+  commerce: ["commerc", "vendeu", "boutiqu", "caissi", "revendeu"],
+  securite: ["gardien", "securite", "vigile"],
+  photo: ["photograph", "videast", "cameraman", "sonoris", "decorat", "animateur"],
+  sante: ["infirm", "sage-femme", "aide-soignant", "aide soignant", "pharmac"],
   cours: ["enseign", "professeur", "tuteur", "instituteur", "formateur"],
-  informatique: ["informat", "develop", "comptab", "secretar", "bureaut", "graphi"],
-  domicile: ["nounou", "aide a domicile", "aide menager", "infirm", "aide-soignant", "aide soignant", "garde d"]
+  informatique: ["informat", "develop", "graphi"],
+  domicile: ["nounou", "aide a domicile", "aide menager", "garde d"]
 };
+// Les métiers du bâtiment reçoivent aussi les missions « bricolage et réparation »
+const GROUPE_BRICOLAGE = ["electricite", "plomberie", "maconnerie", "menuiserie", "peinture", "soudure", "froid", "mecanique"];
 const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function domainesDe(u){
   const s = new Set(Array.isArray(u.domaines) ? u.domaines : []);
-  const prof = norm(u.profession);
-  for (const [cat, mots] of Object.entries(MOTS)) if (mots.some(m => prof.includes(m))) s.add(cat);
+  const texte = norm((u.profession || "") + " " + (u.domaineAutre || ""));
+  for (const [cat, mots] of Object.entries(MOTS)) if (mots.some(m => texte.includes(m))) s.add(cat);
+  if (GROUPE_BRICOLAGE.some(c => s.has(c))) s.add("bricolage");
   return s;
 }
 const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
