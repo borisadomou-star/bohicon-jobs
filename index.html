@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261123-0841">
-<meta name="build-notes" content="Nouveau : Prestations (catalogue, devis, commandes, messagerie, avis) et espace de travail entreprise modernisé.">
+<meta name="build" content="20261123-1956">
+<meta name="build-notes" content="Nouvelle page de connexion, messages plus rassurants et tableaux de bord cliquables.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1124,6 +1124,92 @@
   #fab-wa{bottom:80px;background:#128c4a;color:#fff}
 
   @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important}.surligne{animation:none;outline:3px solid var(--jaune)}.annonce .icone{animation:none}}
+
+  /* ===== Page d'accès : un univers qui présente la plateforme ===== */
+  .acces-hero{min-height:calc(100vh - 92px);min-height:calc(100svh - 92px);padding:24px 22px 80px}
+  .acces-ciel{position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;overflow:hidden;pointer-events:none}
+  .astres{position:absolute;top:0;left:0;width:2px;height:2px;border-radius:50%;background:transparent;box-shadow:42vw 162px 0 0 rgba(255,255,255,.6),84vw 57px 0 0 rgba(255,255,255,1),69vw 104px 0 0 rgba(255,255,255,.75),75vw 67px 0 0 rgba(255,255,255,.9),5vw 96px 0 0 rgba(255,255,255,.6),54vw 79px 0 0 rgba(255,255,255,.9),12vw 572px 0 0 rgba(255,255,255,.6),8vw 854px 0 0 rgba(255,255,255,1),29vw 653px 0 0 rgba(255,255,255,1),74vw 607px 0 0 rgba(255,255,255,.6),7vw 234px 0 0 rgba(255,255,255,1),72vw 887px 0 0 rgba(255,255,255,.9),38vw 437px 0 0 rgba(255,255,255,.9),70vw 128px 0 0 rgba(255,255,255,.75),72vw 843px 0 0 rgba(255,255,255,.9),14vw 603px 0 0 rgba(255,255,255,.9),48vw 107px 0 0 rgba(255,255,255,1),73vw 69px 0 0 rgba(255,255,255,.9),64vw 704px 0 0 rgba(255,255,255,.6),41vw 484px 0 0 rgba(255,255,255,.6),47vw 314px 0 0 rgba(255,255,255,.9),24vw 723px 0 0 rgba(255,255,255,.9),11vw 596px 0 0 rgba(255,255,255,.75),68vw 514px 0 0 rgba(255,255,255,.75),94vw 467px 0 0 rgba(255,255,255,.75),78vw 82px 0 0 rgba(255,255,255,1),66vw 436px 0 0 rgba(255,255,255,.9),97vw 358px 0 0 rgba(255,255,255,.9),63vw 439px 0 0 rgba(255,255,255,1),86vw 87px 0 0 rgba(255,255,255,.75),44vw 719px 0 0 rgba(255,255,255,.75),77vw 516px 0 0 rgba(255,255,255,.6),9vw 868px 0 0 rgba(255,255,255,1),35vw 493px 0 0 rgba(255,255,255,1);-webkit-animation:scintille 5s ease-in-out infinite;animation:scintille 5s ease-in-out infinite}
+  .astres.a2{width:1px;height:1px;box-shadow:8vw 756px 0 0 rgba(255,255,255,.6),83vw 599px 0 0 rgba(255,255,255,.5),37vw 741px 0 0 rgba(255,255,255,.5),86vw 363px 0 0 rgba(255,255,255,1),60vw 371px 0 0 rgba(255,255,255,.8),79vw 127px 0 0 rgba(255,255,255,.5),8vw 231px 0 0 rgba(255,255,255,.6),17vw 764px 0 0 rgba(255,255,255,.8),51vw 408px 0 0 rgba(255,255,255,.5),11vw 178px 0 0 rgba(255,255,255,.5),52vw 570px 0 0 rgba(255,255,255,.6),18vw 846px 0 0 rgba(255,255,255,.5),71vw 293px 0 0 rgba(255,255,255,.5),46vw 707px 0 0 rgba(255,255,255,.5),30vw 162px 0 0 rgba(255,255,255,1),23vw 162px 0 0 rgba(255,255,255,.8),85vw 246px 0 0 rgba(255,255,255,1),63vw 859px 0 0 rgba(255,255,255,.8),34vw 296px 0 0 rgba(255,255,255,1),19vw 437px 0 0 rgba(255,255,255,.6),79vw 587px 0 0 rgba(255,255,255,.6),17vw 715px 0 0 rgba(255,255,255,1),59vw 899px 0 0 rgba(255,255,255,.5),51vw 416px 0 0 rgba(255,255,255,.5),14vw 501px 0 0 rgba(255,255,255,.5),8vw 203px 0 0 rgba(255,255,255,1),27vw 459px 0 0 rgba(255,255,255,.8),15vw 356px 0 0 rgba(255,255,255,1),14vw 8px 0 0 rgba(255,255,255,.8),69vw 111px 0 0 rgba(255,255,255,.6);-webkit-animation-duration:7s;animation-duration:7s;-webkit-animation-delay:1.5s;animation-delay:1.5s}
+  @-webkit-keyframes scintille{0%,100%{opacity:.35}50%{opacity:1}}
+  @keyframes scintille{0%,100%{opacity:.35}50%{opacity:1}}
+  .aurore{position:absolute;left:-30%;width:160%;height:46%;border-radius:50%;-webkit-filter:blur(46px);filter:blur(46px);opacity:.5;will-change:transform}
+  .aurore.au1{top:6%;background:linear-gradient(90deg,rgba(18,153,90,0),rgba(18,153,90,.75) 35%,rgba(252,209,22,.4) 60%,rgba(18,153,90,0));-webkit-animation:aurore 17s ease-in-out infinite alternate;animation:aurore 17s ease-in-out infinite alternate}
+  .aurore.au2{top:40%;height:38%;background:linear-gradient(90deg,rgba(14,116,144,0),rgba(52,211,153,.5) 40%,rgba(14,116,144,0));-webkit-animation:aurore 23s ease-in-out infinite alternate-reverse;animation:aurore 23s ease-in-out infinite alternate-reverse}
+  @-webkit-keyframes aurore{from{-webkit-transform:translate3d(-6%,0,0) rotate(-4deg)}to{-webkit-transform:translate3d(6%,-5%,0) rotate(3deg)}}
+  @keyframes aurore{from{transform:translate3d(-6%,0,0) rotate(-4deg)}to{transform:translate3d(6%,-5%,0) rotate(3deg)}}
+  .filante{position:absolute;width:110px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);opacity:0;-webkit-animation:filante 11s linear infinite;animation:filante 11s linear infinite}
+  .filante.f1{top:14%;left:62%;-webkit-animation-delay:2s;animation-delay:2s}
+  .filante.f2{top:30%;left:86%;width:80px;-webkit-animation-delay:7s;animation-delay:7s}
+  @-webkit-keyframes filante{0%{opacity:0;-webkit-transform:translate3d(0,0,0) rotate(-32deg)}3%{opacity:1}12%,100%{opacity:0;-webkit-transform:translate3d(-190px,120px,0) rotate(-32deg)}}
+  @keyframes filante{0%{opacity:0;transform:translate3d(0,0,0) rotate(-32deg)}3%{opacity:1}12%,100%{opacity:0;transform:translate3d(-190px,120px,0) rotate(-32deg)}}
+  .acces-texte{padding-top:34px}
+  .acces-texte h1{font-size:clamp(1.9rem,8.4vw,2.7rem)}
+  .acces-def{margin:14px 0 0;max-width:34em;font-size:.95rem;line-height:1.6;color:rgba(255,255,255,.88)}
+  .acces-def strong{color:#fcd116;font-weight:600}
+  .acces-piliers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0 0}
+  .pilier{position:relative;padding:12px 12px 13px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(255,255,255,.09);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);-webkit-animation:flotte 7s ease-in-out infinite;animation:flotte 7s ease-in-out infinite}
+  .pilier:nth-child(2){-webkit-animation-delay:-1.8s;animation-delay:-1.8s}
+  .pilier:nth-child(3){-webkit-animation-delay:-3.6s;animation-delay:-3.6s}
+  .pilier:nth-child(4){-webkit-animation-delay:-5.4s;animation-delay:-5.4s}
+  .pilier-ico{display:flex;align-items:center;justify-content:center;width:34px;height:34px;margin-bottom:8px;border-radius:11px;background:linear-gradient(135deg,#fcd116,#ffe98a);color:#0a3a20}
+  .pilier-ico svg{width:19px;height:19px}
+  .pilier b{display:block;font-size:.9rem;color:#fff}
+  .pilier small{display:block;margin-top:2px;font-size:.72rem;line-height:1.4;color:rgba(255,255,255,.76)}
+  @-webkit-keyframes flotte{0%,100%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(0,-4px,0)}}
+  @keyframes flotte{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-4px,0)}}
+  .acces-points{margin-top:16px}
+  .acces-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .acces-btn{width:auto;margin:0;padding:13px 22px;border:0;border-radius:999px;background:linear-gradient(135deg,#fcd116,#ffe98a);color:#0a3a20;font-size:.92rem;font-weight:700;box-shadow:0 16px 30px -14px rgba(252,209,22,.7)}
+  .acces-btn.sec{border:1px solid rgba(255,255,255,.38);background:rgba(255,255,255,.1);color:#fff;box-shadow:none}
+  .acces-texte > *{-webkit-animation:acces-monte .9s cubic-bezier(.2,.7,.2,1) both;animation:acces-monte .9s cubic-bezier(.2,.7,.2,1) both}
+  .acces-texte > *:nth-child(2){-webkit-animation-delay:.08s;animation-delay:.08s}
+  .acces-texte > *:nth-child(3){-webkit-animation-delay:.16s;animation-delay:.16s}
+  .acces-texte > *:nth-child(4){-webkit-animation-delay:.26s;animation-delay:.26s}
+  .acces-texte > *:nth-child(5){-webkit-animation-delay:.36s;animation-delay:.36s}
+  .acces-texte > *:nth-child(6){-webkit-animation-delay:.46s;animation-delay:.46s}
+  @-webkit-keyframes acces-monte{from{opacity:0;-webkit-transform:translate3d(0,16px,0)}to{opacity:1;-webkit-transform:translate3d(0,0,0)}}
+  @keyframes acces-monte{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+  .ecran-acces.mode-inscription .acces-def,.ecran-acces.mode-inscription .acces-piliers,.ecran-acces.mode-inscription .acces-cta{display:none}
+  @media (min-width:900px){
+    .acces-hero{min-height:100vh;padding:48px 60px}
+    .acces-cta{display:none}
+    .acces-texte{padding-top:30px}
+    .acces-texte h1{font-size:3.2rem}
+    .acces-def{font-size:1.02rem}
+    .acces-piliers{gap:14px;max-width:580px}
+    .ecran-acces.mode-inscription .acces-def{display:block}
+    .ecran-acces.mode-inscription .acces-piliers{display:grid}
+  }
+  @media (min-width:900px) and (max-height:760px){.pilier small{display:none}.acces-points{display:none}}
+  @media (prefers-reduced-motion: reduce){.astres,.aurore,.pilier,.acces-texte > *{-webkit-animation:none;animation:none}.filante{display:none}}
+
+  /* ===== Messages de connexion ===== */
+  .msg-avatar{position:relative}
+  .msg-sceau{position:absolute;right:-5px;bottom:-5px;display:flex;align-items:center;justify-content:center;width:18px;height:18px;border:2px solid #fff;border-radius:50%;background:linear-gradient(135deg,#12995a,#0b6b3a);color:#fff}
+  .msg-sceau svg{width:10px;height:10px}
+  .msg-tag{display:block;margin-bottom:1px;font-size:.62rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#0f7a45}
+  .msg-corps .msg-resume{margin-top:3px;font-weight:600;color:#0b6b3a}
+
+  /* ===== Indicateurs cliquables ===== */
+  button.ws-kpi-carte.cliquable{width:100%;margin:0;align-items:flex-start;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid #e4ede7;background:linear-gradient(180deg,#fff,#f5faf7);box-shadow:0 12px 24px -20px rgba(8,69,42,.6);-webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+  button.ws-kpi-carte.cliquable:active{transform:scale(.98)}
+  button.ws-kpi-carte.cliquable:hover{border-color:#bfe3cf;box-shadow:0 16px 28px -18px rgba(8,69,42,.7)}
+  .ws-kpi-carte.alerte{border-color:#f1d98a}
+  .ws-kpi-carte.alerte .ws-kpi-ico{background:#fff3cf;color:#9a6b00}
+  .ws-kpi-carte.alerte b{color:#9a6b00}
+  .ws-kpi-go{position:absolute;top:10px;right:12px;font-size:1.3rem;font-style:normal;line-height:1;color:#7fb79a}
+  button.tuile-s.cliquable{display:block;width:100%;margin:0;text-align:left;font:inherit;color:inherit;cursor:pointer;border:1px solid #dfe9e3;background:var(--fond);box-shadow:none;-webkit-tap-highlight-color:transparent;transition:transform .15s ease,border-color .15s ease}
+  button.tuile-s.cliquable:active{transform:scale(.98)}
+  button.tuile-s.cliquable b::after{content:" ›";color:#7fb79a}
+  /* Petits écrans : la page d'accès montre l'essentiel et les boutons restent accessibles dès l'arrivée */
+  @media (max-width:899px) and (max-height:700px){
+    .pilier small{display:none}
+    .pilier{padding:10px 12px}
+    .acces-points{display:none}
+    .acces-def{font-size:.88rem;line-height:1.5}
+    .acces-piliers{margin-top:14px}
+    .acces-cta{margin-top:14px}
+  }
 </style>
 </head>
 <body>
@@ -1242,6 +1328,7 @@
 
 <div id="ecran-acces" class="ecran-acces cache" role="main" aria-label="Accès à Bohicon Jobs">
   <section class="acces-hero">
+    <div class="acces-ciel" aria-hidden="true"><i class="astres a1"></i><i class="astres a2"></i><i class="aurore au1"></i><i class="aurore au2"></i><i class="filante f1"></i><i class="filante f2"></i></div>
     <svg class="acces-reseau" viewBox="0 0 300 260" fill="none" aria-hidden="true">
       <g stroke="rgba(255,255,255,.28)" stroke-width="1">
         <path d="M40 60L120 30L210 70L260 140L190 200L100 170L40 60Z"/>
@@ -1254,13 +1341,24 @@
     <i class="acces-orbe o1"></i><i class="acces-orbe o2"></i>
     <div class="acces-marque"><span class="acces-logo">BJ</span><b>Bohicon <i>Jobs</i></b></div>
     <div class="acces-texte">
-      <span class="acces-sur">Plateforme d'opportunités</span>
-      <h1>Les opportunités.<br><em>À portée de main.</em></h1>
+      <span class="acces-sur">La plateforme locale des opportunités</span>
+      <h1>Un univers d'opportunités,<br><em>à portée de main.</em></h1>
+      <p class="acces-def"><strong>Bohicon Jobs</strong> relie ceux qui ont besoin d'un service à ceux qui savent le rendre, à Bohicon, Abomey, Covè, Zogbodomey et Djidja.</p>
+      <div class="acces-piliers">
+        <div class="pilier"><span class="pilier-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></span><b>Missions</b><small>Un besoin ? Publie-le. Un coup de main à donner ? Postule.</small></div>
+        <div class="pilier"><span class="pilier-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7"/><path d="M17.5 14v7"/></svg></span><b>Prestations</b><small>Trouve ou propose un service : plomberie, graphisme, formation…</small></div>
+        <div class="pilier"><span class="pilier-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 12h6"/><path d="M9 16h4"/></svg></span><b>Emplois</b><small>Des offres d'entreprises, des critères clairs, un suivi transparent.</small></div>
+        <div class="pilier"><span class="pilier-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2M8 12h2M8 16h2"/><path d="M3 21h18"/></svg></span><b>Espace entreprise</b><small>Recrute, vends tes services et pilote tout depuis un seul espace.</small></div>
+      </div>
       <ul class="acces-points">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Inscription gratuite</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Missions vérifiées</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></svg>Près de chez toi</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>Gratuit</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>Sans commission</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>Données protégées</li>
       </ul>
+      <div class="acces-cta">
+        <button id="acces-cta-connexion" class="acces-btn" type="button">Se connecter</button>
+        <button id="acces-cta-inscription" class="acces-btn sec" type="button">Créer un compte gratuit</button>
+      </div>
     </div>
   </section>
 
@@ -1268,7 +1366,7 @@
     <div id="bloc-connexion">
       <div class="acces-label"><span class="acces-bouclier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Accès sécurisé</div>
       <h2 class="acces-titre">Connexion</h2>
-      <p class="acces-sous">Renseigne tes identifiants pour accéder à ton espace Bohicon Jobs.</p>
+      <p class="acces-sous">Connexion sécurisée : retrouve tes missions, prestations, offres d'emploi et ton espace entreprise.</p>
       <form id="form-connexion" autocomplete="on" novalidate>
         <label class="champ"><span>Adresse e-mail</span><input class="ic ic-mail" id="email" name="email" type="email" placeholder="exemple@gmail.com" autocomplete="username" inputmode="email"></label>
         <label class="champ"><span>Mot de passe</span><input class="ic ic-lock" id="mdp" name="password" type="password" placeholder="Ton mot de passe" autocomplete="current-password"></label>
@@ -3085,6 +3183,11 @@
     } catch (e) { /* choix annulé */ }
   });
   $("ecran-acces").addEventListener("click", e => { if (e.target.closest("#btn-vers-inscription, #btn-vers-connexion")) $("ecran-acces").scrollTo({ top: 0 }); });
+  $("acces-cta-connexion").addEventListener("click", () => {
+    const feuille = document.querySelector(".acces-feuille");
+    try { $("ecran-acces").scrollTo({ top: Math.max(0, feuille.offsetTop - 12), behavior: "smooth" }); } catch (e) { $("ecran-acces").scrollTop = feuille.offsetTop - 12; }
+  });
+  $("acces-cta-inscription").addEventListener("click", () => $("btn-vers-inscription").click());
 
   $("btn-connexion").addEventListener("click", async () => {
     afficherMessage("");
@@ -3160,7 +3263,7 @@
     fermerEspace(true);
     fermerPro(true);
     window.scrollTo(0, 0);
-    afficherMessage("Déconnexion réussie|À bientôt ! Les alertes sont suspendues sur cet appareil jusqu'à ta prochaine connexion.", "info");
+    afficherMessage("Déconnexion réussie|Ta session est fermée en toute sécurité et tes données restent protégées. À très bientôt sur Bohicon Jobs.", "succes");
   };
   $("btn-deconnexion").addEventListener("click", deconnecter);
   $("btn-deco-profil").addEventListener("click", deconnecter);
@@ -4511,13 +4614,23 @@
     const candMissions = candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId));
     const ICO_KPI = { mission: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>', users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5c2 .6 3.5 2.2 3.5 5"/></svg>', emploi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>', commande: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4"/><path d="M12 11v10"/></svg>', devis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>', cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v.01M18 14.5v.01"/></svg>', chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>' };
     const grille = el("div", "ws-kpi");
-    [["Missions publiées", mesPubliees.length, "mission"], ["Candidats à traiter (missions)", candMissions.length, "users"],
-     ["Offres d'emploi ouvertes", kR.ouvertes, "emploi"], ["Candidatures emploi à traiter", kR.atraiter, "users"],
-     ["Commandes à traiter", kP.cmdATraiter, "commande"], ["Devis à répondre", kP.devisAttente, "devis"],
-     ["Revenus déclarés", fcfa(kP.revenus), "cash"], ["Messages non lus", kP.messages, "chat"]].forEach(([l, v, ic]) => {
-      const c = el("div", "ws-kpi-carte");
+    const versMissions = () => { fermerPro(true); ouvrirEspace("histo"); };
+    const versRecrut = () => { proOnglet = "recrut"; rendrePro(); };
+    const versPresta = (vue, filtre) => () => { if (PRESTA.aller) PRESTA.aller(vue, filtre); };
+    [["Missions publiées", mesPubliees.length, "mission", versMissions],
+     ["Candidats à traiter (missions)", candMissions.length, "users", versMissions],
+     ["Offres d'emploi ouvertes", kR.ouvertes, "emploi", versRecrut],
+     ["Candidatures emploi à traiter", kR.atraiter, "users", versRecrut],
+     ["Commandes à traiter", kP.cmdATraiter, "commande", versPresta("commandes", "atraiter")],
+     ["Devis à répondre", kP.devisAttente, "devis", versPresta("devis")],
+     ["Revenus déclarés", fcfa(kP.revenus), "cash", null],
+     ["Messages non lus", kP.messages, "chat", versPresta("messages")]].forEach(([l, v, ic, action]) => {
+      const aTraiter = action && Number(v) > 0 && /traiter|répondre|non lus/.test(l);
+      const c = el(action ? "button" : "div", "ws-kpi-carte" + (action ? " cliquable" : "") + (aTraiter ? " alerte" : ""));
+      if (action){ c.type = "button"; c.setAttribute("aria-label", l + " : " + v + ". Ouvrir"); c.addEventListener("click", action); }
       const i = el("span", "ws-kpi-ico"); i.innerHTML = ICO_KPI[ic];
       c.append(i, el("b", "", String(v)), el("span", "", l));
+      if (action) c.appendChild(el("em", "ws-kpi-go", "›"));
       grille.appendChild(c);
     });
     z.appendChild(grille);
@@ -4977,7 +5090,18 @@
     const ouvertes = new Set(missions.filter(m => st(m) === "disponible").map(m => m.id));
     const recues = candidaturesRecues.filter(c => c.statut === "en_attente" && ouvertes.has(c.missionId)).length;
     if (recues) parties.push(recues > 1 ? recues + " candidatures à traiter" : "1 candidature à traiter");
-    return parties.length ? parties.join(" · ") : "Les nouvelles opportunités t'attendent.";
+    try {
+      const kp = PRESTA.kpi ? PRESTA.kpi() : null;
+      if (kp){
+        if (kp.cmdATraiter) parties.push(kp.cmdATraiter > 1 ? kp.cmdATraiter + " commandes à traiter" : "1 commande à traiter");
+        if (kp.devisAttente) parties.push(kp.devisAttente > 1 ? kp.devisAttente + " devis à répondre" : "1 devis à répondre");
+        if (kp.propositions) parties.push(kp.propositions > 1 ? kp.propositions + " devis reçus" : "1 devis reçu");
+        if (kp.messages) parties.push(kp.messages > 1 ? kp.messages + " messages non lus" : "1 message non lu");
+      }
+      const kr = RECRUT.kpi ? RECRUT.kpi() : null;
+      if (kr && kr.atraiter) parties.push(kr.atraiter > 1 ? kr.atraiter + " candidatures emploi à traiter" : "1 candidature emploi à traiter");
+    } catch (e) { /* ignoré */ }
+    return parties.length ? parties.slice(0, 3).join(" · ") : "Les nouvelles opportunités t'attendent.";
   }
   function afficherBienvenue(estConnexion){
     if (!user || !profil) return;
@@ -4985,22 +5109,26 @@
     const z = $("message");
     clearTimeout(minuteurMessage);
     z.innerHTML = "";
-    const e = el("div", "msg bienvenue");
+    const e = el("div", "msg bienvenue" + (estConnexion ? " connexion" : ""));
     e.setAttribute("role", "status");
-    e.appendChild(el("span", "msg-avatar", (prenom || "B").charAt(0).toUpperCase()));
+    const av = el("span", "msg-avatar", (prenom || "B").charAt(0).toUpperCase());
+    const sceau = el("i", "msg-sceau");
+    sceau.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
+    av.appendChild(sceau);
     const corps = el("div", "msg-corps");
-    corps.appendChild(el("b", "", (estConnexion ? "Bienvenue" : "Bon retour") + (prenom ? ", " + prenom : "")));
-    corps.appendChild(el("span", "", (estConnexion ? "Connexion réussie · " : "") + resumeBienvenue()));
+    corps.appendChild(el("small", "msg-tag", estConnexion ? "Connexion réussie" : "Session sécurisée rétablie"));
+    corps.appendChild(el("b", "", (estConnexion ? "Bienvenue" : "Content de te revoir") + (prenom ? ", " + prenom : "")));
+    corps.appendChild(el("span", "", estConnexion ? "Ton espace est prêt et tes données sont protégées." : "Ta session a été rétablie en toute sécurité."));
+    corps.appendChild(el("span", "msg-resume", resumeBienvenue()));
     const x = el("button", "msg-x", "×");
     x.type = "button";
     x.setAttribute("aria-label", "Fermer le message");
     const barre = el("i", "msg-barre");
-    barre.style.animationDuration = "6500ms";
-    e.append(corps, x, barre);
-    e.insertBefore(e.querySelector(".msg-avatar"), e.firstChild);
+    barre.style.animationDuration = "7500ms";
+    e.append(av, corps, x, barre);
     e.addEventListener("click", () => { z.innerHTML = ""; });
     z.appendChild(e);
-    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, 6500);
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, 7500);
   }
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
@@ -6687,11 +6815,20 @@
       if (p.valide !== true) return p.refusMotif ? ["Refusée", "b-refus"] : ["En attente de validation", "b-attribuee"];
       return p.statut === "active" ? ["Active", "b-disponible"] : ["En pause", "b-gris"];
     }
-    function tuileS(v, l){ const x = el("div", "tuile-s"); x.append(el("b", "", String(v)), el("span", "", l)); return x; }
+    function tuileS(v, l, fn){
+      const x = el(fn ? "button" : "div", "tuile-s" + (fn ? " cliquable" : ""));
+      if (fn){ x.type = "button"; x.setAttribute("aria-label", l + " : " + v); x.addEventListener("click", fn); }
+      x.append(el("b", "", String(v)), el("span", "", l));
+      return x;
+    }
     function vueMesPrestations(z){
       const k = compteurs();
       const tuiles = el("div", "tuiles");
-      tuiles.append(tuileS(k.actives, "Prestations actives"), tuileS(k.devisAttente, "Devis à traiter"), tuileS(k.cmdATraiter, "Commandes à traiter"), tuileS(fcfa(k.revenus), "Revenus déclarés"));
+      tuiles.append(
+        tuileS(k.actives, "Prestations actives"),
+        tuileS(k.devisAttente, "Devis à traiter", () => { pv.onglet = "devis"; pv.sous = null; rerendre(); }),
+        tuileS(k.cmdATraiter, "Commandes à traiter", () => { filtreCmdPro = "atraiter"; pv.onglet = "commandes"; pv.sous = null; rerendre(); }),
+        tuileS(fcfa(k.revenus), "Revenus déclarés"));
       z.appendChild(tuiles);
       z.appendChild(bouton("Proposer une prestation", "", async () => { pv.sous = { type: "form", modele: null }; rerendre(); }));
       z.appendChild(el("div", "rec-note", "Chaque prestation est vérifiée par notre équipe avant d'être visible. Le paiement se fait directement avec tes clients, sans commission."));
@@ -7052,6 +7189,18 @@
     $("ps-mode-prest").addEventListener("click", () => { quitterThread(); pv.mode = "prest"; pv.onglet = "mesprestas"; pv.sous = null; rendrePresta(); });
     window.addEventListener("popstate", () => { if (ouvertPresta) fermerPresta(true); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && !modalOuvert) fermerPresta(); });
+    // Raccourcis depuis les tableaux de bord : ouvre directement la bonne vue
+    PRESTA.aller = (vue, filtre) => {
+      if (filtre) filtreCmdPro = filtre;
+      quitterThread();
+      if (vue === "messages"){
+        pv.mode = "client"; pv.onglet = "messages"; pv.sous = null;
+        if (proOuvert){ proOnglet = "messages"; rendrePro(); } else ouvrirPresta("client", "messages");
+        return;
+      }
+      pv.mode = "prest"; pv.onglet = vue; pv.sous = null;
+      if (proOuvert){ proOnglet = "presta"; rendrePro(); } else ouvrirPresta("prest", vue);
+    };
     PRESTA.pret = true;
   } catch (e) {
     console.error("Module Prestations indisponible :", e);
