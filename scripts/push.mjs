@@ -11,6 +11,7 @@ const db = admin.firestore();
 const fcm = admin.messaging();
 const { Timestamp, FieldValue } = admin.firestore;
 const MAINTENANT = Date.now();
+const FENETRE_30J = new Date(MAINTENANT - 30 * 24 * 3600 * 1000);
 
 const etatRef = db.doc("config/pushEtat");
 const etat = await etatRef.get();
@@ -192,7 +193,7 @@ async function envoyer(uids, titre, corps, lien){
 }
 
 // ---------- Candidatures : nouvelle candidature, candidat retenu, mission confirmée ----------
-const cs = await db.collection("candidatures").orderBy("createdAt", "desc").limit(300).get();
+const cs = await db.collection("candidatures").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(300).get();
 for (const d of cs.docs){
   const c = d.data();
   const maj = {};
@@ -220,7 +221,7 @@ for (const d of cs.docs){
 }
 
 // ---------- Missions : validation, refus, fin de mission à confirmer ----------
-const ms2 = await db.collection("missions").orderBy("createdAt", "desc").limit(300).get();
+const ms2 = await db.collection("missions").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(300).get();
 for (const d of ms2.docs){
   const m = d.data();
   const maj = {};
@@ -285,7 +286,7 @@ const PRESENTATION = {
     ["Astuce", "indique tes domaines et ta formation dans ton profil pour recevoir les missions qui te correspondent"]
   ]
 };
-const inscrits = await db.collection("users").orderBy("createdAt", "desc").limit(200).get();
+const inscrits = await db.collection("users").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(200).get();
 for (const d of inscrits.docs){
   const u = { id: d.id, ...d.data() };
   const maj = {};
@@ -315,7 +316,7 @@ const NIVEAUX_FR = ["Aucun diplôme exigé", "BEPC / CEP", "Baccalauréat", "Bac
 const RECENT_RECRUT = 5 * 24 * 3600 * 1000;
 const T = { transactionnel: true };
 
-const offresSnap = await db.collection("offres").orderBy("createdAt", "desc").limit(200).get();
+const offresSnap = await db.collection("offres").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(200).get();
 for (const d of offresSnap.docs){
   const o = d.data();
   const maj = {};
@@ -333,7 +334,7 @@ for (const d of offresSnap.docs){
   if (Object.keys(maj).length) await d.ref.update(maj);
 }
 
-const postulations = await db.collection("postulations").orderBy("createdAt", "desc").limit(300).get();
+const postulations = await db.collection("postulations").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(300).get();
 for (const d of postulations.docs){
   const q = d.data();
   if (q.notifStatut === q.statut) continue;
@@ -367,6 +368,138 @@ for (const d of postulations.docs){
     }
   }
   await d.ref.update({ notifStatut: q.statut });
+}
+
+// ---------- Prestations : devis, commandes, messages, avis, validation ----------
+// Ne lit que les documents modifiés depuis le dernier passage (champ « maj ») : très peu de lectures.
+{
+  const curseurRef = db.doc("config/prestaCurseur");
+  const cur = await curseurRef.get();
+  const depuis = cur.exists ? Number(cur.data().ms || 0) : MAINTENANT - 6 * 3600 * 1000;
+  const fenetre = new Date(Math.max(0, depuis - 3 * 60 * 1000));
+  const RECENT_P = 5 * 24 * 3600 * 1000;
+  const TP = { transactionnel: true };
+  const fc = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
+  const court = (t, n) => { t = String(t || ""); return t.length > n ? t.slice(0, n - 1) + "…" : t; };
+
+  // Prestations validées ou refusées
+  const pres = await db.collection("prestations").where("createdAt", ">", new Date(MAINTENANT - 45 * 24 * 3600 * 1000)).get();
+  for (const d of pres.docs){
+    const x = d.data(), maj = {};
+    if (x.valide === true && x.valideLe && ms(x.valideLe) !== x.mailValideLe){
+      if (MAINTENANT - ms(x.valideLe) < RECENT_P) await notifier([x.uid], "Votre prestation est publiée", "« " + x.titre + " » a été validée : elle est maintenant visible dans le catalogue des prestations.", SITE,
+        { ...TP, titre: "Prestation publiée", bouton: "Ouvrir mes prestations", lignes: [["Prestation", x.titre], ["Prix", x.prixType === "devis" ? "Sur devis" : fc(x.prix)]] });
+      maj.mailValideLe = ms(x.valideLe);
+    }
+    if (x.valide === false && x.refusMotif && x.refusMotif !== x.mailRefusMotif){
+      await notifier([x.uid], "Votre prestation n'a pas été validée", "« " + x.titre + " » n'a pas pu être publiée. Motif : " + x.refusMotif + ". Vous pouvez la corriger puis la soumettre de nouveau.", SITE,
+        { ...TP, titre: "Prestation non validée", bouton: "Ouvrir Bohicon Jobs", lignes: [["Prestation", x.titre], ["Motif", x.refusMotif]] });
+      maj.mailRefusMotif = x.refusMotif;
+    }
+    if (Object.keys(maj).length) await d.ref.update(maj);
+  }
+
+  // Demandes de devis
+  const devis = await db.collection("devis").where("maj", ">", fenetre).get();
+  for (const d of devis.docs){
+    const q = d.data();
+    if (q.notifStatut === q.statut) continue;
+    const base = [["Prestation", q.prestationTitre]];
+    if (q.statut === "demande"){
+      await notifier([q.prestataireUid], "Nouvelle demande de devis", (q.clientNom || "Un client") + " demande un devis pour « " + q.prestationTitre + " ».", SITE,
+        { ...TP, titre: "Nouvelle demande de devis", bouton: "Répondre au client", lignes: base.concat([["Client", q.clientNom || "—"], ["Besoin", court(q.besoin, 160)]], q.budget ? [["Budget", fc(q.budget)]] : [], q.dateSouhaitee ? [["Date souhaitée", q.dateSouhaitee]] : []) });
+    } else if (q.statut === "propose"){
+      await notifier([q.clientUid], "Vous avez reçu un devis", (q.prestataireNom || "Le prestataire") + " vous propose " + fc(q.prixPropose) + " pour « " + q.prestationTitre + " ».", SITE,
+        { ...TP, titre: "Devis reçu", bouton: "Voir le devis", lignes: base.concat([["Prix proposé", fc(q.prixPropose)], ["Délai", q.delaiPropose || "À convenir"]], q.messageProposition ? [["Message", court(q.messageProposition, 160)]] : []) });
+    } else if (q.statut === "accepte"){
+      await notifier([q.prestataireUid], "Devis accepté", (q.clientNom || "Le client") + " a accepté votre devis pour « " + q.prestationTitre + " ». Confirmez la commande.", SITE,
+        { ...TP, titre: "Devis accepté", bouton: "Confirmer la commande", lignes: base.concat([["Montant", fc(q.prixPropose)]]) });
+    } else if (q.statut === "refuse"){
+      const versClient = q.refusePar === "prestataire";
+      await notifier([versClient ? q.clientUid : q.prestataireUid], versClient ? "Demande de devis déclinée" : "Devis refusé",
+        versClient ? "Le prestataire ne peut pas donner suite à votre demande pour « " + q.prestationTitre + " »." : (q.clientNom || "Le client") + " a refusé votre devis pour « " + q.prestationTitre + " ».", SITE,
+        { ...TP, titre: versClient ? "Demande déclinée" : "Devis refusé", bouton: "Ouvrir Bohicon Jobs", lignes: base.concat(q.motif ? [["Motif", q.motif]] : []) });
+    } else if (q.statut === "annule"){
+      await notifier([q.prestataireUid], "Demande de devis annulée", (q.clientNom || "Le client") + " a annulé sa demande pour « " + q.prestationTitre + " ».", SITE,
+        { ...TP, titre: "Demande annulée", bouton: "Ouvrir Bohicon Jobs", lignes: base });
+    }
+    await d.ref.update({ notifStatut: q.statut });
+  }
+
+  // Commandes
+  const commandes = await db.collection("commandes").where("maj", ">", fenetre).get();
+  const aRecompter = new Set();
+  for (const d of commandes.docs){
+    const c = d.data();
+    if (c.statut === "terminee") aRecompter.add(c.prestataireUid);
+    if (c.notifStatut === c.statut) continue;
+    const base = [["Commande", c.titre], ["Montant", fc(c.prix)]];
+    const quand = c.dateRdv ? [["Date", c.dateRdv + (c.heureRdv ? " à " + c.heureRdv : "")]] : [];
+    if (c.statut === "en_attente"){
+      await notifier([c.prestataireUid], "Nouvelle commande", (c.clientNom || "Un client") + " a commandé « " + c.titre + " ». Confirmez-la pour la planifier.", SITE,
+        { ...TP, titre: "Nouvelle commande", bouton: "Confirmer la commande", lignes: base.concat([["Client", c.clientNom || "—"], ["Mode", c.mode === "sur_place" ? "Sur place" : "En ligne"]], quand, c.lieu ? [["Lieu", c.lieu]] : []) });
+      await notifier([c.clientUid], "Commande envoyée", "Votre commande « " + c.titre + " » a été transmise à " + (c.prestataireNom || "le prestataire") + ". Vous serez prévenu(e) dès sa confirmation.", SITE,
+        { ...TP, titre: "Commande envoyée", bouton: "Suivre ma commande", lignes: base.concat(quand) });
+    } else if (c.statut === "confirmee"){
+      await notifier([c.clientUid], "Commande confirmée", (c.prestataireNom || "Le prestataire") + " a confirmé votre commande « " + c.titre + " ».", SITE,
+        { ...TP, titre: "Commande confirmée", bouton: "Suivre ma commande", lignes: base.concat(quand, c.lieu ? [["Lieu", c.lieu]] : []) });
+    } else if (c.statut === "en_cours"){
+      await notifier([c.clientUid], "Prestation démarrée", "Le travail sur « " + c.titre + " » a commencé.", SITE,
+        { ...TP, titre: "Prestation démarrée", bouton: "Suivre ma commande", lignes: base });
+    } else if (c.statut === "livree"){
+      await notifier([c.clientUid], "Prestation livrée : confirmez la réception", (c.prestataireNom || "Le prestataire") + " indique avoir terminé « " + c.titre + " ». Confirmez la réception pour clôturer la commande.", SITE,
+        { ...TP, titre: "Prestation livrée", bouton: "Confirmer la réception", lignes: base.concat(c.compteRendu ? [["Compte rendu", court(c.compteRendu, 200)]] : []) });
+    } else if (c.statut === "terminee"){
+      await notifier([c.prestataireUid], "Commande terminée", (c.clientNom || "Le client") + " a confirmé la réception de « " + c.titre + " ».", SITE,
+        { ...TP, titre: "Commande terminée", bouton: "Ouvrir mes commandes", lignes: base });
+      await notifier([c.clientUid], "Donnez votre avis", "Votre commande « " + c.titre + " » est terminée. Votre avis aide les autres utilisateurs.", SITE,
+        { ...TP, titre: "Laissez un avis", bouton: "Donner mon avis", lignes: base });
+    } else if (c.statut === "annulee"){
+      const versPresta = c.annuleePar === "client";
+      await notifier([versPresta ? c.prestataireUid : c.clientUid], "Commande annulée", (versPresta ? (c.clientNom || "Le client") : (c.prestataireNom || "Le prestataire")) + " a annulé la commande « " + c.titre + " ».", SITE,
+        { ...TP, titre: "Commande annulée", bouton: "Ouvrir Bohicon Jobs", lignes: base.concat(c.motif ? [["Motif", c.motif]] : []) });
+    } else if (c.statut === "litige"){
+      await notifier([c.prestataireUid], "Un problème a été signalé", (c.clientNom || "Le client") + " a signalé un problème sur « " + c.titre + " ». Contactez-le pour trouver une solution.", SITE,
+        { ...TP, titre: "Problème signalé", bouton: "Ouvrir la commande", lignes: base.concat(c.motif ? [["Problème", court(c.motif, 200)]] : []) });
+    }
+    await d.ref.update({ notifStatut: c.statut });
+  }
+  for (const uid of aRecompter){
+    const n = (await db.collection("commandes").where("prestataireUid", "==", uid).where("statut", "==", "terminee").count().get()).data().count;
+    await db.collection("prestataires").doc(uid).set({ nbTerminees: n }, { merge: true });
+  }
+
+  // Avis vérifiés : notification et moyennes affichées dans le catalogue
+  const avis = await db.collection("avisPrestations").where("createdAt", ">", fenetre).get();
+  for (const d of avis.docs){
+    const a = d.data();
+    if (a.mailAvis) continue;
+    await notifier([a.prestataireUid], "Nouvel avis client", (a.clientNom || "Un client") + " vous a donné " + a.note + "/5." + (a.commentaire ? " « " + court(a.commentaire, 120) + " »" : ""), SITE,
+      { ...TP, titre: "Nouvel avis vérifié", bouton: "Voir mes avis", lignes: [["Note", a.note + " / 5"]].concat(a.commentaire ? [["Commentaire", court(a.commentaire, 200)]] : []) });
+    const moy = l => l.length ? Math.round(l.reduce((s, x) => s + Number(x.data().note || 0), 0) / l.length * 10) / 10 : 0;
+    const parPrest = (await db.collection("avisPrestations").where("prestationId", "==", a.prestationId).get()).docs;
+    await db.collection("prestations").doc(a.prestationId).update({ noteMoy: moy(parPrest), nbAvis: parPrest.length }).catch(() => {});
+    const parProv = (await db.collection("avisPrestations").where("prestataireUid", "==", a.prestataireUid).get()).docs;
+    await db.collection("prestataires").doc(a.prestataireUid).set({ noteMoy: moy(parProv), nbAvis: parProv.length }, { merge: true });
+    await d.ref.update({ mailAvis: true });
+  }
+
+  // Messages : un seul courriel par série de messages, après 90 secondes
+  const convs = await db.collection("conversations").where("maj", ">", fenetre).get();
+  for (const d of convs.docs){
+    const c = d.data();
+    const dernier = Number(c.dernierMs || 0);
+    if (!c.dernierDe || dernier <= Number(c.notifieMs || 0)) continue;
+    if (MAINTENANT - dernier < 90 * 1000) continue;
+    if (MAINTENANT - dernier < RECENT_P){
+      const dest = (c.participants || []).find(u => u !== c.dernierDe);
+      const nom = (c.noms && c.noms[c.dernierDe]) || "Un utilisateur";
+      if (dest) await notifier([dest], "Nouveau message de " + nom, court(c.dernierTexte, 120), SITE,
+        { ...TP, titre: "Nouveau message", bouton: "Lire le message", lignes: [["De", nom]].concat(c.contexte ? [["À propos de", c.contexte]] : [], [["Message", court(c.dernierTexte, 200)]]) });
+    }
+    await d.ref.update({ notifieMs: dernier });
+  }
+  await curseurRef.set({ ms: MAINTENANT });
 }
 
 // ---------- Nouvelles inscriptions : prévenir les administrateurs ----------
