@@ -236,6 +236,7 @@
       <button class="onglet" data-t="missions" type="button">Missions</button>
       <button class="onglet" data-t="cands" type="button" id="onglet-cands">Candidatures</button>
       <button class="onglet" data-t="recrut" type="button" id="onglet-recrut">Recrutements</button>
+      <button class="onglet" data-t="presta" type="button" id="onglet-presta">Prestations</button>
       <button class="onglet" data-t="validation" type="button" id="onglet-validation">À valider</button>
       <button class="onglet" data-t="signalements" type="button" id="onglet-sig">Signalements</button>
       <button class="onglet" data-t="bannieres" type="button">Bannières</button>
@@ -258,6 +259,8 @@
       <div id="compteurs-inscr" class="tuiles"></div>
       <div id="liste-inscr"></div>
     </div>
+
+    <div id="t-presta" class="card cache"></div>
 
     <div id="t-recrut" class="card cache"></div>
 
@@ -484,6 +487,7 @@
   let recents = [], premierRecents = true, premierCands = true, filtreCands = "attente";
   let pushTokens = [], pushEtat = null;
   let offresAdm = [], postulAdm = [];
+  let prestaAdm = [], devisAdm = [], cmdAdm = [], avisAdm = [];
   let editionId = null;
   let annonceAdmin = null, annonceRemplie = false;
 
@@ -1344,7 +1348,92 @@
     });
   }
 
-  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); rendrePush(); rendreRecrut(); }
+  // ---------- Prestations : statistiques, validation et litiges ----------
+  function rendrePrestaAdm(){
+    const z = $("t-presta");
+    z.innerHTML = "";
+    z.appendChild(el("h2", "", "Prestations"));
+    const fc = n => Number(n || 0).toLocaleString("fr-FR") + " FCFA";
+    const msP = o => (o.createdAt && o.createdAt.toMillis ? o.createdAt.toMillis() : 0);
+    const aValider = prestaAdm.filter(p => p.valide !== true && !p.refusMotif);
+    const litiges = cmdAdm.filter(c => c.statut === "litige");
+    $("onglet-presta").textContent = "Prestations" + (aValider.length + litiges.length ? " (" + (aValider.length + litiges.length) + ")" : "");
+    const tuile = (v, l) => { const t = el("div", "tuile-s"); t.append(el("b", "", String(v)), el("span", "", l)); return t; };
+    const terminees = cmdAdm.filter(c => c.statut === "terminee");
+    const note = avisAdm.length ? Math.round(avisAdm.reduce((s, x) => s + Number(x.note || 0), 0) / avisAdm.length * 10) / 10 : 0;
+    const g = el("div", "tuiles");
+    g.append(
+      tuile(prestaAdm.filter(p => p.valide === true && p.statut === "active").length, "Prestations actives"), tuile(aValider.length, "À valider"),
+      tuile(new Set(prestaAdm.filter(p => p.valide === true).map(p => p.uid)).size, "Prestataires"), tuile(devisAdm.length, "Demandes de devis"),
+      tuile(cmdAdm.length, "Commandes"), tuile(cmdAdm.filter(c => ["confirmee", "en_cours", "livree"].includes(c.statut)).length, "En cours"),
+      tuile(terminees.length, "Terminées"), tuile(cmdAdm.filter(c => c.statut === "annulee").length, "Annulées"),
+      tuile(litiges.length, "Litiges"), tuile(fc(terminees.reduce((s, c) => s + Number(c.prix || 0), 0)), "Volume déclaré"),
+      tuile(avisAdm.length ? "★ " + note : "—", avisAdm.length + " avis vérifiés"), tuile(devisAdm.filter(d => d.statut === "demande").length, "Devis sans réponse"));
+    z.appendChild(g);
+    z.appendChild(el("div", "info", "Le paiement se fait directement entre clients et prestataires : Bohicon Jobs ne prélève aucune commission. Le volume est déclaratif (commandes terminées)."));
+
+    const LIB = { graphisme: "Graphisme", redaction: "Rédaction", web: "Web et mobile", marketing: "Marketing", video: "Vidéo et son", formation: "Formation", assistance: "Assistance", menage: "Ménage", livraison: "Livraison", jardinage: "Jardinage", bricolage: "Bricolage", cuisine: "Cuisine", domicile: "Aide à domicile", transport: "Transport", cours: "Cours", informatique: "Informatique", electricite: "Électricité", plomberie: "Plomberie", maconnerie: "Maçonnerie", menuiserie: "Menuiserie", peinture: "Peinture", soudure: "Soudure", mecanique: "Mécanique", froid: "Froid et clim.", electronique: "Électronique", couture: "Couture", coiffure: "Coiffure", comptabilite: "Comptabilité", commerce: "Commerce", securite: "Sécurité", agriculture: "Agriculture", photo: "Photo et vidéo", sante: "Santé", autre: "Autre" };
+    const parCat = {};
+    prestaAdm.filter(p => p.valide === true).forEach(p => { parCat[p.categorie] = (parCat[p.categorie] || 0) + 1; });
+    const top = Object.entries(parCat).sort((x, y) => y[1] - x[1]).slice(0, 6);
+    if (top.length){
+      z.appendChild(el("h3", "", "Domaines les plus proposés"));
+      const l = el("div", "rec-compteurs");
+      top.forEach(([k, n]) => l.appendChild(el("span", "rec-pastille", (LIB[k] || k) + " · " + n)));
+      z.appendChild(l);
+    }
+
+    if (litiges.length){
+      z.appendChild(el("h3", "", "Litiges à examiner"));
+      litiges.forEach(c => {
+        const r = el("div", "rang");
+        const gg = el("div");
+        gg.appendChild(el("div", "h-titre", c.titre + " · " + fc(c.prix)));
+        gg.appendChild(el("div", "h-sous", "Client : " + (c.clientNom || "—") + " · Prestataire : " + (c.prestataireNom || "—")));
+        gg.appendChild(el("div", "h-sous", "Problème signalé : " + (c.motif || "—")));
+        r.appendChild(gg);
+        z.appendChild(r);
+      });
+    }
+
+    z.appendChild(el("h3", "", "Prestations à valider (" + aValider.length + ")"));
+    if (!aValider.length) z.appendChild(el("div", "vide", "Aucune prestation en attente."));
+    aValider.sort((x, y) => msP(y) - msP(x)).forEach(p => {
+      const r = el("div", "rang");
+      const gg = el("div");
+      gg.appendChild(el("div", "h-titre", p.titre));
+      gg.appendChild(el("div", "h-sous", (p.entrepriseNom || p.prestataireNom || "—") + " · " + (LIB[p.categorie] || p.categorie) + " · " + ({ en_ligne: "En ligne", sur_place: "Sur place", les_deux: "Les deux" }[p.mode] || "")));
+      gg.appendChild(el("div", "h-sous", p.prixType === "devis" ? "Sur devis" : (p.prixType === "a_partir_de" ? "À partir de " : "") + fc(p.prix)));
+      gg.appendChild(el("div", "h-sous", String(p.description || "").slice(0, 220)));
+      const btns = el("div", "btns");
+      btns.appendChild(bouton("Valider", "mini", async () => {
+        await updateDoc(doc(db, "prestations", p.id), { valide: true, valideLe: serverTimestamp(), refusMotif: "" });
+        toastAdmin("Prestation validée : le prestataire est prévenu par e-mail.");
+      }));
+      btns.appendChild(bouton("Refuser", "sec mini", async () => {
+        const motif = ((await demander("Ce motif sera communiqué au prestataire.", { titre: "Refuser la prestation", ok: "Refuser", danger: true, champ: { placeholder: "Motif du refus", valeur: "Description insuffisante", max: 120 } })) || "").trim();
+        if (!motif) return;
+        await updateDoc(doc(db, "prestations", p.id), { valide: false, refusMotif: motif });
+      }));
+      r.append(gg, btns);
+      z.appendChild(r);
+    });
+
+    z.appendChild(el("h3", "", "Dernières commandes"));
+    if (!cmdAdm.length) z.appendChild(el("div", "vide", "Aucune commande pour le moment."));
+    cmdAdm.slice().sort((x, y) => msP(y) - msP(x)).slice(0, 12).forEach(c => {
+      const r = el("div", "rang");
+      const gg = el("div");
+      const t = el("div", "h-titre", c.titre + " · " + fc(c.prix));
+      t.appendChild(el("span", "badge " + (c.statut === "terminee" ? "b-disponible" : c.statut === "litige" ? "b-refusee" : c.statut === "annulee" ? "b-gris" : "b-attente"), ({ en_attente: "En attente", confirmee: "Confirmée", en_cours: "En cours", livree: "Livrée", terminee: "Terminée", annulee: "Annulée", litige: "Litige" })[c.statut] || c.statut));
+      gg.appendChild(t);
+      gg.appendChild(el("div", "h-sous", (c.clientNom || "—") + " → " + (c.prestataireNom || "—") + " · " + (c.mode === "sur_place" ? "Sur place" : "En ligne")));
+      r.appendChild(gg);
+      z.appendChild(r);
+    });
+  }
+
+  function rendre(){ rendreApercu(); rendreUsers(); rendreInscriptions(); rendreCandidatures(); rendreMissions(); rendreValidation(); rendreSignalements(); rendreBannieres(); rendreRetours(); rendreAmbassadeurs(); rendrePush(); rendreRecrut(); rendrePrestaAdm(); }
 
   // ---------- Export CSV ----------
   function cellule(v){
@@ -1364,7 +1453,7 @@
   });
 
   // ---------- Données en direct ----------
-  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; pushTokens = []; pushEtat = null; offresAdm = []; postulAdm = []; }
+  function arreter(){ unsubs.forEach(f => f()); unsubs = []; users = []; missions = []; cands = []; signalements = []; bannieres = []; retours = []; ambassadeurs = []; annonceRemplie = false; entreprisesV = new Set(); recents = []; premierRecents = true; premierCands = true; pushTokens = []; pushEtat = null; offresAdm = []; postulAdm = []; prestaAdm = []; devisAdm = []; cmdAdm = []; avisAdm = []; }
   function demarrer(){
     const err = e => { console.error(e); message("Impossible de charger les données. Vérifie les règles Firestore."); };
     const lire = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1402,6 +1491,10 @@
     unsubs.push(onSnapshot(doc(db, "config", "pushEtat"), s => { pushEtat = s.exists() ? s.data() : null; rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "offres"), limit(300)), s => { offresAdm = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(query(collection(db, "postulations"), limit(500)), s => { postulAdm = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "prestations"), limit(500)), s => { prestaAdm = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "devis"), limit(500)), s => { devisAdm = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "commandes"), limit(500)), s => { cmdAdm = lire(s); rendre(); }, err));
+    unsubs.push(onSnapshot(query(collection(db, "avisPrestations"), limit(500)), s => { avisAdm = lire(s); rendre(); }, err));
     unsubs.push(onSnapshot(doc(db, "config", "annonce"), s => {
       annonceAdmin = s.exists() ? s.data() : null;
       if (!annonceRemplie){ annonceRemplie = true; remplirAnnonce(); } else majApercuAnnonce();
@@ -1451,7 +1544,7 @@
 
   document.querySelectorAll(".onglet").forEach(b => b.addEventListener("click", () => {
     document.querySelectorAll(".onglet").forEach(x => x.classList.toggle("on", x === b));
-    ["apercu", "users", "inscriptions", "cands", "recrut", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs", "push"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
+    ["apercu", "users", "inscriptions", "cands", "recrut", "presta", "missions", "validation", "signalements", "bannieres", "retours", "ambassadeurs", "push"].forEach(t => $("t-" + t).classList.toggle("cache", t !== b.dataset.t));
   }));
   $("q-users").addEventListener("input", rendreUsers);
   $("q-cands").addEventListener("input", rendreCandidatures);

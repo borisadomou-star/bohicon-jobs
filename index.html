@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261120-1417">
-<meta name="build-notes" content="Barre d'infos plus fiable, nouveaux métiers, photo de profil et genre.">
+<meta name="build" content="20261123-0841">
+<meta name="build-notes" content="Nouveau : Prestations (catalogue, devis, commandes, messagerie, avis) et espace de travail entreprise modernisé.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -924,6 +924,144 @@
   .dom-compte{margin:0 2px 8px;font-size:.78rem;font-weight:600;color:var(--vert)}
   .dom-autre{margin:12px 0 4px}
 
+  /* ===== Prestations ===== */
+  #vue-presta .vue-corps{padding-bottom:30px}
+  .ps-entete{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .ps-bascule{display:flex;padding:4px;border-radius:999px;background:#fff;box-shadow:0 8px 20px -14px rgba(8,69,42,.55)}
+  .ps-mode{width:auto;margin:0;padding:9px 16px;border-radius:999px;background:transparent;color:var(--gris);font-size:.82rem;font-weight:700;box-shadow:none}
+  .ps-mode.on{background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 10px 18px -12px rgba(11,107,58,.9)}
+  .ps-onglets{display:flex;gap:6px;margin-bottom:14px;padding:5px;overflow-x:auto;border-radius:18px;background:#fff;box-shadow:0 8px 20px -16px rgba(8,69,42,.5);scrollbar-width:none}
+  .ps-onglets::-webkit-scrollbar{display:none}
+  .ps-onglet{flex:0 0 auto;display:flex;align-items:center;gap:6px;width:auto;margin:0;padding:10px 14px;border-radius:13px;background:transparent;color:#5f7468;font-size:.82rem;font-weight:600;white-space:nowrap;box-shadow:none}
+  .ps-onglet.on{background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 10px 18px -12px rgba(11,107,58,.9)}
+  .ps-pastille{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e0352b;color:#fff;font-size:.65rem;font-style:normal;font-weight:700;line-height:18px;text-align:center}
+  .ps-intro{display:flex;flex-direction:column;gap:2px;margin-bottom:12px;padding:14px 16px;border-radius:20px;color:#fff;background:radial-gradient(120% 90% at 90% 0%,rgba(252,209,22,.22),rgba(252,209,22,0) 55%),linear-gradient(160deg,#062f1b,#0a5a32 62%,#0f7a45)}
+  .ps-intro b{font-size:1.05rem}
+  .ps-intro span{font-size:.82rem;opacity:.9;line-height:1.45}
+  .ps-recherche input{margin:0 0 10px;border-radius:999px}
+  .ps-filtres{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+  .ps-filtres select{margin:0;font-size:.84rem}
+  .ps-filtres select:last-child{grid-column:1 / -1}
+  .ps-resultats{margin:0 4px 10px;font-size:.78rem;font-weight:600;color:var(--gris)}
+  .ps-grille{display:grid;gap:12px}
+  .ps-carte{display:flex;flex-direction:column;width:100%;margin:0;padding:0;overflow:hidden;border:1px solid #e4ede7;border-radius:20px;background:#fff;color:var(--encre);text-align:left;box-shadow:0 14px 28px -22px rgba(8,69,42,.55)}
+  .ps-vignette{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:150px;overflow:hidden;background:linear-gradient(135deg,var(--vert),var(--vert2))}
+  .ps-vignette img{width:100%;height:100%;object-fit:cover}
+  .ps-vignette-ini{font-size:2.6rem;font-weight:800;color:rgba(255,255,255,.85)}
+  .ps-vignette.grande{height:210px;margin-bottom:12px;border-radius:20px}
+  .ps-vignette.mini{flex:none;width:92px;height:70px;border-radius:14px}
+  .ps-carte-corps{padding:12px 14px 14px}
+  .ps-puces{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .ps-puce{padding:3px 10px;border-radius:999px;background:#eef3f0;color:#33463b;font-size:.7rem;font-weight:700}
+  .ps-puce.mode-en_ligne{background:#e6eefc;color:#1a4fa0}
+  .ps-puce.mode-sur_place{background:#e7f5ed;color:#0d6b3c}
+  .ps-puce.mode-les_deux{background:#fff3dc;color:#8f5a00}
+  .ps-titre{margin:0 0 8px;font-size:1.02rem;line-height:1.3}
+  .ps-carte-bas{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .ps-qui{display:flex;align-items:center;gap:8px;min-width:0;font-size:.8rem;color:var(--gris)}
+  .ps-qui span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ps-qui .avatar-mini{flex:none;width:26px;height:26px;font-size:.7rem}
+  .ps-note{font-weight:700;color:#b36b00}
+  .ps-prix{flex:none;font-size:.95rem;color:var(--vert)}
+  .ps-lien-missions{margin:14px 0 4px;text-align:center;font-size:.84rem;color:var(--gris)}
+  .ps-lien-missions .lien{display:inline;width:auto;margin:0;padding:0;font-size:.84rem}
+  .ps-titre-grand{margin:4px 0 6px;font-size:1.35rem;line-height:1.25;letter-spacing:-.01em}
+  .ps-prix-grand{margin-bottom:12px;font-size:1.25rem;font-weight:800;color:var(--vert)}
+  .ps-infos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+  .ps-info{padding:10px 12px;border-radius:14px;background:#f5faf7}
+  .ps-info small{display:block;font-size:.7rem;color:var(--gris)}
+  .ps-info b{font-size:.86rem}
+  .ps-desc{margin:6px 0 12px;font-size:.9rem;line-height:1.55;color:#33463b;white-space:pre-line}
+  .ps-note-ligne{margin-bottom:10px;font-size:.84rem;font-weight:700;color:#b36b00}
+  .ps-prestataire{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:12px;border:1px solid #e4ede7;border-radius:18px;background:#fff}
+  .ps-prest-txt{flex:1;min-width:0}
+  .ps-prest-txt b{display:block;font-size:.95rem}
+  .ps-prest-txt small{display:block;font-size:.76rem;color:var(--gris)}
+  .ps-prestataire .mini{width:auto;margin:0}
+  .ps-actions{display:grid;gap:8px;margin-bottom:10px}
+  .ps-note-paiement{margin-bottom:14px;padding:10px 12px;border-radius:12px;background:#eef8f2;color:#0d5a33;font-size:.78rem;line-height:1.45}
+  .ps-portfolio{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .ps-realisation{margin:0;overflow:hidden;border:1px solid #e4ede7;border-radius:14px;background:#fff}
+  .ps-realisation img{display:block;width:100%;height:120px;object-fit:cover}
+  .ps-realisation figcaption{padding:6px 10px;font-size:.74rem;color:var(--gris)}
+  .ps-realisation .lien{display:block;width:100%;margin:0;padding:6px;font-size:.76rem}
+  .ps-vide-mini{grid-column:1 / -1;padding:10px 2px;font-size:.82rem;color:var(--gris)}
+  .ps-avis-carte{margin-bottom:10px;padding:12px 14px;border:1px solid #e4ede7;border-radius:16px;background:#fff}
+  .ps-avis-haut{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px}
+  .ps-etoiles-fixes{font-size:.9rem;color:#e0a100;letter-spacing:1px}
+  .ps-verifie{margin-left:auto;padding:2px 8px;border-radius:999px;background:#e8f6ea;color:#1b6b2f;font-size:.68rem;font-weight:700}
+  .ps-reponse{padding:8px 10px;border-radius:10px;background:#f5faf7;font-size:.8rem;color:#33463b}
+  .ps-profil-tete{display:flex;align-items:center;gap:14px;margin:6px 0 10px}
+  .ps-conv{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 8px;padding:12px 14px;border:1px solid #e4ede7;border-radius:18px;background:#fff;color:var(--encre);text-align:left;box-shadow:none}
+  .ps-conv.nonlu{border-color:#cfe8d9;background:#f1faf5}
+  .ps-conv-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .ps-conv-txt b{font-size:.92rem}
+  .ps-conv-txt small{font-size:.72rem;color:var(--vert);font-weight:700}
+  .ps-conv-txt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;color:var(--gris)}
+  .ps-conv.nonlu .ps-conv-txt b,.ps-conv.nonlu .ps-conv-txt span{font-weight:800;color:var(--encre)}
+  .ps-thread-tete{margin:8px 2px 10px}
+  .ps-thread-tete b{display:block;font-size:1.05rem}
+  .ps-thread-tete small{color:var(--gris)}
+  .ps-messages{display:flex;flex-direction:column;gap:8px;max-height:52vh;min-height:160px;padding:12px;overflow-y:auto;border:1px solid #e4ede7;border-radius:18px;background:#f7faf8}
+  .ps-bulle{display:flex;flex-direction:column;max-width:82%;padding:9px 12px;border-radius:16px;font-size:.88rem;line-height:1.45;word-break:break-word}
+  .ps-bulle small{margin-top:3px;font-size:.66rem;opacity:.7}
+  .ps-bulle.moi{align-self:flex-end;border-bottom-right-radius:4px;background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff}
+  .ps-bulle.autre{align-self:flex-start;border-bottom-left-radius:4px;background:#fff;border:1px solid #e4ede7;color:var(--encre)}
+  .ps-saisie{display:flex;align-items:flex-end;gap:8px;margin-top:10px}
+  .ps-saisie textarea{flex:1;margin:0;min-height:44px;resize:none}
+  .ps-saisie .mini{width:auto;margin:0;padding:12px 18px}
+  .ps-etoiles{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}
+  .ps-etoile{width:auto;margin:0;padding:2px 4px;background:none;color:#d9dfdb;font-size:2rem;line-height:1;box-shadow:none}
+  .ps-etoile.on{color:#e0a100}
+  .ps-modal{max-height:88vh;overflow-y:auto;text-align:left}
+  .ps-modal .dlg-titre,.ps-modal .dlg-msg{text-align:center}
+  .ps-jours{display:flex;flex-wrap:wrap;gap:6px}
+  .ps-jour{width:auto;margin:0;padding:8px 12px;border:1.5px solid #dfe9e3;border-radius:12px;background:#fff;color:var(--gris);font-size:.8rem;font-weight:700;box-shadow:none}
+  .ps-jour.on{border-color:var(--vert2);background:#e7f5ed;color:var(--vert-fonce)}
+  .ps-ligne-presta{display:flex;gap:12px;align-items:flex-start}
+  .ps-ligne-corps{flex:1;min-width:0}
+  .ps-paiement{margin:8px 0 0;font-size:.78rem}
+  .ps-astuce{margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#eef3fb;color:#26467d;font-size:.8rem;line-height:1.45}
+  .ps-astuce .lien{display:inline;width:auto;margin:0;padding:0;font-size:.8rem;font-weight:700}
+  .carte-presta{background:linear-gradient(135deg,#ffffff,#fff8e1);border-color:#f1d98a}
+  .carte-presta .ce-ico{background:linear-gradient(135deg,#d99a00,#f2c230)}
+  @media (min-width:900px){.ps-grille{grid-template-columns:repeat(2,1fr)}#vue-presta .vue-corps{max-width:980px}.ps-portfolio{grid-template-columns:repeat(3,1fr)}}
+
+  /* ===== Espace de travail des entreprises ===== */
+  .ws-nav{display:flex;gap:6px;margin-bottom:14px;padding:6px;overflow-x:auto;border:1px solid #e8efea;border-radius:20px;background:#fff;box-shadow:0 12px 26px -20px rgba(8,69,42,.55);scrollbar-width:none}
+  .ws-nav::-webkit-scrollbar{display:none}
+  .ws-item{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:8px;width:auto;margin:0;padding:10px 14px;border-radius:14px;background:transparent;color:#5f7468;font-size:.84rem;font-weight:600;white-space:nowrap;box-shadow:none}
+  .ws-ico{display:flex}
+  .ws-ico svg{width:19px;height:19px}
+  .ws-item.on{background:linear-gradient(135deg,var(--vert),var(--vert2));color:#fff;box-shadow:0 12px 20px -14px rgba(11,107,58,.9)}
+  .ws-badge{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#e0352b;color:#fff;font-size:.65rem;font-style:normal;font-weight:700;line-height:18px;text-align:center}
+  .ws-main{min-width:0}
+  .ws-kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .ws-kpi-carte{position:relative;display:flex;flex-direction:column;gap:2px;padding:14px;overflow:hidden;border:1px solid #e4ede7;border-radius:18px;background:linear-gradient(180deg,#fff,#f5faf7);box-shadow:0 12px 24px -20px rgba(8,69,42,.6)}
+  .ws-kpi-carte::before{content:"";position:absolute;top:0;bottom:0;left:0;width:4px;background:linear-gradient(180deg,var(--vert2),var(--jaune))}
+  .ws-kpi-ico{display:flex;align-items:center;justify-content:center;width:34px;height:34px;margin-bottom:6px;border-radius:11px;background:#e7f5ed;color:#0f7a45}
+  .ws-kpi-ico svg{width:19px;height:19px}
+  .ws-kpi-carte b{font-size:1.35rem;letter-spacing:-.01em}
+  .ws-kpi-carte span:last-child{font-size:.74rem;line-height:1.3;color:var(--gris)}
+  .ws-actions{grid-template-columns:repeat(2,1fr)}
+  .ws-fil{display:grid;gap:8px;margin-bottom:12px}
+  .ws-fil-ligne{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e4ede7;border-radius:14px;background:#fff;font-size:.84rem}
+  .ws-fil-ligne i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--vert2)}
+  .ws-fil-ligne span{flex:1;min-width:0}
+  .ws-fil-ligne small{flex:none;color:var(--gris)}
+  .pro-carte{position:relative;overflow:hidden}
+  .pro-carte::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 30px rgba(255,255,255,.04),0 0 0 62px rgba(255,255,255,.025);pointer-events:none}
+  .pro-carte > *{position:relative;z-index:1}
+  @media (min-width:900px){
+    #vue-pro .vue-corps{max-width:1120px}
+    .ws{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+    .ws-nav{position:sticky;top:12px;flex-direction:column;gap:4px;margin-bottom:0;padding:10px;overflow:visible}
+    .ws-item{justify-content:flex-start;padding:12px 14px}
+    .ws-badge{margin-left:auto}
+    .ws-kpi{grid-template-columns:repeat(4,1fr)}
+    .ws-actions{grid-template-columns:repeat(3,1fr)}
+  }
+
   /* Étapes */
   .etapes{display:flex;align-items:flex-start;margin-top:4px}
   .etape{flex:1;text-align:center;position:relative;padding:0 4px}
@@ -1167,7 +1305,7 @@
 
 <nav class="nav-bas" aria-label="Navigation principale">
   <button class="nav-item actif" id="nav-accueil" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.4L12 4.8l6.5 5.6V19a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5h4v5h3.5a1 1 0 0 0 1-1v-9"/></svg></span>Accueil</button>
-  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="currentColor" fill-opacity=".2" stroke="none"/><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></span>Missions</button>
+  <button class="nav-item" id="nav-missions" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7"/><path d="M17.5 14v7"/></svg></span>Services<span class="nav-badge cache" id="nav-badge-presta">0</span></button>
   <button class="nav-item pub" id="nav-publier" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span>Publier</button>
   <button class="nav-item" id="nav-alertes" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></span>Alertes<span class="nav-badge cache" id="nav-badge">0</span></button>
   <button class="nav-item" id="nav-espace" type="button"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8" fill="currentColor" fill-opacity=".2" stroke="none"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8z" fill="currentColor" fill-opacity=".2" stroke="none"/><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.8-3.8 4-5.8 7.5-5.8s6.7 2 7.5 5.8"/></svg></span>Espace</button>
@@ -1185,6 +1323,20 @@
   <div class="bi-texte"><b>Installer Bohicon Jobs</b><small>Accès rapide depuis ton écran d'accueil</small></div>
   <button id="btn-install-bandeau" class="mini" type="button">Installer</button>
   <button id="btn-install-fermer" class="lien" type="button" aria-label="Fermer">✕</button>
+</div>
+
+<div id="vue-presta" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Prestations">
+  <div class="vue-corps ps-corps">
+    <div class="ps-entete">
+      <button id="btn-fermer-presta" class="btn-accueil" type="button">← Accueil</button>
+      <div class="ps-bascule" role="tablist">
+        <button id="ps-mode-client" class="ps-mode on" type="button">Je cherche</button>
+        <button id="ps-mode-prest" class="ps-mode" type="button">Je propose</button>
+      </div>
+    </div>
+    <div id="presta-nav" class="ps-onglets"></div>
+    <div id="presta-contenu"></div>
+  </div>
 </div>
 
 <div id="vue-pro" class="vue-espace cache" role="dialog" aria-modal="true" aria-label="Espace entreprises">
@@ -1254,6 +1406,7 @@
             <span class="form-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span>
             <div><h2 id="t-publier-titre">Publier une mission</h2><p>Décris ton besoin : les personnes de ton quartier pourront se proposer.</p></div>
           </div>
+          <div class="ps-astuce">Tu proposes un service (graphisme, plomberie, formation…) ? <button id="lien-presta-publier" class="lien" type="button">Publie-le dans Prestations</button></div>
           <div class="verif-note">
             <span id="icone-verif-pub" aria-hidden="true"></span>
             <div><b>Contrôle avant publication</b><span class="vn-txt">Notre équipe vérifie chaque mission avant de la rendre visible.</span></div>
@@ -2849,7 +3002,8 @@
   }
 
   // Données de la plateforme : lues seulement par un utilisateur connecté
-  const RECRUT = {};   // fonctions du module de recrutement (facultatives : le site fonctionne sans)
+  const RECRUT = {};
+  const PRESTA = {};   // fonctions du module Prestations (facultatives)   // fonctions du module de recrutement (facultatives : le site fonctionne sans)
   const demarragesPublics = [];
   let arretsPublics = [];
   function demarrerDonneesPubliques(){
@@ -2881,8 +3035,8 @@
     if (u) noterActivite();
     user = u;
     profil = null;
-    if (u){ demarrerDonneesPubliques(); if (RECRUT.demarrer) RECRUT.demarrer(); }
-    else { arreterDonneesPubliques(); missions = []; if (RECRUT.arreter) RECRUT.arreter(); }
+    if (u){ demarrerDonneesPubliques(); if (RECRUT.demarrer) RECRUT.demarrer(); if (PRESTA.demarrer) PRESTA.demarrer(); }
+    else { arreterDonneesPubliques(); missions = []; if (RECRUT.arreter) RECRUT.arreter(); if (PRESTA.arreter) PRESTA.arreter(); }
     if (u && !enInscription){
       try {
         const s = await getDoc(doc(db, "users", u.uid));
@@ -3128,6 +3282,7 @@
   function ouvrirEspace(onglet){
     if (!user) return;
     if (proOuvert) fermerPro(true);
+    if (PRESTA.fermer) PRESTA.fermer(true);
     const v = $("vue-espace");
     v.style.top = document.querySelector(".topbar").offsetHeight + "px";
     v.classList.remove("cache");
@@ -3143,10 +3298,11 @@
 
   let enMissions = false;
   function majNav(){
-    const autre = espaceOuvert || !$("vue-pro").classList.contains("cache");
+    const presta = !$("vue-presta").classList.contains("cache");
+    const autre = espaceOuvert || !$("vue-pro").classList.contains("cache") || presta;
     $("nav-espace").classList.toggle("actif", espaceOuvert);
-    $("nav-missions").classList.toggle("actif", !autre && enMissions);
-    $("nav-accueil").classList.toggle("actif", !autre && !enMissions);
+    $("nav-missions").classList.toggle("actif", presta);
+    $("nav-accueil").classList.toggle("actif", !autre);
   }
 
   function fermerEspace(viaRetour){
@@ -3166,6 +3322,7 @@
   function retourAccueil(){
     fermerEspace();
     fermerPro();
+    if (PRESTA.fermer) PRESTA.fermer();
     window.scrollTo({ top: 0, behavior: reduit ? "auto" : "smooth" });
   }
   $("btn-fermer-espace").addEventListener("click", retourAccueil);
@@ -3645,7 +3802,7 @@
 
   // ---------- Barre de navigation du bas (mobile) ----------
   $("nav-accueil").addEventListener("click", () => retourAccueil());
-  $("nav-missions").addEventListener("click", () => { fermerEspace(); fermerPro(); defiler($("missions")); });
+  $("nav-missions").addEventListener("click", () => { fermerEspace(); fermerPro(); if (PRESTA.ouvrir) PRESTA.ouvrir("client", "catalogue"); else defiler($("missions")); });
   $("nav-publier").addEventListener("click", () => $("cta-publier").click());
   $("nav-alertes").addEventListener("click", e => {
     e.stopPropagation();
@@ -3831,6 +3988,7 @@
 
   function ouvrirPro(onglet){
     if (espaceOuvert) fermerEspace(true);
+    if (PRESTA.fermer) PRESTA.fermer(true);
     const v = $("vue-pro");
     v.classList.remove("cache");
     v.style.top = document.querySelector(".topbar").offsetHeight + "px";
@@ -4202,7 +4360,7 @@
   }
 
   function rendrePro(){
-    const z = $("pro-contenu");
+    let z = $("pro-contenu");
     z.innerHTML = "";
     proSaisie = false;
     const ent = user && profilOk() ? profil.entreprise : null;
@@ -4284,17 +4442,37 @@
       z.appendChild(bloc);
     }
 
-    const ong = el("div", "pro-onglets");
-    [["dash", "Tableau de bord"], ["modeles", "Modèles"], ["recrut", "Mes recrutements"], ["profil", "Ma fiche"]].forEach(([k, t]) => {
-      const b = el("button", "pro-onglet" + (proOnglet === k ? " on" : ""), t);
+    // ----- espace de travail : navigation latérale (ordinateur) ou horizontale (téléphone) -----
+    const kn = PRESTA.kpi ? PRESTA.kpi() : { devisAttente: 0, cmdATraiter: 0, messages: 0 };
+    const ICONES_WS = { dash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>', modeles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>', recrut: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5c2 .6 3.5 2.2 3.5 5"/></svg>', presta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7"/><path d="M17.5 14v7"/></svg>', messages: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>', profil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16"/><path d="M14 10h5a1 1 0 0 1 1 1v10"/><path d="M8 8h2M8 12h2M8 16h2"/><path d="M3 21h18"/></svg>' };
+    const ws = el("div", "ws");
+    const nav = el("nav", "ws-nav");
+    [["dash", "Tableau de bord", 0], ["modeles", "Modèles", 0], ["recrut", "Mes recrutements", 0], ["presta", "Prestations", kn.devisAttente + kn.cmdATraiter], ["messages", "Messages", kn.messages], ["profil", "Ma fiche", 0]].forEach(([k, t, n]) => {
+      const b = el("button", "ws-item" + (proOnglet === k ? " on" : ""));
       b.type = "button";
+      const ic = el("span", "ws-ico"); ic.innerHTML = ICONES_WS[k];
+      b.append(ic, el("span", "ws-lib", t));
+      if (n) b.appendChild(el("i", "ws-badge", String(n > 9 ? "9+" : n)));
       b.addEventListener("click", () => { proOnglet = k; rendrePro(); });
-      ong.appendChild(b);
+      nav.appendChild(b);
     });
-    z.appendChild(ong);
+    const principal = el("div", "ws-main");
+    ws.append(nav, principal);
+    z.appendChild(ws);
+    z = principal;
 
     if (proOnglet === "recrut"){
       if (RECRUT.rendrePro) RECRUT.rendrePro(z, ent);
+      else z.appendChild(el("div", "vide", "Cette fonction est momentanément indisponible."));
+      return;
+    }
+    if (proOnglet === "presta"){
+      if (PRESTA.rendrePro) PRESTA.rendrePro(z);
+      else z.appendChild(el("div", "vide", "Cette fonction est momentanément indisponible."));
+      return;
+    }
+    if (proOnglet === "messages"){
+      if (PRESTA.rendrePro) PRESTA.rendrePro(z, "messages");
       else z.appendChild(el("div", "vide", "Cette fonction est momentanément indisponible."));
       return;
     }
@@ -4318,7 +4496,7 @@
       return;
     }
 
-    // ----- tableau de bord -----
+    // ----- tableau de bord : espace de travail -----
     if (!verifiee){
       z.appendChild(el("div", "info attente", "Ton entreprise n'est pas encore vérifiée. Le badge « Entreprise vérifiée » rassure les utilisateurs et met tes annonces en valeur."));
       z.appendChild(bouton("Demander la vérification", "sec mini", async () => {
@@ -4327,21 +4505,29 @@
         $("retour-message").value = "Demande de vérification de mon entreprise : " + ent.nom + (ent.secteur ? " (" + ent.secteur + ")" : "") + ".";
       }));
     }
+    const kP = PRESTA.kpi ? PRESTA.kpi() : { devisAttente: 0, cmdATraiter: 0, revenus: 0, messages: 0 };
+    const kR = RECRUT.kpi ? RECRUT.kpi() : { ouvertes: 0, atraiter: 0 };
     const dispo = new Set(mesPubliees.filter(m => st(m) === "disponible").map(m => m.id));
-    const terminees = mesPubliees.filter(m => st(m) === "terminee");
-    const tuile = (valeur, label) => { const t = el("div", "tuile-s"); t.append(el("b", "", valeur), el("span", "", label)); return t; };
-    const tuiles = el("div", "tuiles");
-    tuiles.append(
-      tuile(String(mesPubliees.length), "Missions publiées"),
-      tuile(String(candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId)).length), "Candidatures à traiter"),
-      tuile(String(mesPubliees.filter(m => st(m) === "attribuee" || st(m) === "a_confirmer").length), "Missions en cours"),
-      tuile(fcfa(terminees.reduce((s, m) => s + Number(m.prix || 0), 0)), "Montant confié")
-    );
-    z.appendChild(tuiles);
+    const candMissions = candidaturesRecues.filter(c => c.statut === "en_attente" && dispo.has(c.missionId));
+    const ICO_KPI = { mission: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>', users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 5a3.5 3.5 0 0 1 0 7"/><path d="M18 14.5c2 .6 3.5 2.2 3.5 5"/></svg>', emploi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 12h6"/><path d="M9 16h4"/></svg>', commande: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4"/><path d="M12 11v10"/></svg>', devis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>', cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v.01M18 14.5v.01"/></svg>', chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>' };
+    const grille = el("div", "ws-kpi");
+    [["Missions publiées", mesPubliees.length, "mission"], ["Candidats à traiter (missions)", candMissions.length, "users"],
+     ["Offres d'emploi ouvertes", kR.ouvertes, "emploi"], ["Candidatures emploi à traiter", kR.atraiter, "users"],
+     ["Commandes à traiter", kP.cmdATraiter, "commande"], ["Devis à répondre", kP.devisAttente, "devis"],
+     ["Revenus déclarés", fcfa(kP.revenus), "cash"], ["Messages non lus", kP.messages, "chat"]].forEach(([l, v, ic]) => {
+      const c = el("div", "ws-kpi-carte");
+      const i = el("span", "ws-kpi-ico"); i.innerHTML = ICO_KPI[ic];
+      c.append(i, el("b", "", String(v)), el("span", "", l));
+      grille.appendChild(c);
+    });
+    z.appendChild(grille);
 
-    const actions = el("div", "pro-actions");
+    z.appendChild(el("div", "pro-titre", "Actions rapides"));
+    const actions = el("div", "pro-actions ws-actions");
     [["publier", "Publier une mission", () => preparerPublication({}, "Nouvelle mission|Renseigne les informations puis publie.")],
      ["modeles", "Utiliser un modèle", () => { proOnglet = "modeles"; rendrePro(); }],
+     ["fiche", "Offre d'emploi", () => { proOnglet = "recrut"; rendrePro(); }],
+     ["publier", "Proposer une prestation", () => { if (PRESTA.ouvrir) PRESTA.ouvrir("prest", "mesprestas"); }],
      ["annonces", "Mes annonces", () => { fermerPro(true); ouvrirEspace("histo"); }],
      ["fiche", "Ma fiche entreprise", () => { proOnglet = "profil"; rendrePro(); }]].forEach(([ic, label, action]) => {
       const b = el("button", "pro-action"); b.type = "button";
@@ -4352,8 +4538,24 @@
     });
     z.appendChild(actions);
 
+    const evts = candMissions.map(c => ({ ms: dateMs(c), texte: c.nom + " s'est proposé(e) pour « " + c.titre + " »" }));
+    (PRESTA.activite ? PRESTA.activite() : []).forEach(e => evts.push(e));
+    evts.sort((a, b2) => b2.ms - a.ms);
+    if (evts.length){
+      z.appendChild(el("div", "pro-titre", "Activité récente"));
+      const fil = el("div", "ws-fil");
+      evts.slice(0, 6).forEach(e => {
+        const l = el("div", "ws-fil-ligne");
+        l.appendChild(el("i", ""));
+        l.appendChild(el("span", "", e.texte));
+        if (e.ms) l.appendChild(el("small", "", tempsRelatif(e.ms)));
+        fil.appendChild(l);
+      });
+      z.appendChild(fil);
+    }
+
     z.appendChild(el("div", "pro-titre", "Mes dernières annonces"));
-    const recentes = mesPubliees.slice().sort((a, b) => dateMs(b) - dateMs(a)).slice(0, 5);
+    const recentes = mesPubliees.slice().sort((a, b2) => dateMs(b2) - dateMs(a)).slice(0, 5);
     if (!recentes.length) z.appendChild(el("div", "vide", "Aucune annonce pour l'instant. Utilise un modèle pour publier rapidement."));
     recentes.forEach(m => {
       const ligne = el("div", "h-ligne");
@@ -5175,6 +5377,11 @@
       arretsRecrut = []; offresOuvertes = []; mesOffres = []; mesPostulations = []; postulationsRecues = [];
     };
     RECRUT.majEmplois = () => rendreEmplois();
+    RECRUT.kpi = () => ({
+      ouvertes: mesOffres.filter(o => o.valide === true && o.statut === "ouverte").length,
+      atraiter: postulationsRecues.filter(p => p.statut === "recue").length,
+      retenus: postulationsRecues.filter(p => p.statut === "retenue").length
+    });
 
     // ---------- carte d'accès sur l'accueil ----------
     function majCarteEmplois(){
@@ -5633,6 +5840,1221 @@
     }
   } catch (e) {
     console.error("Module de recrutement indisponible :", e);
+  }
+
+  // ==================== PRESTATIONS : catalogue, devis, commandes, messagerie, avis ====================
+  // Module isolé : s'il échoue, le reste du site continue de fonctionner normalement.
+  try {
+    // ---------- constantes ----------
+    const MODES = { en_ligne: "En ligne", sur_place: "Sur place", les_deux: "En ligne et sur place" };
+    const TYPES_PROFIL = { particulier: "Particulier", professionnel: "Professionnel", entreprise: "Entreprise" };
+    const UNITES = ["prestation", "heure", "jour", "page", "projet", "mois"];
+    const STATUTS_CMD = { en_attente: "En attente de confirmation", confirmee: "Confirmée", en_cours: "En cours", livree: "Livrée", terminee: "Terminée", annulee: "Annulée", litige: "Litige signalé" };
+    const STATUTS_DEVIS = { demande: "Demande envoyée", propose: "Devis reçu", accepte: "Accepté", refuse: "Refusé", annule: "Annulé" };
+    const ORDRE_CMD = ["en_attente", "confirmee", "en_cours", "livree", "terminee", "annulee", "litige"];
+    const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+    const CATS_EN_LIGNE = [["graphisme", "Graphisme et design"], ["redaction", "Rédaction et traduction"], ["web", "Développement web et mobile"],
+      ["marketing", "Marketing digital et réseaux sociaux"], ["video", "Montage vidéo et son"], ["formation", "Formation et coaching en ligne"], ["assistance", "Assistance administrative en ligne"]];
+    const CATS_PRESTA = CATEGORIES.filter(c => c[0] !== "autre").map(c => [c[0], c[2]]).concat(CATS_EN_LIGNE, [["autre", "Autre service"]]);
+    const VILLES_PRESTA = ["Bohicon", "Abomey", "Covè", "Zogbodomey", "Djidja", "Autre"];
+
+    // ---------- état ----------
+    let prestaPublic = [], mesPresta = [], devisCli = [], devisPro = [], cmdCli = [], cmdPro = [], convs = [], mesAvis = [], avisRecus = [], arretsPresta = [];
+    let monProfilPresta = null, ouvertPresta = false, modalOuvert = false, desabonnerThread = null;
+    const profilsCache = new Map();
+    const pv = { mode: "client", onglet: "catalogue", sous: null };
+    const cat = { q: "", mode: "", categorie: "", ville: "", tri: "recent", nb: 12 };
+
+    // ---------- utilitaires (logique pure) ----------
+    const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    const msD = t => (t && typeof t.toMillis === "function") ? t.toMillis() : (typeof t === "number" ? t : 0);
+    const docsDe = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
+    const libCat = k => (CATS_PRESTA.find(c => c[0] === k) || [k, k])[1];
+    const aujourdhui = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+    const prixTexte = p => p.prixType === "devis" ? "Sur devis"
+      : (p.prixType === "a_partir_de" ? "À partir de " : "") + fcfa(p.prix) + (p.unite && p.unite !== "prestation" ? " / " + p.unite : "");
+    const nomUtilisateur = () => ((profil && ((profil.prenom || "") + " " + (profil.nom || "")).trim()) || "Utilisateur");
+    const convId = (a, b) => [a, b].sort().join("_");
+    const moyenne = liste => liste.length ? Math.round(liste.reduce((s, x) => s + Number(x.note || 0), 0) / liste.length * 10) / 10 : 0;
+    const etoiles = n => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
+
+    function filtrerCatalogue(liste, f){
+      const q = norm(f.q);
+      let out = liste.filter(p =>
+        (!f.mode || p.mode === f.mode || p.mode === "les_deux")
+        && (!f.categorie || p.categorie === f.categorie)
+        && (!f.ville || p.mode === "en_ligne" || norm(p.zone).includes(norm(f.ville)))
+        && (!q || norm([p.titre, p.description, libCat(p.categorie), p.prestataireNom, (p.tagsLib || []).join(" ")].join(" ")).includes(q)));
+      if (f.tri === "prix") out = out.slice().sort((a, b) => (a.prixType === "devis" ? 1e12 : a.prix) - (b.prixType === "devis" ? 1e12 : b.prix));
+      else if (f.tri === "note") out = out.slice().sort((a, b) => (b.noteMoy || 0) - (a.noteMoy || 0) || (b.nbAvis || 0) - (a.nbAvis || 0));
+      else out = out.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt));
+      return out;
+    }
+    // Réservation : jour et heure compatibles avec les disponibilités du prestataire
+    function creneauValide(p, dateStr, heure){
+      if (!dateStr) return { ok: false, raison: "Choisis une date." };
+      const d = new Date(dateStr + "T12:00:00");
+      if (isNaN(d.getTime())) return { ok: false, raison: "Date invalide." };
+      if (dateStr < aujourdhui()) return { ok: false, raison: "La date doit être aujourd'hui ou à venir." };
+      const jours = Array.isArray(p.dispoJours) ? p.dispoJours : [];
+      const jour = d.getDay() === 0 ? 7 : d.getDay();
+      if (jours.length && !jours.includes(jour)) return { ok: false, raison: "Le prestataire n'est pas disponible ce jour-là (" + jours.map(j => JOURS[j - 1]).join(", ") + ")." };
+      if (heure && p.dispoDebut && p.dispoFin && (heure < p.dispoDebut || heure > p.dispoFin)) return { ok: false, raison: "Choisis une heure entre " + p.dispoDebut + " et " + p.dispoFin + "." };
+      return { ok: true, raison: "" };
+    }
+    const TRANSITIONS_CMD = {
+      prestataire: { en_attente: ["confirmee", "annulee"], confirmee: ["en_cours", "annulee"], en_cours: ["livree"] },
+      client: { en_attente: ["annulee"], confirmee: ["annulee"], livree: ["terminee", "litige"] }
+    };
+    const peutPasser = (role, de, vers) => (TRANSITIONS_CMD[role][de] || []).includes(vers);
+
+    // ---------- données en temps réel ----------
+    function nonLus(){
+      return convs.filter(c => c.dernierDe && c.dernierDe !== user.uid && Number(c.dernierMs || 0) > Number((c.lus || {})[user.uid] || 0)).length;
+    }
+    function compteurs(){
+      return {
+        devisAttente: devisPro.filter(d => d.statut === "demande").length,
+        cmdATraiter: cmdPro.filter(c => c.statut === "en_attente").length,
+        cmdEnCours: cmdPro.filter(c => ["confirmee", "en_cours", "livree"].includes(c.statut)).length,
+        cmdTerminees: cmdPro.filter(c => c.statut === "terminee").length,
+        revenus: cmdPro.filter(c => c.statut === "terminee").reduce((s, c) => s + Number(c.prix || 0), 0),
+        propositions: devisCli.filter(d => d.statut === "propose").length,
+        livraisons: cmdCli.filter(c => c.statut === "livree").length,
+        messages: nonLus(),
+        actives: mesPresta.filter(p => p.valide === true && p.statut === "active").length,
+        note: moyenne(avisRecus)
+      };
+    }
+    function majBadges(){
+      try {
+        const k = compteurs();
+        const total = k.devisAttente + k.cmdATraiter + k.propositions + k.livraisons + k.messages;
+        const b = document.getElementById("nav-badge-presta");
+        if (b){ b.textContent = total > 9 ? "9+" : String(total); b.classList.toggle("cache", !total); }
+      } catch (e) { /* ignoré */ }
+    }
+    function rafraichirPresta(){
+      try {
+        majBadges();
+        const bloque = pv.sous && (pv.sous.type === "form" || pv.sous.type === "thread");
+        if (ouvertPresta && !modalOuvert && !bloque) rendrePresta();
+        if (proOuvert && (proOnglet === "presta" || proOnglet === "messages") && !proSaisie && !modalOuvert && !(pv.sous && pv.sous.type === "thread")) rendrePro();
+      } catch (e) { console.error("Prestations :", e); }
+    }
+    PRESTA.demarrer = () => {
+      if (arretsPresta.length || !user) return;
+      const err = e => console.error("Prestations :", e);
+      const ecoute = (q, f) => onSnapshot(q, s => { f(docsDe(s)); rafraichirPresta(); }, err);
+      arretsPresta = [
+        ecoute(query(collection(db, "prestations"), where("valide", "==", true), where("statut", "==", "active"), limit(150)), l => { prestaPublic = l; }),
+        ecoute(query(collection(db, "prestations"), where("uid", "==", user.uid)), l => { mesPresta = l; }),
+        ecoute(query(collection(db, "devis"), where("clientUid", "==", user.uid)), l => { devisCli = l; }),
+        ecoute(query(collection(db, "devis"), where("prestataireUid", "==", user.uid)), l => { devisPro = l; }),
+        ecoute(query(collection(db, "commandes"), where("clientUid", "==", user.uid)), l => { cmdCli = l; }),
+        ecoute(query(collection(db, "commandes"), where("prestataireUid", "==", user.uid)), l => { cmdPro = l; }),
+        ecoute(query(collection(db, "conversations"), where("participants", "array-contains", user.uid)), l => { convs = l; }),
+        ecoute(query(collection(db, "avisPrestations"), where("clientUid", "==", user.uid)), l => { mesAvis = l; }),
+        ecoute(query(collection(db, "avisPrestations"), where("prestataireUid", "==", user.uid)), l => { avisRecus = l; }),
+        onSnapshot(doc(db, "prestataires", user.uid), s => { monProfilPresta = s.exists() ? { id: s.id, ...s.data() } : null; rafraichirPresta(); }, err)
+      ];
+    };
+    PRESTA.arreter = () => {
+      arretsPresta.forEach(f => { try { f(); } catch (e) { /* ignoré */ } });
+      arretsPresta = []; prestaPublic = []; mesPresta = []; devisCli = []; devisPro = []; cmdCli = []; cmdPro = []; convs = []; mesAvis = []; avisRecus = []; monProfilPresta = null;
+      if (desabonnerThread){ try { desabonnerThread(); } catch (e) { /* ignoré */ } desabonnerThread = null; }
+      majBadges();
+    };
+    PRESTA.kpi = () => compteurs();
+    PRESTA.activite = () => {
+      const l = [];
+      cmdPro.forEach(c => l.push({ ms: msD(c.maj) || msD(c.createdAt), texte: "Commande « " + c.titre + " » : " + (STATUTS_CMD[c.statut] || c.statut) }));
+      devisPro.filter(d => d.statut === "demande").forEach(d => l.push({ ms: msD(d.maj) || msD(d.createdAt), texte: "Demande de devis de " + (d.clientNom || "un client") + " pour « " + d.prestationTitre + " »" }));
+      convs.filter(c => c.dernierDe && c.dernierDe !== user.uid).forEach(c => l.push({ ms: Number(c.dernierMs || 0), texte: "Message : " + String(c.dernierTexte || "").slice(0, 60) }));
+      return l.sort((a, b) => b.ms - a.ms).slice(0, 6);
+    };
+
+    // ---------- lecture ponctuelle (sans écoute continue) ----------
+    function lireUneFois(q){
+      return new Promise(resolve => {
+        let u = null;
+        u = onSnapshot(q, s => { if (u) u(); resolve(docsDe(s)); }, () => resolve([]));
+      });
+    }
+    function lireProfilPresta(uid){
+      if (profilsCache.has(uid)) return Promise.resolve(profilsCache.get(uid));
+      return new Promise(resolve => {
+        let u = null;
+        u = onSnapshot(doc(db, "prestataires", uid), s => {
+          if (u) u();
+          const p = s.exists() ? { id: s.id, ...s.data() } : null;
+          profilsCache.set(uid, p);
+          resolve(p);
+        }, () => resolve(null));
+      });
+    }
+
+    // ---------- fenêtre de formulaire réutilisable ----------
+    function modalFormulaire(o){
+      return new Promise(resolve => {
+        modalOuvert = true;
+        const fond = document.createElement("div");
+        fond.className = "dlg-fond";
+        const boite = document.createElement("div");
+        boite.className = "dlg pres ps-modal";
+        boite.setAttribute("role", "dialog");
+        boite.setAttribute("aria-modal", "true");
+        boite.appendChild(el("h3", "dlg-titre", o.titre));
+        if (o.intro) boite.appendChild(el("p", "dlg-msg", o.intro));
+        const champs = {};
+        (o.champs || []).forEach(c => {
+          if (c.type === "choix"){
+            const zoneChoix = el("div", "champ");
+            zoneChoix.appendChild(el("span", "", c.label));
+            const seg = el("div", "seg");
+            let choisi = c.valeur || (c.options[0] && c.options[0][0]) || "";
+            const boutons = c.options.map(([v, l]) => {
+              const b = el("button", "seg-btn" + (v === choisi ? " on" : ""), l);
+              b.type = "button";
+              b.addEventListener("click", () => { choisi = v; boutons.forEach(x => x.classList.toggle("on", x === b)); });
+              seg.appendChild(b);
+              return b;
+            });
+            zoneChoix.appendChild(seg);
+            champs[c.id] = { get value(){ return choisi; } };
+            boite.appendChild(zoneChoix);
+            return;
+          }
+          const lab = el("label", "champ");
+          lab.appendChild(el("span", "", c.label));
+          const inp = c.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
+          if (c.type === "textarea") inp.rows = c.lignes || 3; else inp.type = c.type || "text";
+          if (c.max) inp.maxLength = c.max;
+          if (c.placeholder) inp.placeholder = c.placeholder;
+          if (c.min != null) inp.min = c.min;
+          if (c.valeur != null) inp.value = c.valeur;
+          champs[c.id] = inp;
+          lab.appendChild(inp);
+          boite.appendChild(lab);
+        });
+        const rang = el("div", "dlg-actions");
+        const ann = el("button", "dlg-btn sec", "Annuler"); ann.type = "button";
+        const ok = el("button", "dlg-btn ok", o.ok || "Valider"); ok.type = "button";
+        const fermer = v => { modalOuvert = false; fond.remove(); resolve(v); };
+        ann.addEventListener("click", () => fermer(null));
+        ok.addEventListener("click", () => {
+          const valeurs = {};
+          Object.keys(champs).forEach(k => { valeurs[k] = String(champs[k].value).trim(); });
+          const erreur = o.valider ? o.valider(valeurs) : "";
+          if (erreur){ afficherMessage(erreur); return; }
+          fermer(valeurs);
+        });
+        rang.append(ann, ok);
+        boite.appendChild(rang);
+        fond.appendChild(boite);
+        fond.addEventListener("click", e => { if (e.target === fond) fermer(null); });
+        document.body.appendChild(fond);
+      });
+    }
+    function modalAvis(titre){
+      return new Promise(resolve => {
+        modalOuvert = true;
+        const fond = document.createElement("div");
+        fond.className = "dlg-fond";
+        const boite = document.createElement("div");
+        boite.className = "dlg pres ps-modal";
+        boite.appendChild(el("h3", "dlg-titre", "Ton avis sur « " + titre + " »"));
+        boite.appendChild(el("p", "dlg-msg", "Ton avis est vérifié : il est lié à une commande terminée."));
+        let note = 0;
+        const etoilesZone = el("div", "ps-etoiles");
+        const boutons = [1, 2, 3, 4, 5].map(n => {
+          const b = el("button", "ps-etoile", "★");
+          b.type = "button";
+          b.setAttribute("aria-label", n + " étoile" + (n > 1 ? "s" : ""));
+          b.addEventListener("click", () => { note = n; boutons.forEach((x, i) => x.classList.toggle("on", i < n)); });
+          etoilesZone.appendChild(b);
+          return b;
+        });
+        boite.appendChild(etoilesZone);
+        const zone = document.createElement("textarea");
+        zone.className = "dlg-champ"; zone.rows = 3; zone.maxLength = 400; zone.placeholder = "Ton commentaire (facultatif)";
+        boite.appendChild(zone);
+        const rang = el("div", "dlg-actions");
+        const ann = el("button", "dlg-btn sec", "Annuler"); ann.type = "button";
+        const ok = el("button", "dlg-btn ok", "Publier mon avis"); ok.type = "button";
+        const fermer = v => { modalOuvert = false; fond.remove(); resolve(v); };
+        ann.addEventListener("click", () => fermer(null));
+        ok.addEventListener("click", () => { if (!note){ afficherMessage("Note manquante|Touche une étoile pour noter la prestation."); return; } fermer({ note, commentaire: zone.value.trim() }); });
+        rang.append(ann, ok);
+        boite.appendChild(rang);
+        fond.appendChild(boite);
+        fond.addEventListener("click", e => { if (e.target === fond) fermer(null); });
+        document.body.appendChild(fond);
+      });
+    }
+
+    // ---------- fenêtre « Prestations » ----------
+    const rerendre = () => { if (ouvertPresta) rendrePresta(); else if (proOuvert) rendrePro(); };
+    function ouvrirPresta(mode, onglet){
+      if (espaceOuvert) fermerEspace(true);
+      if (proOuvert) fermerPro(true);
+      const v = $("vue-presta");
+      v.classList.remove("cache");
+      v.style.top = document.querySelector(".topbar").offsetHeight + "px";
+      document.body.style.overflow = "hidden";
+      if (!ouvertPresta){
+        ouvertPresta = true;
+        try { history.pushState({ presta: true }, ""); } catch (e) { /* ignoré */ }
+      }
+      if (mode) pv.mode = mode;
+      if (onglet) pv.onglet = onglet; else if (mode) pv.onglet = mode === "client" ? "catalogue" : "mesprestas";
+      pv.sous = null;
+      rendrePresta();
+      v.scrollTop = 0;
+      majNav();
+    }
+    function fermerPresta(viaRetour){
+      if (!ouvertPresta) return;
+      ouvertPresta = false;
+      $("vue-presta").classList.add("cache");
+      if (desabonnerThread){ try { desabonnerThread(); } catch (e) { /* ignoré */ } desabonnerThread = null; }
+      if (!espaceOuvert && !proOuvert) document.body.style.overflow = "";
+      if (!viaRetour){ try { if (history.state && history.state.presta) history.back(); } catch (e) { /* ignoré */ } }
+      majNav();
+    }
+    PRESTA.ouvrir = ouvrirPresta;
+    PRESTA.fermer = fermerPresta;
+    PRESTA.ouvert = () => ouvertPresta;
+
+    const retourBtn = fn => { const b = bouton("← Retour", "sec mini ps-retour-b", async () => fn()); return b; };
+    const videEl = t => el("div", "vide", t);
+    function quitterThread(){ if (desabonnerThread){ try { desabonnerThread(); } catch (e) { /* ignoré */ } desabonnerThread = null; } }
+
+    function onglets(){
+      const k = compteurs();
+      return pv.mode === "client"
+        ? [["catalogue", "Catalogue", 0], ["demandes", "Mes demandes", k.propositions + k.livraisons], ["messages", "Messages", k.messages]]
+        : [["mesprestas", "Mes prestations", 0], ["devis", "Devis reçus", k.devisAttente], ["commandes", "Commandes", k.cmdATraiter], ["agenda", "Agenda", 0], ["profil", "Profil", 0], ["stats", "Statistiques", 0]];
+    }
+    function barreOnglets(zone){
+      zone.innerHTML = "";
+      onglets().forEach(([k, l, n]) => {
+        const b = el("button", "ps-onglet" + (pv.onglet === k ? " on" : ""), l);
+        b.type = "button";
+        if (n) b.appendChild(el("i", "ps-pastille", String(n > 9 ? "9+" : n)));
+        b.addEventListener("click", () => { quitterThread(); pv.onglet = k; pv.sous = null; rerendre(); });
+        zone.appendChild(b);
+      });
+    }
+    function rendrePresta(){
+      const z = $("presta-contenu");
+      const avait = document.activeElement && document.activeElement.id === "ps-q";
+      z.innerHTML = "";
+      $("ps-mode-client").classList.toggle("on", pv.mode === "client");
+      $("ps-mode-prest").classList.toggle("on", pv.mode === "prest");
+      barreOnglets($("presta-nav"));
+      rendreContenu(z);
+      if (avait && $("ps-q")){
+        const q = $("ps-q"); q.focus();
+        try { q.setSelectionRange(q.value.length, q.value.length); } catch (e) { /* ignoré */ }
+      }
+    }
+    function rendreContenu(z){
+      if (pv.sous){
+        const s = pv.sous;
+        if (s.type === "detail"){ vueDetail(z, s.id); return; }
+        if (s.type === "profil"){ vueProfilPublic(z, s.uid); return; }
+        if (s.type === "thread"){ vueThread(z, s.id); return; }
+        if (s.type === "form"){ vueFormPrestation(z, s.modele); return; }
+      }
+      if (pv.mode === "client"){
+        if (pv.onglet === "demandes") vueMesDemandes(z);
+        else if (pv.onglet === "messages") vueMessages(z);
+        else vueCatalogue(z);
+        return;
+      }
+      const vues = { mesprestas: vueMesPrestations, devis: vueDevisRecus, commandes: vueCommandesPro, agenda: vueAgenda, profil: vueProfilPrestataire, stats: vueStatsPro };
+      (vues[pv.onglet] || vueMesPrestations)(z);
+    }
+    // Espace de travail des entreprises : vues « prestataire » et « messages »
+    PRESTA.rendrePro = (z, vue) => {
+      if (vue === "messages"){
+        pv.mode = "client";
+        if (pv.sous && pv.sous.type !== "thread") pv.sous = null;
+        if (!pv.sous) vueMessages(z); else vueThread(z, pv.sous.id);
+        return;
+      }
+      pv.mode = "prest";
+      if (!["mesprestas", "devis", "commandes", "agenda", "profil", "stats"].includes(pv.onglet)) pv.onglet = "mesprestas";
+      const nav = el("div", "ps-onglets ps-onglets-ws");
+      barreOnglets(nav);
+      z.appendChild(nav);
+      rendreContenu(z);
+    };
+
+    // ---------- catalogue ----------
+    function vignette(p, classe){
+      const v = el("div", classe || "ps-vignette");
+      if (p.vignette){ const i = document.createElement("img"); i.src = p.vignette; i.alt = ""; i.loading = "lazy"; v.appendChild(i); }
+      else v.appendChild(el("span", "ps-vignette-ini", libCat(p.categorie).charAt(0)));
+      return v;
+    }
+    function carteCatalogue(p){
+      const c = el("button", "ps-carte");
+      c.type = "button";
+      c.appendChild(vignette(p));
+      const corps = el("div", "ps-carte-corps");
+      const puces = el("div", "ps-puces");
+      puces.append(el("span", "ps-puce mode-" + p.mode, MODES[p.mode] || ""), el("span", "ps-puce", libCat(p.categorie)));
+      corps.appendChild(puces);
+      corps.appendChild(el("h3", "ps-titre", p.titre));
+      const bas = el("div", "ps-carte-bas");
+      const qui = el("div", "ps-qui");
+      qui.appendChild(avatarNode(p.entrepriseNom || p.prestataireNom || "?", p.entrepriseNom ? logoDe(p.uid) : photoDe(p.uid), "avatar avatar-mini", ""));
+      qui.appendChild(el("span", "", p.entrepriseNom || p.prestataireNom || "Prestataire"));
+      if (p.nbAvis) qui.appendChild(el("small", "ps-note", "★ " + p.noteMoy + " (" + p.nbAvis + ")"));
+      bas.append(qui, el("b", "ps-prix", prixTexte(p)));
+      corps.appendChild(bas);
+      c.appendChild(corps);
+      c.addEventListener("click", () => { pv.sous = { type: "detail", id: p.id }; rerendre(); });
+      return c;
+    }
+    function selectPS(options, valeur, onChange, aria){
+      const s = document.createElement("select");
+      s.setAttribute("aria-label", aria);
+      options.forEach(([v, l]) => { const o = el("option", "", l); o.value = v; s.appendChild(o); });
+      s.value = valeur;
+      s.addEventListener("change", () => onChange(s.value));
+      return s;
+    }
+    function vueCatalogue(z){
+      const intro = el("div", "ps-intro");
+      intro.append(el("b", "", "Trouve le bon prestataire"), el("span", "", "Services en ligne et sur place. Tu paies directement le prestataire : aucune commission."));
+      z.appendChild(intro);
+      const barre = el("div", "ps-recherche");
+      const q = document.createElement("input");
+      q.type = "search"; q.id = "ps-q"; q.placeholder = "Rechercher un service (plomberie, logo, traduction…)"; q.value = cat.q;
+      barre.appendChild(q);
+      z.appendChild(barre);
+      const modes = el("div", "cc-chips");
+      [["", "Tous"], ["en_ligne", "En ligne"], ["sur_place", "Sur place"]].forEach(([k, l]) => {
+        const b = el("button", "cc-chip" + (cat.mode === k ? " on" : ""), l);
+        b.type = "button";
+        b.addEventListener("click", () => { cat.mode = k; cat.nb = 12; rerendre(); });
+        modes.appendChild(b);
+      });
+      z.appendChild(modes);
+      const filtres = el("div", "ps-filtres");
+      filtres.append(
+        selectPS([["", "Toutes les catégories"]].concat(CATS_PRESTA), cat.categorie, v => { cat.categorie = v; cat.nb = 12; rerendre(); }, "Catégorie"),
+        selectPS([["", "Toutes les villes"]].concat(VILLES_PRESTA.map(v => [v, v])), cat.ville, v => { cat.ville = v; cat.nb = 12; rerendre(); }, "Ville"),
+        selectPS([["recent", "Plus récentes"], ["prix", "Prix croissant"], ["note", "Mieux notées"]], cat.tri, v => { cat.tri = v; rerendre(); }, "Trier par"));
+      z.appendChild(filtres);
+      const nombre = el("div", "ps-resultats");
+      z.appendChild(nombre);
+      const grille = el("div", "ps-grille");
+      z.appendChild(grille);
+      const remplir = () => {
+        const res = filtrerCatalogue(prestaPublic, cat);
+        nombre.textContent = res.length + " service" + (res.length > 1 ? "s" : "") + " trouvé" + (res.length > 1 ? "s" : "");
+        grille.innerHTML = "";
+        res.slice(0, cat.nb).forEach(p => grille.appendChild(carteCatalogue(p)));
+        if (res.length > cat.nb){
+          const plus = el("button", "voir-plus-missions", "Afficher plus de services (" + (res.length - cat.nb) + " restants)");
+          plus.type = "button";
+          plus.addEventListener("click", () => { cat.nb += 12; remplir(); });
+          grille.appendChild(plus);
+        }
+        if (!res.length){
+          const v = videEl("Aucun service ne correspond. Modifie ta recherche ou publie ton besoin comme mission.");
+          v.appendChild(bouton("Publier une mission", "sec mini", async () => { fermerPresta(true); ouvrirEspace("publier"); }));
+          grille.appendChild(v);
+        }
+      };
+      q.addEventListener("input", () => { cat.q = q.value; cat.nb = 12; remplir(); });
+      remplir();
+      const lien = el("div", "ps-lien-missions");
+      lien.appendChild(el("span", "", "Besoin précis, urgent ou local ? "));
+      lien.appendChild(bouton("Publier une mission", "lien", async () => { fermerPresta(true); ouvrirEspace("publier"); }));
+      z.appendChild(lien);
+    }
+
+    // ---------- fiche d'une prestation ----------
+    function noteTexte(o){ return o && o.nbAvis ? "★ " + o.noteMoy + " · " + o.nbAvis + " avis vérifié" + (o.nbAvis > 1 ? "s" : "") : "Pas encore d'avis"; }
+    function remplirPortfolio(port, l, vide){
+      if (!port.isConnected) return;
+      if (!l.length){ port.appendChild(el("div", "ps-vide-mini", vide)); return; }
+      l.forEach(x => { const f = el("figure", "ps-realisation"); const i = document.createElement("img"); i.src = x.data; i.alt = x.titre || ""; f.appendChild(i); if (x.titre) f.appendChild(el("figcaption", "", x.titre)); port.appendChild(f); });
+    }
+    function vueDetail(z, id){
+      const p = prestaPublic.find(x => x.id === id) || mesPresta.find(x => x.id === id);
+      z.appendChild(retourBtn(() => { pv.sous = null; rerendre(); }));
+      if (!p){ z.appendChild(videEl("Cette prestation n'est plus disponible.")); return; }
+      z.appendChild(vignette(p, "ps-vignette grande"));
+      const puces = el("div", "ps-puces");
+      puces.append(el("span", "ps-puce mode-" + p.mode, MODES[p.mode] || ""), el("span", "ps-puce", libCat(p.categorie)));
+      z.appendChild(puces);
+      z.appendChild(el("h2", "ps-titre-grand", p.titre));
+      z.appendChild(el("div", "ps-prix-grand", prixTexte(p)));
+      const infos = el("div", "ps-infos");
+      [["Délai", p.delai], ["Zone", p.zone], ["Disponibilité", (p.dispoJours && p.dispoJours.length) ? p.dispoJours.map(j => JOURS[j - 1]).join(", ") + (p.dispoDebut ? " · " + p.dispoDebut + " – " + p.dispoFin : "") : ""]]
+        .filter(x => x[1]).forEach(([k, v]) => { const l = el("div", "ps-info"); l.append(el("small", "", k), el("b", "", v)); infos.appendChild(l); });
+      if (infos.children.length) z.appendChild(infos);
+      z.appendChild(el("p", "ps-desc", p.description));
+      if (p.nbAvis) z.appendChild(el("div", "ps-note-ligne", noteTexte(p)));
+
+      const prest = el("div", "ps-prestataire");
+      prest.appendChild(avatarNode(p.entrepriseNom || p.prestataireNom || "?", p.entrepriseNom ? logoDe(p.uid) : photoDe(p.uid), "avatar", ""));
+      const tx = el("div", "ps-prest-txt");
+      tx.append(el("b", "", p.entrepriseNom || p.prestataireNom || "Prestataire"), el("small", "", TYPES_PROFIL[p.typeProfil] || "Prestataire"));
+      prest.appendChild(tx);
+      prest.appendChild(bouton("Voir le profil", "sec mini", async () => { pv.sous = { type: "profil", uid: p.uid }; rerendre(); }));
+      z.appendChild(prest);
+
+      if (p.uid !== user.uid){
+        const act = el("div", "ps-actions");
+        if (p.prixType === "fixe") act.appendChild(bouton((p.mode !== "en_ligne" && (p.dispoJours || []).length) ? "Réserver et commander" : "Commander", "", async () => actionCommander(p)));
+        act.appendChild(bouton("Demander un devis", p.prixType === "fixe" ? "sec" : "", async () => actionDevis(p)));
+        act.appendChild(bouton("Écrire au prestataire", "sec", async () => ouvrirConversation(p.uid, p.entrepriseNom || p.prestataireNom, p.titre)));
+        z.appendChild(act);
+        z.appendChild(el("div", "ps-note-paiement", "Paiement direct entre toi et le prestataire. Bohicon Jobs ne prélève aucune commission."));
+      }
+      const port = el("div", "ps-portfolio");
+      z.appendChild(el("div", "pro-titre", "Portfolio"));
+      z.appendChild(port);
+      lireUneFois(query(collection(db, "portfolio"), where("uid", "==", p.uid), limit(8))).then(l => remplirPortfolio(port, l, "Aucune réalisation publiée pour le moment."));
+      const zoneAvis = el("div", "ps-avis");
+      z.appendChild(el("div", "pro-titre", "Avis vérifiés"));
+      z.appendChild(zoneAvis);
+      lireUneFois(query(collection(db, "avisPrestations"), where("prestationId", "==", p.id), limit(20))).then(l => {
+        if (!zoneAvis.isConnected) return;
+        if (!l.length){ zoneAvis.appendChild(el("div", "ps-vide-mini", "Aucun avis pour le moment.")); return; }
+        l.sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(a => zoneAvis.appendChild(carteAvis(a)));
+      });
+    }
+    function carteAvis(a){
+      const c = el("div", "ps-avis-carte");
+      const h = el("div", "ps-avis-haut");
+      h.append(el("b", "", a.clientNom || "Client"), el("span", "ps-etoiles-fixes", etoiles(a.note)), el("span", "ps-verifie", "Avis vérifié"));
+      c.appendChild(h);
+      if (a.commentaire) c.appendChild(el("p", "ps-desc", a.commentaire));
+      if (a.reponse) c.appendChild(el("div", "ps-reponse", "Réponse du prestataire : " + a.reponse));
+      return c;
+    }
+
+    // ---------- profil public d'un prestataire ----------
+    function vueProfilPublic(z, uid){
+      z.appendChild(retourBtn(() => { pv.sous = null; rerendre(); }));
+      const tete = el("div", "ps-profil-tete");
+      z.appendChild(tete);
+      const liste = prestaPublic.filter(p => p.uid === uid);
+      const nom = (liste[0] && (liste[0].entrepriseNom || liste[0].prestataireNom)) || "Prestataire";
+      tete.appendChild(avatarNode(nom, (liste[0] && liste[0].entrepriseNom) ? logoDe(uid) : photoDe(uid), "photo-g", ""));
+      const tx = el("div", "ps-prest-txt");
+      tx.append(el("h2", "ps-titre-grand", nom));
+      const sous = el("small", "", "Chargement du profil…");
+      tx.appendChild(sous);
+      tete.appendChild(tx);
+      const bio = el("p", "ps-desc", "");
+      z.appendChild(bio);
+      lireProfilPresta(uid).then(pr => {
+        if (!tete.isConnected) return;
+        sous.textContent = [pr && TYPES_PROFIL[pr.typeProfil], pr && pr.ville].filter(Boolean).join(" · ") || "Prestataire";
+        bio.textContent = (pr && pr.bio) || "";
+      });
+      if (uid !== user.uid){
+        const act = el("div", "ps-actions");
+        act.appendChild(bouton("Écrire au prestataire", "", async () => ouvrirConversation(uid, nom, "")));
+        z.appendChild(act);
+      }
+      z.appendChild(el("div", "pro-titre", "Services proposés (" + liste.length + ")"));
+      const grille = el("div", "ps-grille");
+      liste.forEach(p => grille.appendChild(carteCatalogue(p)));
+      if (!liste.length) grille.appendChild(videEl("Aucun service actif pour le moment."));
+      z.appendChild(grille);
+      z.appendChild(el("div", "pro-titre", "Portfolio"));
+      const port = el("div", "ps-portfolio");
+      z.appendChild(port);
+      lireUneFois(query(collection(db, "portfolio"), where("uid", "==", uid), limit(12))).then(l => remplirPortfolio(port, l, "Aucune réalisation publiée."));
+      z.appendChild(el("div", "pro-titre", "Avis vérifiés"));
+      const zoneAvis = el("div", "ps-avis");
+      z.appendChild(zoneAvis);
+      lireUneFois(query(collection(db, "avisPrestations"), where("prestataireUid", "==", uid), limit(30))).then(l => {
+        if (!zoneAvis.isConnected) return;
+        if (!l.length){ zoneAvis.appendChild(el("div", "ps-vide-mini", "Aucun avis pour le moment.")); return; }
+        zoneAvis.appendChild(el("div", "ps-note-ligne", "★ " + moyenne(l) + " sur 5 · " + l.length + " avis vérifié" + (l.length > 1 ? "s" : "")));
+        l.sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(a => zoneAvis.appendChild(carteAvis(a)));
+      });
+    }
+
+    // ---------- demandes de devis et commandes (côté client) ----------
+    async function actionDevis(p){
+      const sur = p.mode !== "en_ligne";
+      const r = await modalFormulaire({
+        titre: "Demander un devis", intro: "Décris ton besoin : le prestataire te répond avec un prix et un délai. Paiement direct, sans commission.",
+        champs: [
+          { id: "besoin", label: "Ton besoin", type: "textarea", lignes: 4, max: 800, placeholder: "Décris précisément ce que tu attends…" },
+          { id: "date", label: "Date souhaitée (facultatif)", type: "date", min: aujourdhui() },
+          { id: "budget", label: "Budget indicatif en FCFA (facultatif)", type: "number", min: 0, placeholder: "Ex : 25000" }
+        ].concat(sur ? [{ id: "lieu", label: "Lieu de la prestation", max: 100, placeholder: "Quartier, adresse ou repère" }] : []),
+        ok: "Envoyer la demande",
+        valider: v => v.besoin.length < 10 ? "Besoin trop court|Décris ton besoin en 10 caractères minimum." : ""
+      });
+      if (!r) return;
+      try {
+        await addDoc(collection(db, "devis"), {
+          prestationId: p.id, prestationTitre: p.titre, prestataireUid: p.uid, prestataireNom: p.entrepriseNom || p.prestataireNom || "",
+          clientUid: user.uid, clientNom: nomUtilisateur(), besoin: r.besoin, dateSouhaitee: r.date || "", budget: Math.max(0, parseInt(r.budget, 10) || 0),
+          lieu: (r.lieu || "").slice(0, 100), statut: "demande", horodatages: { demande: Date.now() }, createdAt: serverTimestamp(), maj: serverTimestamp()
+        });
+      } catch (e){ console.error(e); afficherMessage("Demande non envoyée|Vérifie ta connexion puis réessaie."); return; }
+      afficherMessage("Demande envoyée|Le prestataire est prévenu. Tu seras informé(e) dès qu'il répond.", "succes");
+      pv.mode = "client"; pv.onglet = "demandes"; pv.sous = null; rerendre();
+    }
+    async function creerCommande(p, o){
+      const prix = o.devis ? Math.round(Number(o.devis.prixPropose || 0)) : Math.round(Number(p.prix || 0));
+      const ref = o.devis ? doc(db, "commandes", o.devis.id) : doc(collection(db, "commandes"));
+      const base = {
+        prestationId: p.id, titre: p.titre, prestataireUid: p.uid, prestataireNom: p.entrepriseNom || p.prestataireNom || "",
+        clientUid: user.uid, clientNom: nomUtilisateur(), mode: o.mode, prix, dateRdv: o.date || "", heureRdv: o.heure || "",
+        lieu: (o.lieu || "").slice(0, 100), notesClient: (o.notes || "").slice(0, 500), statut: "en_attente", paiementRecu: false,
+        horodatages: { en_attente: Date.now() }, createdAt: serverTimestamp(), maj: serverTimestamp()
+      };
+      if (o.devis){
+        base.devisId = o.devis.id;
+        const lot = writeBatch(db);
+        lot.set(ref, base);
+        lot.update(doc(db, "devis", o.devis.id), { statut: "accepte", ["horodatages.accepte"]: Date.now(), commandeId: ref.id, maj: serverTimestamp() });
+        await lot.commit();
+      } else await setDoc(ref, base);
+    }
+    async function actionCommander(p){
+      const modes = p.mode === "les_deux" ? ["sur_place", "en_ligne"] : [p.mode];
+      const r = await modalFormulaire({
+        titre: "Commander : " + p.titre,
+        intro: "Montant : " + prixTexte(p) + ". Le prestataire confirme ensuite ta commande. Paiement direct avec lui, sans commission.",
+        champs: [
+          ...(modes.length > 1 ? [{ id: "mode", label: "Mode", type: "choix", options: [["sur_place", "Sur place"], ["en_ligne", "En ligne"]], valeur: modes[0] }] : []),
+          { id: "date", label: "Date souhaitée", type: "date", min: aujourdhui() },
+          { id: "heure", label: "Heure souhaitée (facultatif)", type: "time" },
+          { id: "lieu", label: "Lieu d'intervention (si sur place)", max: 100, placeholder: "Quartier, adresse ou repère" },
+          { id: "notes", label: "Précisions pour le prestataire", type: "textarea", lignes: 3, max: 500 }
+        ],
+        ok: "Envoyer la commande",
+        valider: v => {
+          const mode = v.mode || modes[0];
+          if (mode === "sur_place"){
+            if (!v.lieu) return "Lieu manquant|Indique le lieu d'intervention.";
+            const c = creneauValide(p, v.date, v.heure);
+            if (!c.ok) return "Créneau indisponible|" + c.raison;
+          } else if (v.date && v.date < aujourdhui()) return "Date passée|Choisis une date à venir.";
+          return "";
+        }
+      });
+      if (!r) return;
+      try { await creerCommande(p, { mode: r.mode || modes[0], date: r.date, heure: r.heure, lieu: r.lieu, notes: r.notes }); }
+      catch (e){ console.error(e); afficherMessage("Commande non envoyée|Vérifie ta connexion puis réessaie."); return; }
+      afficherMessage("Commande envoyée|Le prestataire doit la confirmer. Tu es prévenu(e) à chaque étape.", "succes");
+      pv.mode = "client"; pv.onglet = "demandes"; pv.sous = null; rerendre();
+    }
+
+    function friseCmd(c){
+      const z = el("div", "rec-frise");
+      const h = c.horodatages || {};
+      ORDRE_CMD.filter(k => h[k]).sort((a, b) => h[a] - h[b]).forEach(k => {
+        const l = el("div", "rec-etape " + (k === "annulee" || k === "litige" ? "refusee" : k));
+        l.appendChild(el("i", ""));
+        l.appendChild(el("span", "", STATUTS_CMD[k]));
+        l.appendChild(el("small", "", new Date(h[k]).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) + " " + new Date(h[k]).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })));
+        z.appendChild(l);
+      });
+      return z;
+    }
+    const classeCmd = s => ({ en_attente: "b-attribuee", confirmee: "b-a_confirmer", en_cours: "b-a_confirmer", livree: "b-a_confirmer", terminee: "b-disponible", annulee: "b-gris", litige: "b-refus" })[s] || "b-gris";
+    async function changerCmd(c, vers, role, extras){
+      if (!peutPasser(role, c.statut, vers)){ afficherMessage("Action impossible|Cette étape n'est pas disponible."); return; }
+      try { await updateDoc(doc(db, "commandes", c.id), Object.assign({ statut: vers, ["horodatages." + vers]: Date.now(), maj: serverTimestamp() }, extras || {})); }
+      catch (e){ console.error(e); afficherMessage("Action impossible|Vérifie ta connexion puis réessaie."); }
+    }
+    function lignesCmd(c){
+      return [c.mode === "sur_place" ? "Sur place" : "En ligne", c.dateRdv ? new Date(c.dateRdv + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) + (c.heureRdv ? " à " + c.heureRdv : "") : "", c.lieu].filter(Boolean).join(" · ");
+    }
+
+    function vueMesDemandes(z){
+      z.appendChild(el("div", "pro-titre", "Mes devis"));
+      if (!devisCli.length) z.appendChild(videEl("Aucune demande de devis. Parcours le catalogue pour en envoyer."));
+      devisCli.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(d => {
+        const c = el("div", "rec-carte");
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + ({ demande: "b-attribuee", propose: "b-a_confirmer", accepte: "b-disponible", refuse: "b-refus", annule: "b-gris" })[d.statut], STATUTS_DEVIS[d.statut]), el("span", "rec-contrat", new Date(msD(d.createdAt) || Date.now()).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })));
+        c.appendChild(haut);
+        c.appendChild(el("h3", "rec-titre", d.prestationTitre));
+        c.appendChild(el("div", "rec-meta", "Prestataire : " + (d.prestataireNom || "—")));
+        c.appendChild(el("p", "rec-desc", d.besoin));
+        if (d.statut === "propose") c.appendChild(el("div", "info", "Proposition : " + fcfa(d.prixPropose) + (d.delaiPropose ? " · délai " + d.delaiPropose : "") + (d.messageProposition ? ". " + d.messageProposition : "")));
+        if (d.statut === "refuse" && d.motif) c.appendChild(el("div", "erreur", "Motif : " + d.motif));
+        const act = el("div", "rec-pied");
+        if (d.statut === "propose"){
+          act.appendChild(bouton("Accepter et commander", "mini", async () => {
+            const p = prestaPublic.find(x => x.id === d.prestationId) || mesPresta.find(x => x.id === d.prestationId);
+            if (!p){ afficherMessage("Prestation indisponible|Elle n'est plus proposée par le prestataire."); return; }
+            if (!(await confirmer("Tu acceptes le devis de " + fcfa(d.prixPropose) + ". Le prestataire doit ensuite confirmer la commande.", { titre: "Accepter le devis", ok: "Accepter" }))) return;
+            try { await creerCommande(p, { devis: d, mode: p.mode === "en_ligne" ? "en_ligne" : (d.lieu ? "sur_place" : "en_ligne"), date: d.dateSouhaitee, lieu: d.lieu, notes: d.besoin }); }
+            catch (e){ console.error(e); afficherMessage("Commande non envoyée|Vérifie ta connexion puis réessaie."); return; }
+            afficherMessage("Devis accepté|La commande est envoyée au prestataire.", "succes");
+          }));
+          act.appendChild(bouton("Refuser", "sec mini", async () => {
+            if (!(await confirmer("Le prestataire sera informé.", { titre: "Refuser le devis", ok: "Refuser", danger: true }))) return;
+            await updateDoc(doc(db, "devis", d.id), { statut: "refuse", refusePar: "client", ["horodatages.refuse"]: Date.now(), maj: serverTimestamp() });
+          }));
+        }
+        if (d.statut === "demande") act.appendChild(bouton("Annuler la demande", "sec mini", async () => {
+          await updateDoc(doc(db, "devis", d.id), { statut: "annule", ["horodatages.annule"]: Date.now(), maj: serverTimestamp() });
+        }));
+        act.appendChild(bouton("Écrire", "sec mini", async () => ouvrirConversation(d.prestataireUid, d.prestataireNom, d.prestationTitre)));
+        c.appendChild(act);
+        z.appendChild(c);
+      });
+
+      z.appendChild(el("div", "pro-titre", "Mes commandes"));
+      if (!cmdCli.length) z.appendChild(videEl("Aucune commande pour le moment."));
+      cmdCli.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(c0 => {
+        const c = el("div", "rec-carte");
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + classeCmd(c0.statut), STATUTS_CMD[c0.statut]), el("span", "rec-score", fcfa(c0.prix)));
+        c.appendChild(haut);
+        c.appendChild(el("h3", "rec-titre", c0.titre));
+        c.appendChild(el("div", "rec-meta", (c0.prestataireNom || "") + " · " + lignesCmd(c0)));
+        c.appendChild(friseCmd(c0));
+        if (c0.compteRendu) c.appendChild(el("div", "info", "Compte rendu du prestataire : " + c0.compteRendu));
+        if (c0.motif && ["annulee", "litige"].includes(c0.statut)) c.appendChild(el("div", "erreur", "Motif : " + c0.motif));
+        const act = el("div", "rec-pied");
+        if (peutPasser("client", c0.statut, "annulee")) act.appendChild(bouton("Annuler", "sec mini", async () => {
+          const r = await modalFormulaire({ titre: "Annuler la commande", champs: [{ id: "motif", label: "Motif", max: 200, placeholder: "Pourquoi annules-tu ?" }], ok: "Annuler la commande", valider: v => v.motif.length < 3 ? "Motif requis|Indique un motif." : "" });
+          if (r) await changerCmd(c0, "annulee", "client", { motif: r.motif, annuleePar: "client" });
+        }));
+        if (c0.statut === "livree"){
+          act.appendChild(bouton("Confirmer la réception", "mini", async () => {
+            if (!(await confirmer("Tu confirmes que la prestation a été réalisée. Tu pourras ensuite laisser un avis.", { titre: "Confirmer la réception", ok: "Confirmer" }))) return;
+            await changerCmd(c0, "terminee", "client");
+          }));
+          act.appendChild(bouton("Signaler un problème", "sec mini", async () => {
+            const r = await modalFormulaire({ titre: "Signaler un problème", intro: "Notre équipe sera informée.", champs: [{ id: "motif", label: "Décris le problème", type: "textarea", max: 200 }], ok: "Signaler", valider: v => v.motif.length < 5 ? "Description requise|Décris le problème." : "" });
+            if (r) await changerCmd(c0, "litige", "client", { motif: r.motif });
+          }));
+        }
+        if (c0.statut === "terminee"){
+          const avis = mesAvis.find(a => a.id === c0.id);
+          if (avis) act.appendChild(el("span", "ps-etoiles-fixes", etoiles(avis.note) + " · ton avis"));
+          else act.appendChild(bouton("Laisser un avis", "mini", async () => {
+            const r = await modalAvis(c0.titre);
+            if (!r) return;
+            try {
+              await setDoc(doc(db, "avisPrestations", c0.id), {
+                commandeId: c0.id, prestationId: c0.prestationId, prestataireUid: c0.prestataireUid, clientUid: user.uid, clientNom: nomUtilisateur(),
+                note: r.note, commentaire: r.commentaire.slice(0, 400), verifie: true, createdAt: serverTimestamp()
+              });
+            } catch (e){ console.error(e); afficherMessage("Avis non publié|Réessaie dans un instant."); return; }
+            afficherMessage("Avis publié|Merci : il est marqué comme vérifié.", "succes");
+          }));
+        }
+        act.appendChild(bouton("Écrire", "sec mini", async () => ouvrirConversation(c0.prestataireUid, c0.prestataireNom, c0.titre)));
+        c.appendChild(act);
+        z.appendChild(c);
+      });
+    }
+
+    // ---------- messagerie ----------
+    async function ouvrirConversation(autreUid, autreNom, contexte){
+      if (!autreUid || autreUid === user.uid) return;
+      const id = convId(user.uid, autreUid);
+      if (!convs.find(c => c.id === id)){
+        const ref = doc(db, "conversations", id);
+        const existe = await new Promise(r => { let u = null; u = onSnapshot(ref, s => { if (u) u(); r(s.exists()); }, () => r(false)); });
+        if (!existe){
+          try {
+            await setDoc(ref, {
+              participants: [user.uid, autreUid].sort(), noms: { [user.uid]: nomUtilisateur(), [autreUid]: autreNom || "Utilisateur" },
+              contexte: contexte || "", dernierTexte: "", dernierMs: 0, dernierDe: "", lus: {}, maj: serverTimestamp()
+            });
+          } catch (e){ console.error(e); afficherMessage("Conversation impossible|Réessaie dans un instant."); return; }
+        }
+      }
+      if (!ouvertPresta && !(proOuvert && proOnglet === "messages")) ouvrirPresta("client", "messages");
+      pv.mode = "client"; pv.onglet = "messages";
+      pv.sous = { type: "thread", id };
+      rerendre();
+    }
+    PRESTA.ouvrirConversation = ouvrirConversation;
+    function autreNomConv(c){
+      const autre = (c.participants || []).find(u => u !== user.uid);
+      return (c.noms && c.noms[autre]) || "Utilisateur";
+    }
+    function vueMessages(z){
+      if (!convs.length){ z.appendChild(videEl("Aucune conversation. Écris à un prestataire depuis sa fiche.")); return; }
+      convs.slice().sort((a, b) => Number(b.dernierMs || 0) - Number(a.dernierMs || 0)).forEach(c => {
+        const nonLu = c.dernierDe && c.dernierDe !== user.uid && Number(c.dernierMs || 0) > Number((c.lus || {})[user.uid] || 0);
+        const l = el("button", "ps-conv" + (nonLu ? " nonlu" : ""));
+        l.type = "button";
+        l.appendChild(avatarNode(autreNomConv(c), "", "avatar", ""));
+        const tx = el("div", "ps-conv-txt");
+        tx.appendChild(el("b", "", autreNomConv(c)));
+        if (c.contexte) tx.appendChild(el("small", "", c.contexte));
+        tx.appendChild(el("span", "", (c.dernierDe === user.uid ? "Toi : " : "") + (c.dernierTexte || "Nouvelle conversation")));
+        l.appendChild(tx);
+        if (nonLu) l.appendChild(el("i", "nt-point"));
+        l.addEventListener("click", () => { pv.sous = { type: "thread", id: c.id }; rerendre(); });
+        z.appendChild(l);
+      });
+    }
+    function vueThread(z, id){
+      const conv = convs.find(c => c.id === id) || { id, participants: [user.uid], noms: {} };
+      z.appendChild(retourBtn(() => { quitterThread(); pv.sous = null; rerendre(); }));
+      const tete = el("div", "ps-thread-tete");
+      tete.append(el("b", "", autreNomConv(conv)), el("small", "", conv.contexte || ""));
+      z.appendChild(tete);
+      const zone = el("div", "ps-messages");
+      z.appendChild(zone);
+      const saisie = el("div", "ps-saisie");
+      const champ = document.createElement("textarea");
+      champ.rows = 1; champ.maxLength = 800; champ.placeholder = "Écris ton message…";
+      const envoyer = bouton("Envoyer", "mini", async () => {
+        const texte = champ.value.trim();
+        if (!texte) return;
+        champ.value = "";
+        try {
+          const lot = writeBatch(db);
+          lot.set(doc(collection(db, "conversations", id, "messages")), { de: user.uid, texte, ms: Date.now(), createdAt: serverTimestamp() });
+          lot.update(doc(db, "conversations", id), { dernierTexte: texte.slice(0, 140), dernierMs: Date.now(), dernierDe: user.uid, ["lus." + user.uid]: Date.now(), maj: serverTimestamp() });
+          await lot.commit();
+        } catch (e){ console.error(e); champ.value = texte; afficherMessage("Message non envoyé|Vérifie ta connexion puis réessaie."); }
+      });
+      saisie.append(champ, envoyer);
+      z.appendChild(saisie);
+      quitterThread();
+      desabonnerThread = onSnapshot(query(collection(db, "conversations", id, "messages"), orderBy("ms", "asc"), limit(200)), s => {
+        if (!zone.isConnected) return;
+        zone.innerHTML = "";
+        const liste = docsDe(s);
+        if (!liste.length) zone.appendChild(el("div", "ps-vide-mini", "Aucun message. Écris le premier !"));
+        liste.forEach(m => {
+          const b = el("div", "ps-bulle " + (m.de === user.uid ? "moi" : "autre"));
+          b.appendChild(el("span", "", m.texte));
+          b.appendChild(el("small", "", new Date(m.ms || 0).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })));
+          zone.appendChild(b);
+        });
+        zone.scrollTop = zone.scrollHeight;
+        const dernier = liste[liste.length - 1];
+        const c2 = convs.find(c => c.id === id);
+        if (dernier && dernier.de !== user.uid && c2 && Number(c2.dernierMs || 0) > Number((c2.lus || {})[user.uid] || 0)){
+          updateDoc(doc(db, "conversations", id), { ["lus." + user.uid]: Date.now() }).catch(() => { /* ignoré */ });
+        }
+      }, e => console.error("Messages :", e));
+    }
+
+    // =====================================================================
+    //  CÔTÉ PRESTATAIRE
+    // =====================================================================
+    function lireImage(fichier, largeur, hauteur, mode, maxChars){
+      return new Promise((resolve, reject) => {
+        if (!fichier || !/^image\//.test(fichier.type)) return reject(new Error("format"));
+        const url = URL.createObjectURL(fichier);
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement("canvas");
+          const ctx = c.getContext("2d");
+          if (mode === "cover"){
+            c.width = largeur; c.height = hauteur;
+            const r = Math.max(largeur / img.width, hauteur / img.height);
+            const w = img.width * r, h = img.height * r;
+            ctx.drawImage(img, (largeur - w) / 2, (hauteur - h) / 2, w, h);
+          } else {
+            const r = Math.min(1, largeur / Math.max(img.width, img.height));
+            c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+          }
+          URL.revokeObjectURL(url);
+          let sortie = "";
+          for (const q of [0.8, 0.68, 0.55, 0.42, 0.3]){ sortie = c.toDataURL("image/jpeg", q); if (sortie.length < maxChars) break; }
+          if (sortie.length >= maxChars) return reject(new Error("taille"));
+          resolve(sortie);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("lecture")); };
+        img.src = url;
+      });
+    }
+    function etatPresta(p){
+      if (p.valide !== true) return p.refusMotif ? ["Refusée", "b-refus"] : ["En attente de validation", "b-attribuee"];
+      return p.statut === "active" ? ["Active", "b-disponible"] : ["En pause", "b-gris"];
+    }
+    function tuileS(v, l){ const x = el("div", "tuile-s"); x.append(el("b", "", String(v)), el("span", "", l)); return x; }
+    function vueMesPrestations(z){
+      const k = compteurs();
+      const tuiles = el("div", "tuiles");
+      tuiles.append(tuileS(k.actives, "Prestations actives"), tuileS(k.devisAttente, "Devis à traiter"), tuileS(k.cmdATraiter, "Commandes à traiter"), tuileS(fcfa(k.revenus), "Revenus déclarés"));
+      z.appendChild(tuiles);
+      z.appendChild(bouton("Proposer une prestation", "", async () => { pv.sous = { type: "form", modele: null }; rerendre(); }));
+      z.appendChild(el("div", "rec-note", "Chaque prestation est vérifiée par notre équipe avant d'être visible. Le paiement se fait directement avec tes clients, sans commission."));
+      if (!mesPresta.length){ z.appendChild(videEl("Tu n'as pas encore de prestation. Propose ton premier service pour recevoir des demandes.")); return; }
+      mesPresta.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(p => {
+        const c = el("div", "rec-carte ps-ligne-presta");
+        c.appendChild(vignette(p, "ps-vignette mini"));
+        const corps = el("div", "ps-ligne-corps");
+        const [lib, cls] = etatPresta(p);
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + cls, lib), el("span", "rec-contrat", MODES[p.mode] || ""));
+        corps.appendChild(haut);
+        corps.appendChild(el("h3", "rec-titre", p.titre));
+        corps.appendChild(el("div", "rec-meta", libCat(p.categorie) + " · " + prixTexte(p)));
+        if (p.valide !== true && p.refusMotif) corps.appendChild(el("div", "erreur", "Refusée : " + p.refusMotif + ". Modifie-la puis soumets-la de nouveau."));
+        const nbD = devisPro.filter(d => d.prestationId === p.id).length, nbC = cmdPro.filter(x => x.prestationId === p.id).length;
+        corps.appendChild(el("div", "rec-meta", nbD + " devis · " + nbC + " commande" + (nbC > 1 ? "s" : "") + (p.nbAvis ? " · ★ " + p.noteMoy + " (" + p.nbAvis + ")" : "")));
+        const act = el("div", "rec-pied");
+        act.appendChild(bouton("Modifier", "mini", async () => { pv.sous = { type: "form", modele: p }; rerendre(); }));
+        if (p.valide === true) act.appendChild(bouton(p.statut === "active" ? "Mettre en pause" : "Réactiver", "sec mini", async () => {
+          await updateDoc(doc(db, "prestations", p.id), { statut: p.statut === "active" ? "pause" : "active" });
+        }));
+        act.appendChild(bouton("Dupliquer", "sec mini", async () => { pv.sous = { type: "form", modele: Object.assign({}, p, { id: null }) }; rerendre(); }));
+        corps.appendChild(act);
+        c.appendChild(corps);
+        z.appendChild(c);
+      });
+    }
+    function parserTags(texte){
+      const vus = new Set(), s = [];
+      String(texte || "").split(/[,;\n]/).forEach(x => { const lib = x.trim().slice(0, 30), n = norm(lib); if (n && !vus.has(n)){ vus.add(n); s.push({ n, lib }); } });
+      return s.slice(0, 8);
+    }
+    function vueFormPrestation(z, modele){
+      proSaisie = true;
+      const m = modele || {};
+      const edition = !!(modele && modele.id);
+      const f = el("div", "rec-form");
+      z.appendChild(retourBtn(() => { pv.sous = null; proSaisie = false; rerendre(); }));
+      f.insertAdjacentHTML("beforeend",
+        '<div class="rec-avertissement">Ta prestation est vérifiée par notre équipe avant d\'être visible. ' + (edition ? "Toute modification la renvoie en validation. " : "") + 'Le paiement se fait directement avec tes clients, sans commission.</div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Le service</div>'
+        + '<label class="champ"><span>Titre de la prestation</span><input class="ic ic-briefcase" id="pf-titre" maxlength="80" placeholder="Ex : Création de logo professionnel"></label>'
+        + '<label class="champ"><span>Catégorie</span><select class="ic ic-tag" id="pf-cat"></select></label>'
+        + '<div class="champ"><span>Où ?</span><select class="ic ic-pin" id="pf-mode" data-segments></select></div>'
+        + '<label class="champ"><span>Description</span><textarea id="pf-desc" rows="5" maxlength="1000" placeholder="Ce qui est inclus, ta méthode, tes références…"></textarea></label>'
+        + '<label class="champ"><span>Mots-clés <small>séparés par des virgules</small></span><input class="ic ic-tag" id="pf-tags" maxlength="120" placeholder="Ex : logo, identité visuelle, affiche"></label></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">2</span>Tarif et délai</div>'
+        + '<div class="champ"><span>Type de prix</span><select class="ic ic-cash" id="pf-prixtype" data-segments></select></div>'
+        + '<label class="champ champ-prix" id="pf-bloc-prix"><span>Prix (FCFA)</span><input class="ic ic-cash" id="pf-prix" type="number" min="0" inputmode="numeric" placeholder="Ex : 15000"></label>'
+        + '<label class="champ"><span>Unité de facturation</span><select class="ic ic-tag" id="pf-unite"></select></label>'
+        + '<label class="champ"><span>Délai de réalisation <small>facultatif</small></span><input class="ic ic-clock" id="pf-delai" maxlength="40" placeholder="Ex : 3 jours"></label></div>'
+        + '<div class="sect" id="pf-bloc-lieu"><div class="sect-titre"><span class="sect-num">3</span>Zone et disponibilités</div>'
+        + '<label class="champ"><span>Zone d\'intervention</span><input class="ic ic-pin" id="pf-zone" maxlength="80" placeholder="Ex : Bohicon, Abomey, Covè"></label>'
+        + '<div class="champ"><span>Jours disponibles</span><div class="ps-jours" id="pf-jours"></div></div>'
+        + '<div class="duo-champs"><label class="champ"><span>De</span><input class="ic ic-clock" id="pf-debut" type="time"></label><label class="champ"><span>À</span><input class="ic ic-clock" id="pf-fin" type="time"></label></div></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">4</span>Image de couverture</div>'
+        + '<div class="logo-zone"><div class="ps-vignette mini" id="pf-apercu"></div><div class="logo-actions"><button id="pf-choisir" class="sec mini" type="button">Choisir une image</button><button id="pf-retirer" class="lien" type="button">Retirer</button><small>Image 16:10 recommandée. Elle est réduite automatiquement.</small></div><input id="pf-fichier" type="file" accept="image/*" hidden></div></div>');
+      const cat0 = f.querySelector("#pf-cat"), mode0 = f.querySelector("#pf-mode"), pt = f.querySelector("#pf-prixtype"), un = f.querySelector("#pf-unite");
+      CATS_PRESTA.forEach(([v, l]) => { const o = el("option", "", l); o.value = v; cat0.appendChild(o); });
+      [["sur_place", "Sur place"], ["en_ligne", "En ligne"], ["les_deux", "Les deux"]].forEach(([v, l]) => { const o = el("option", "", l); o.value = v; mode0.appendChild(o); });
+      [["fixe", "Prix fixe"], ["a_partir_de", "À partir de"], ["devis", "Sur devis"]].forEach(([v, l]) => { const o = el("option", "", l); o.value = v; pt.appendChild(o); });
+      UNITES.forEach(u => { const o = el("option", "", u); o.value = u; un.appendChild(o); });
+      f.querySelector("#pf-titre").value = m.titre || "";
+      cat0.value = m.categorie || "informatique";
+      mode0.value = m.mode || "sur_place";
+      f.querySelector("#pf-desc").value = m.description || "";
+      f.querySelector("#pf-tags").value = (m.tagsLib || []).join(", ");
+      pt.value = m.prixType || "fixe";
+      f.querySelector("#pf-prix").value = m.prix != null ? String(m.prix) : "";
+      un.value = m.unite || "prestation";
+      f.querySelector("#pf-delai").value = m.delai || "";
+      f.querySelector("#pf-zone").value = m.zone || (profil && profil.ville) || "";
+      f.querySelector("#pf-debut").value = m.dispoDebut || "08:00";
+      f.querySelector("#pf-fin").value = m.dispoFin || "18:00";
+      const jours = new Set(m.dispoJours || [1, 2, 3, 4, 5, 6]);
+      const zoneJours = f.querySelector("#pf-jours");
+      JOURS.forEach((nom, i) => {
+        const b = el("button", "ps-jour" + (jours.has(i + 1) ? " on" : ""), nom);
+        b.type = "button";
+        b.addEventListener("click", () => { if (jours.has(i + 1)) jours.delete(i + 1); else jours.add(i + 1); b.classList.toggle("on", jours.has(i + 1)); });
+        zoneJours.appendChild(b);
+      });
+      let vignetteData = m.vignette || "";
+      const apercu = f.querySelector("#pf-apercu");
+      const dessinerApercu = () => { apercu.innerHTML = ""; if (vignetteData){ const i = document.createElement("img"); i.src = vignetteData; i.alt = ""; apercu.appendChild(i); } else apercu.appendChild(el("span", "ps-vignette-ini", libCat(cat0.value).charAt(0))); };
+      dessinerApercu();
+      const maj = () => {
+        f.querySelector("#pf-bloc-prix").classList.toggle("cache", pt.value === "devis");
+        f.querySelector("#pf-bloc-lieu").classList.toggle("cache", mode0.value === "en_ligne");
+      };
+      pt.addEventListener("change", maj); mode0.addEventListener("change", maj);
+      maj();
+      const fic = f.querySelector("#pf-fichier");
+      f.querySelector("#pf-choisir").addEventListener("click", () => fic.click());
+      fic.addEventListener("change", async () => {
+        const fichier = fic.files && fic.files[0];
+        if (!fichier) return;
+        try { vignetteData = await lireImage(fichier, 480, 300, "cover", 28000); dessinerApercu(); }
+        catch (e) { afficherMessage("Image non utilisable|Choisis une image PNG ou JPG."); }
+        fic.value = "";
+      });
+      f.querySelector("#pf-retirer").addEventListener("click", () => { vignetteData = ""; dessinerApercu(); });
+      f.appendChild(bouton(edition ? "Enregistrer et soumettre pour validation" : "Soumettre pour validation", "", async () => {
+        const titre = f.querySelector("#pf-titre").value.trim(), description = f.querySelector("#pf-desc").value.trim();
+        const prixType = pt.value, prix = prixType === "devis" ? 0 : Math.round(Number(f.querySelector("#pf-prix").value) || 0);
+        if (titre.length < 3){ afficherMessage("Titre manquant|Donne un titre à ta prestation (3 caractères minimum)."); return; }
+        if (description.length < 30){ afficherMessage("Description trop courte|Décris ton service en 30 caractères minimum."); return; }
+        if (prixType !== "devis" && prix <= 0){ afficherMessage("Prix manquant|Indique un prix supérieur à 0 ou choisis « Sur devis »."); return; }
+        const mode = mode0.value;
+        if (mode !== "en_ligne" && !f.querySelector("#pf-zone").value.trim()){ afficherMessage("Zone manquante|Indique ta zone d'intervention."); return; }
+        const tags = parserTags(f.querySelector("#pf-tags").value);
+        const typeProfil = monProfilPresta ? monProfilPresta.typeProfil : (profil && profil.entreprise && profil.entreprise.nom ? "entreprise" : "particulier");
+        const contenu = {
+          titre, categorie: cat0.value, mode, description, prixType, prix, unite: un.value, delai: f.querySelector("#pf-delai").value.trim().slice(0, 40),
+          zone: mode === "en_ligne" ? "" : f.querySelector("#pf-zone").value.trim().slice(0, 80), tags: tags.map(x => x.n), tagsLib: tags.map(x => x.lib),
+          vignette: vignetteData, dispoJours: mode === "en_ligne" ? [] : Array.from(jours).sort(), dispoDebut: f.querySelector("#pf-debut").value || "08:00", dispoFin: f.querySelector("#pf-fin").value || "18:00"
+        };
+        try {
+          if (edition){
+            await updateDoc(doc(db, "prestations", m.id), Object.assign({}, contenu, { valide: !!estAdminUtilisateur, refusMotif: "" }));
+          } else {
+            await addDoc(collection(db, "prestations"), Object.assign({}, contenu, {
+              uid: user.uid, prestataireNom: nomUtilisateur(), typeProfil, ...(profil && profil.entreprise && profil.entreprise.nom ? { entrepriseNom: profil.entreprise.nom } : {}),
+              statut: "active", valide: !!estAdminUtilisateur, createdAt: serverTimestamp()
+            }));
+            if (!monProfilPresta){
+              await setDoc(doc(db, "prestataires", user.uid), { nom: nomUtilisateur(), typeProfil, bio: "", ville: (profil && profil.ville) || "", categories: [contenu.categorie], ...(profil && profil.entreprise && profil.entreprise.nom ? { entrepriseNom: profil.entreprise.nom } : {}), maj: serverTimestamp() });
+            }
+          }
+        } catch (e){ console.error(e); afficherMessage("Prestation non enregistrée|Vérifie les champs puis réessaie."); return; }
+        afficherMessage("Prestation soumise|Notre équipe la vérifie avant de la rendre visible. Tu seras prévenu(e) par e-mail.", "succes");
+        pv.sous = null; proSaisie = false; rerendre();
+      }));
+      z.appendChild(f);
+    }
+
+    function vueDevisRecus(z){
+      if (!devisPro.length){ z.appendChild(videEl("Aucune demande de devis pour le moment.")); return; }
+      devisPro.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(d => {
+        const c = el("div", "rec-carte");
+        const haut = el("div", "rec-haut");
+        haut.append(el("span", "badge " + ({ demande: "b-attribuee", propose: "b-a_confirmer", accepte: "b-disponible", refuse: "b-gris", annule: "b-gris" })[d.statut], d.statut === "demande" ? "À traiter" : STATUTS_DEVIS[d.statut]), el("span", "rec-contrat", d.clientNom || "Client"));
+        c.appendChild(haut);
+        c.appendChild(el("h3", "rec-titre", d.prestationTitre));
+        c.appendChild(el("p", "rec-desc", d.besoin));
+        c.appendChild(el("div", "rec-meta", [d.dateSouhaitee ? "Date souhaitée : " + d.dateSouhaitee : "", d.budget ? "Budget : " + fcfa(d.budget) : "", d.lieu ? "Lieu : " + d.lieu : ""].filter(Boolean).join(" · ")));
+        if (d.statut === "propose") c.appendChild(el("div", "info", "Ta proposition : " + fcfa(d.prixPropose) + (d.delaiPropose ? " · " + d.delaiPropose : "")));
+        const act = el("div", "rec-pied");
+        if (d.statut === "demande"){
+          act.appendChild(bouton("Répondre avec un devis", "mini", async () => {
+            const r = await modalFormulaire({
+              titre: "Ton devis", intro: "Le client reçoit ta proposition et peut l'accepter pour passer commande.",
+              champs: [{ id: "prix", label: "Prix proposé (FCFA)", type: "number", min: 0, valeur: d.budget || "" }, { id: "delai", label: "Délai de réalisation", max: 60, placeholder: "Ex : 5 jours" }, { id: "message", label: "Message au client", type: "textarea", max: 500 }],
+              ok: "Envoyer le devis", valider: v => !(Number(v.prix) > 0) ? "Prix manquant|Indique un prix supérieur à 0." : ""
+            });
+            if (!r) return;
+            await updateDoc(doc(db, "devis", d.id), { statut: "propose", prixPropose: Math.round(Number(r.prix)), delaiPropose: r.delai.slice(0, 60), messageProposition: r.message.slice(0, 500), ["horodatages.propose"]: Date.now(), maj: serverTimestamp() });
+            afficherMessage("Devis envoyé|Le client est prévenu.", "succes");
+          }));
+          act.appendChild(bouton("Décliner", "sec mini", async () => {
+            const r = await modalFormulaire({ titre: "Décliner la demande", champs: [{ id: "motif", label: "Motif (communiqué au client)", max: 200 }], ok: "Décliner", valider: v => v.motif.length < 3 ? "Motif requis|Indique un motif." : "" });
+            if (r) await updateDoc(doc(db, "devis", d.id), { statut: "refuse", refusePar: "prestataire", motif: r.motif, ["horodatages.refuse"]: Date.now(), maj: serverTimestamp() });
+          }));
+        }
+        act.appendChild(bouton("Écrire au client", "sec mini", async () => ouvrirConversation(d.clientUid, d.clientNom, d.prestationTitre)));
+        c.appendChild(act);
+        z.appendChild(c);
+      });
+    }
+
+    // ---------- commandes reçues et interventions ----------
+    function actionsCmdPro(c0){
+      const act = el("div", "rec-pied");
+      const motifModal = (titre, ok) => modalFormulaire({ titre, champs: [{ id: "motif", label: "Motif (communiqué au client)", max: 200 }], ok, valider: v => v.motif.length < 3 ? "Motif requis|Indique un motif." : "" });
+      if (c0.statut === "en_attente"){
+        act.appendChild(bouton("Confirmer", "mini", async () => changerCmd(c0, "confirmee", "prestataire")));
+        act.appendChild(bouton("Refuser", "sec mini", async () => { const r = await motifModal("Refuser la commande", "Refuser"); if (r) await changerCmd(c0, "annulee", "prestataire", { motif: r.motif, annuleePar: "prestataire" }); }));
+      }
+      if (c0.statut === "confirmee"){
+        act.appendChild(bouton(c0.mode === "sur_place" ? "Démarrer l'intervention" : "Démarrer le travail", "mini", async () => changerCmd(c0, "en_cours", "prestataire")));
+        act.appendChild(bouton("Annuler", "sec mini", async () => { const r = await motifModal("Annuler la commande", "Annuler la commande"); if (r) await changerCmd(c0, "annulee", "prestataire", { motif: r.motif, annuleePar: "prestataire" }); }));
+      }
+      if (c0.statut === "en_cours") act.appendChild(bouton("Marquer comme livrée", "mini", async () => {
+        const r = await modalFormulaire({ titre: "Compte rendu de la prestation", intro: "Résume ce qui a été fait : le client confirmera la réception.", champs: [{ id: "cr", label: "Compte rendu", type: "textarea", lignes: 4, max: 800 }], ok: "Livrer", valider: v => v.cr.length < 5 ? "Compte rendu requis|Décris brièvement la prestation réalisée." : "" });
+        if (r) await changerCmd(c0, "livree", "prestataire", { compteRendu: r.cr });
+      }));
+      return act;
+    }
+    function carteCmdPro(c0){
+      const c = el("div", "rec-carte");
+      const haut = el("div", "rec-haut");
+      haut.append(el("span", "badge " + classeCmd(c0.statut), STATUTS_CMD[c0.statut]), el("span", "rec-score", fcfa(c0.prix)));
+      c.appendChild(haut);
+      c.appendChild(el("h3", "rec-titre", c0.titre));
+      c.appendChild(el("div", "rec-meta", "Client : " + (c0.clientNom || "—") + " · " + lignesCmd(c0)));
+      if (c0.notesClient) c.appendChild(el("p", "rec-desc", c0.notesClient));
+      c.appendChild(friseCmd(c0));
+      if (c0.motif && ["annulee", "litige"].includes(c0.statut)) c.appendChild(el("div", "erreur", "Motif : " + c0.motif));
+      const act = actionsCmdPro(c0);
+      if (c0.statut !== "annulee"){
+        const pay = el("label", "check ps-paiement");
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!c0.paiementRecu;
+        cb.addEventListener("change", () => { updateDoc(doc(db, "commandes", c0.id), { paiementRecu: cb.checked, maj: serverTimestamp() }).catch(() => afficherMessage("Action impossible. Réessaie.")); });
+        pay.append(cb, el("span", "", "Paiement reçu du client (suivi personnel)"));
+        c.appendChild(pay);
+      }
+      act.appendChild(bouton("Écrire au client", "sec mini", async () => ouvrirConversation(c0.clientUid, c0.clientNom, c0.titre)));
+      c.appendChild(act);
+      return c;
+    }
+    let filtreCmdPro = "atraiter";
+    function vueCommandesPro(z){
+      const GROUPES = { atraiter: ["en_attente"], encours: ["confirmee", "en_cours", "livree"], terminees: ["terminee"], annulees: ["annulee", "litige"] };
+      const chips = el("div", "cc-chips");
+      [["atraiter", "À traiter"], ["encours", "En cours"], ["terminees", "Terminées"], ["annulees", "Annulées"], ["tout", "Toutes"]].forEach(([k, l]) => {
+        const n = k === "tout" ? cmdPro.length : cmdPro.filter(c => GROUPES[k].includes(c.statut)).length;
+        const b = el("button", "cc-chip" + (filtreCmdPro === k ? " on" : ""), l + " (" + n + ")");
+        b.type = "button";
+        b.addEventListener("click", () => { filtreCmdPro = k; rerendre(); });
+        chips.appendChild(b);
+      });
+      z.appendChild(chips);
+      const liste = cmdPro.filter(c => filtreCmdPro === "tout" || GROUPES[filtreCmdPro].includes(c.statut)).sort((a, b) => msD(b.createdAt) - msD(a.createdAt));
+      if (!liste.length){ z.appendChild(videEl("Aucune commande dans cette catégorie.")); return; }
+      liste.forEach(c => z.appendChild(carteCmdPro(c)));
+    }
+    function vueAgenda(z){
+      const actives = cmdPro.filter(c => ["en_attente", "confirmee", "en_cours"].includes(c.statut));
+      const datees = actives.filter(c => c.dateRdv).sort((a, b) => (a.dateRdv + (a.heureRdv || "")).localeCompare(b.dateRdv + (b.heureRdv || "")));
+      const sansDate = actives.filter(c => !c.dateRdv);
+      z.appendChild(el("div", "rec-note", "Tes interventions et livraisons à venir, classées par date. Confirme, démarre puis termine chaque intervention depuis cette page."));
+      if (!actives.length){ z.appendChild(videEl("Aucune intervention planifiée.")); return; }
+      let jour = "";
+      datees.forEach(c => {
+        if (c.dateRdv !== jour){
+          jour = c.dateRdv;
+          z.appendChild(el("div", "nt-jour", c.dateRdv === aujourdhui() ? "Aujourd'hui" : new Date(c.dateRdv + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })));
+        }
+        z.appendChild(carteCmdPro(c));
+      });
+      if (sansDate.length){
+        z.appendChild(el("div", "nt-jour", "Sans date précise"));
+        sansDate.forEach(c => z.appendChild(carteCmdPro(c)));
+      }
+    }
+
+    // ---------- profil prestataire et portfolio ----------
+    function vueProfilPrestataire(z){
+      const pr = monProfilPresta || {};
+      const f = el("div", "rec-form");
+      f.insertAdjacentHTML("beforeend",
+        '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Mon profil prestataire</div>'
+        + '<p class="rec-aide">Ce profil est visible par les clients. Ta photo vient de ton profil Bohicon Jobs.</p>'
+        + '<div class="champ"><span>Je suis</span><select class="ic ic-users" id="pp2-type" data-segments></select></div>'
+        + '<label class="champ"><span>Ville</span><select class="ic ic-pin" id="pp2-ville"></select></label>'
+        + '<label class="champ"><span>Présentation</span><textarea id="pp2-bio" rows="4" maxlength="400" placeholder="Qui es-tu ? Quelle est ton expérience ? Pourquoi te choisir ?"></textarea></label></div>');
+      const st = f.querySelector("#pp2-type"), sv = f.querySelector("#pp2-ville");
+      Object.entries(TYPES_PROFIL).forEach(([v, l]) => { const o = el("option", "", l); o.value = v; st.appendChild(o); });
+      VILLES_PRESTA.forEach(v => { const o = el("option", "", v); o.value = v; sv.appendChild(o); });
+      st.value = pr.typeProfil || (profil && profil.entreprise && profil.entreprise.nom ? "entreprise" : "particulier");
+      sv.value = pr.ville || (profil && profil.ville) || "Bohicon";
+      f.querySelector("#pp2-bio").value = pr.bio || "";
+      f.appendChild(bouton("Enregistrer mon profil", "", async () => {
+        const cats = Array.from(new Set(mesPresta.map(p => p.categorie))).slice(0, 10);
+        try {
+          await setDoc(doc(db, "prestataires", user.uid), {
+            nom: nomUtilisateur(), typeProfil: st.value, bio: f.querySelector("#pp2-bio").value.trim().slice(0, 400), ville: sv.value, categories: cats,
+            ...(profil && profil.entreprise && profil.entreprise.nom ? { entrepriseNom: profil.entreprise.nom } : {}), maj: serverTimestamp()
+          }, { merge: true });
+        } catch (e){ console.error(e); afficherMessage("Profil non enregistré|Réessaie dans un instant."); return; }
+        profilsCache.delete(user.uid);
+        afficherMessage("Profil enregistré|Les clients le voient sur tes prestations.", "succes");
+      }));
+      z.appendChild(f);
+
+      z.appendChild(el("div", "pro-titre", "Mon portfolio"));
+      const port = el("div", "ps-portfolio");
+      z.appendChild(port);
+      lireUneFois(query(collection(db, "portfolio"), where("uid", "==", user.uid), limit(12))).then(l => {
+        if (!port.isConnected) return;
+        l.forEach(x => {
+          const fig = el("figure", "ps-realisation");
+          const i = document.createElement("img"); i.src = x.data; i.alt = x.titre || "";
+          fig.appendChild(i);
+          if (x.titre) fig.appendChild(el("figcaption", "", x.titre));
+          fig.appendChild(bouton("Supprimer", "lien", async () => { await deleteDoc(doc(db, "portfolio", x.id)); rerendre(); }));
+          port.appendChild(fig);
+        });
+        if (!l.length) port.appendChild(el("div", "ps-vide-mini", "Montre tes réalisations : photos de chantiers, créations, résultats…"));
+        z.appendChild(bouton("Ajouter une réalisation", "sec mini", async () => {
+          if (l.length >= 12){ afficherMessage("Portfolio complet|Tu peux publier 12 réalisations au maximum."); return; }
+          const sel = document.createElement("input"); sel.type = "file"; sel.accept = "image/*";
+          sel.addEventListener("change", async () => {
+            const fichier = sel.files && sel.files[0];
+            if (!fichier) return;
+            try {
+              const data = await lireImage(fichier, 640, 640, "contain", 70000);
+              const r = await modalFormulaire({ titre: "Nouvelle réalisation", champs: [{ id: "titre", label: "Titre (facultatif)", max: 60, placeholder: "Ex : Installation électrique, villa Bohicon" }], ok: "Publier" });
+              if (!r) return;
+              await addDoc(collection(db, "portfolio"), { uid: user.uid, titre: r.titre, data, createdAt: serverTimestamp() });
+              afficherMessage("Réalisation ajoutée|Elle apparaît dans ton portfolio.", "succes");
+              rerendre();
+            } catch (e) { console.error(e); afficherMessage("Image non utilisable|Choisis une image PNG ou JPG, puis réessaie."); }
+          });
+          sel.click();
+        }));
+      });
+    }
+
+    // ---------- statistiques personnelles ----------
+    function vueStatsPro(z){
+      const k = compteurs();
+      const tuiles = el("div", "tuiles");
+      tuiles.append(tuileS(k.actives, "Prestations actives"), tuileS(k.devisAttente, "Devis à traiter"), tuileS(k.cmdEnCours, "Commandes en cours"), tuileS(k.cmdTerminees, "Commandes terminées"),
+        tuileS(fcfa(k.revenus), "Revenus déclarés"), tuileS(avisRecus.length ? "★ " + k.note : "—", avisRecus.length + " avis vérifié" + (avisRecus.length > 1 ? "s" : "")));
+      z.appendChild(tuiles);
+      z.appendChild(el("div", "rec-note", "Les revenus correspondent aux commandes terminées. Le paiement se fait directement entre toi et tes clients."));
+      z.appendChild(el("div", "pro-titre", "Avis reçus"));
+      if (!avisRecus.length){ z.appendChild(videEl("Aucun avis pour le moment. Ils apparaissent après chaque commande terminée.")); return; }
+      avisRecus.slice().sort((a, b) => msD(b.createdAt) - msD(a.createdAt)).forEach(a => {
+        const c = carteAvis(a);
+        if (!a.reponse){
+          c.appendChild(bouton("Répondre", "sec mini", async () => {
+            const r = await modalFormulaire({ titre: "Répondre à l'avis", champs: [{ id: "reponse", label: "Ta réponse (publique)", type: "textarea", max: 300 }], ok: "Publier la réponse", valider: v => v.reponse.length < 3 ? "Réponse requise|Écris quelques mots." : "" });
+            if (r) await updateDoc(doc(db, "avisPrestations", a.id), { reponse: r.reponse, reponseLe: serverTimestamp() });
+          }));
+        }
+        z.appendChild(c);
+      });
+    }
+
+    // ---------- accès depuis l'accueil et la publication de missions ----------
+    function majCartePresta(){
+      const cible = $("missions");
+      if (!cible || !cible.parentNode) return;
+      let c = document.getElementById("carte-presta");
+      if (!c){
+        c = document.createElement("button");
+        c.type = "button";
+        c.id = "carte-presta";
+        c.className = "carte-emplois carte-presta";
+        c.innerHTML = '<span class="ce-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7"/><path d="M17.5 14v7"/></svg></span><span class="ce-txt"><b>Prestations</b><small></small></span><span class="ce-fleche">&rarr;</span>';
+        c.addEventListener("click", () => ouvrirPresta("client", "catalogue"));
+        cible.parentNode.insertBefore(c, cible);
+      }
+      const n = prestaPublic.length;
+      c.querySelector("small").textContent = n
+        ? n + " service" + (n > 1 ? "s" : "") + " en ligne et sur place : graphisme, plomberie, formation… sans commission."
+        : "Trouve ou propose un service (graphisme, informatique, plomberie, formation…) sans commission.";
+    }
+    const _rafraichir = rafraichirPresta;
+    rafraichirPresta = function(){ try { majCartePresta(); } catch (e) { /* ignoré */ } _rafraichir(); };
+    const lienPublier = document.getElementById("lien-presta-publier");
+    if (lienPublier) lienPublier.addEventListener("click", () => ouvrirPresta("prest", "mesprestas"));
+    $("btn-fermer-presta").addEventListener("click", () => { fermerPresta(); window.scrollTo({ top: 0 }); });
+    $("ps-mode-client").addEventListener("click", () => { quitterThread(); pv.mode = "client"; pv.onglet = "catalogue"; pv.sous = null; rendrePresta(); });
+    $("ps-mode-prest").addEventListener("click", () => { quitterThread(); pv.mode = "prest"; pv.onglet = "mesprestas"; pv.sous = null; rendrePresta(); });
+    window.addEventListener("popstate", () => { if (ouvertPresta) fermerPresta(true); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modalOuvert) fermerPresta(); });
+    PRESTA.pret = true;
+  } catch (e) {
+    console.error("Module Prestations indisponible :", e);
   }
 
 </script>
