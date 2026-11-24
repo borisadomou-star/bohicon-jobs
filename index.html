@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261123-1956">
-<meta name="build-notes" content="Nouvelle page de connexion, messages plus rassurants et tableaux de bord cliquables.">
+<meta name="build" content="20261124-0520">
+<meta name="build-notes" content="Messages de connexion et de déconnexion premium, aperçu de partage amélioré.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -14,7 +14,20 @@
 <meta name="apple-mobile-web-app-title" content="Bohicon Jobs">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script src="config.js"></script>
-<title>Bohicon Jobs</title>
+<title>Bohicon Jobs – Missions, prestations et emplois à Bohicon</title>
+<meta name="description" content="Bohicon Jobs : missions, prestations, offres d'emploi et espace entreprise à Bohicon, Abomey, Covè, Zogbodomey et Djidja. Gratuit et sans commission.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bohicon Jobs">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Bohicon Jobs : les opportunités à portée de main">
+<meta property="og:description" content="Missions, prestations, offres d'emploi et espace entreprise à Bohicon et environs. Gratuit, sans commission.">
+<meta property="og:url" content="https://borisadomou-star.github.io/bohicon-jobs/">
+<meta property="og:image" content="https://borisadomou-star.github.io/bohicon-jobs/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bohicon Jobs : les opportunités à portée de main">
+<meta name="twitter:image" content="https://borisadomou-star.github.io/bohicon-jobs/og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1210,6 +1223,43 @@
     .acces-piliers{margin-top:14px}
     .acces-cta{margin-top:14px}
   }
+
+  /* ===== Cartes de session premium (connexion, retour, déconnexion) ===== */
+  .msg.premium{display:block;padding:16px 16px 20px;border:1px solid rgba(242,194,48,.5);border-left:1px solid rgba(242,194,48,.5);border-radius:24px;color:#fff;
+    background:radial-gradient(120% 140% at 100% 0%,rgba(252,209,22,.24),rgba(252,209,22,0) 55%),radial-gradient(90% 120% at 0% 100%,rgba(18,153,90,.5),rgba(18,153,90,0) 60%),linear-gradient(150deg,#041a0f 0%,#07391f 55%,#0a5a32 100%);
+    box-shadow:0 34px 70px -24px rgba(2,18,9,.9),0 0 0 1px rgba(255,255,255,.06) inset;
+    -webkit-animation:pm-entree .6s cubic-bezier(.2,.8,.2,1) both;animation:pm-entree .6s cubic-bezier(.2,.8,.2,1) both}
+  .pm-brillance{position:absolute;top:0;bottom:0;left:-45%;width:34%;pointer-events:none;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.14),rgba(255,255,255,0));-webkit-transform:skewX(-18deg);transform:skewX(-18deg);-webkit-animation:pm-eclat 2.2s ease-out .45s 1 both;animation:pm-eclat 2.2s ease-out .45s 1 both}
+  .pm-tete{position:relative;display:flex;align-items:center;gap:14px;padding-right:18px}
+  .pm-medaillon{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;color:#0a3a20;
+    background:radial-gradient(circle at 30% 25%,#fff0a6,#f2c230 58%,#c99700);box-shadow:0 14px 26px -12px rgba(242,194,48,.9),0 0 0 4px rgba(242,194,48,.18)}
+  .msg.premium.deconnexion .pm-medaillon{background:radial-gradient(circle at 30% 25%,#ffffff,#dbe4de 58%,#a9b7af);box-shadow:0 14px 26px -12px rgba(255,255,255,.55),0 0 0 4px rgba(255,255,255,.14)}
+  .pm-svg{position:absolute;top:0;left:0;width:100%;height:100%}
+  .pm-anneau{fill:none;stroke:rgba(255,255,255,.8);stroke-width:1.6;stroke-dasharray:158;stroke-dashoffset:158;-webkit-animation:pm-trace 1s ease-out .15s forwards;animation:pm-trace 1s ease-out .15s forwards}
+  .pm-coche{fill:none;stroke:#0a3a20;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:46;stroke-dashoffset:46;-webkit-animation:pm-trace .55s ease-out .6s forwards;animation:pm-trace .55s ease-out .6s forwards}
+  .pm-glyphe{display:flex;color:#0a3a20;-webkit-animation:pm-apparait .5s ease-out .5s both;animation:pm-apparait .5s ease-out .5s both}
+  .pm-glyphe svg{width:26px;height:26px}
+  .pm-textes{flex:1;min-width:0}
+  .pm-tag{display:flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#fcd116}
+  .pm-tag-ico{display:flex}
+  .pm-tag-ico svg{width:12px;height:12px}
+  .msg-corps .pm-tag{color:#fcd116}
+  .pm-titre{display:block;margin-top:3px;font-size:1.18rem;font-weight:700;line-height:1.2;letter-spacing:-.01em;color:#fff}
+  .pm-sous{display:block;margin-top:3px;font-size:.82rem;line-height:1.45;color:rgba(255,255,255,.78)}
+  .pm-x{position:absolute;top:8px;right:10px;width:auto;margin:0;padding:2px 6px;background:none;color:rgba(255,255,255,.6);font-size:1.3rem;line-height:1;box-shadow:none;z-index:2}
+  .pm-puces{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
+  .pm-puce{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid rgba(242,194,48,.38);border-radius:999px;background:rgba(255,255,255,.07);font-size:.74rem;font-weight:600;color:#fff7d6}
+  .pm-puce::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:#fcd116;box-shadow:0 0 8px rgba(252,209,22,.8)}
+  .msg.premium .msg-barre{height:3px;background:linear-gradient(90deg,#fcd116,#fff3b0);opacity:1}
+  @-webkit-keyframes pm-entree{from{opacity:0;-webkit-transform:translateY(-16px) scale(.96)}to{opacity:1;-webkit-transform:none}}
+  @keyframes pm-entree{from{opacity:0;transform:translateY(-16px) scale(.96)}to{opacity:1;transform:none}}
+  @-webkit-keyframes pm-trace{to{stroke-dashoffset:0}}
+  @keyframes pm-trace{to{stroke-dashoffset:0}}
+  @-webkit-keyframes pm-eclat{from{left:-45%}to{left:130%}}
+  @keyframes pm-eclat{from{left:-45%}to{left:130%}}
+  @-webkit-keyframes pm-apparait{from{opacity:0;-webkit-transform:scale(.6)}to{opacity:1;-webkit-transform:none}}
+  @keyframes pm-apparait{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){.msg.premium,.pm-glyphe{-webkit-animation:none;animation:none}.pm-anneau,.pm-coche{-webkit-animation:none;animation:none;stroke-dashoffset:0}.pm-brillance{display:none}}
 </style>
 </head>
 <body>
@@ -3256,6 +3306,7 @@
   });
 
   const deconnecter = async () => {
+    const prenomSortie = String((profil && profil.prenom) || "").trim();
     try { const j = localStorage.getItem("bj_push_jeton"); if (j && user) await deleteDoc(doc(db, "pushTokens", j)); } catch (e) { /* ignoré */ }
     try { localStorage.removeItem("bj_push_jeton"); } catch (e) { /* ignoré */ }
     await signOut(auth);
@@ -3263,7 +3314,13 @@
     fermerEspace(true);
     fermerPro(true);
     window.scrollTo(0, 0);
-    afficherMessage("Déconnexion réussie|Ta session est fermée en toute sécurité et tes données restent protégées. À très bientôt sur Bohicon Jobs.", "succes");
+    afficherCarteSession({
+      type: "deconnexion", glyphe: "cadenas", tag: "Session fermée",
+      titre: prenomSortie ? "À bientôt, " + prenomSortie : "À bientôt",
+      sous: "Ta session est fermée en toute sécurité. Tes données restent protégées sur Bohicon Jobs.",
+      puces: ["Fermée à " + new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }), "Données protégées"],
+      duree: 6500
+    });
   };
   $("btn-deconnexion").addEventListener("click", deconnecter);
   $("btn-deco-profil").addEventListener("click", deconnecter);
@@ -5083,7 +5140,7 @@
     lsEcrire("bj_bienvenue", String(Date.now()));
     setTimeout(() => afficherBienvenue(mode === "connexion"), 1500);
   }
-  function resumeBienvenue(){
+  function listeBienvenue(){
     const parties = [];
     const aConfirmer = mesCandidatures.filter(c => c.statut === "acceptee" && !c.confirmee).length;
     if (aConfirmer) parties.push(aConfirmer > 1 ? aConfirmer + " missions à confirmer" : "1 mission à confirmer");
@@ -5101,34 +5158,62 @@
       const kr = RECRUT.kpi ? RECRUT.kpi() : null;
       if (kr && kr.atraiter) parties.push(kr.atraiter > 1 ? kr.atraiter + " candidatures emploi à traiter" : "1 candidature emploi à traiter");
     } catch (e) { /* ignoré */ }
-    return parties.length ? parties.slice(0, 3).join(" · ") : "Les nouvelles opportunités t'attendent.";
+    return parties.slice(0, 3);
+  }
+  function resumeBienvenue(){
+    const l = listeBienvenue();
+    return l.length ? l.join(" · ") : "Les nouvelles opportunités t'attendent.";
+  }
+
+  // Cartes de session (connexion, retour, déconnexion) : style premium
+  const SVG_BOUCLIER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.4-3 8.1-7 9.5-4-1.4-7-5.1-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg>';
+  const SVG_CADENAS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg>';
+  function afficherCarteSession(o){
+    const z = $("message");
+    clearTimeout(minuteurMessage);
+    z.innerHTML = "";
+    const e = el("div", "msg premium " + o.type);
+    e.setAttribute("role", "status");
+    e.appendChild(el("i", "pm-brillance"));
+    const tete = el("div", "pm-tete");
+    const med = el("span", "pm-medaillon");
+    med.innerHTML = '<svg class="pm-svg" viewBox="0 0 56 56" aria-hidden="true"><circle class="pm-anneau" cx="28" cy="28" r="25"/>'
+      + (o.glyphe === "cadenas" ? "" : '<path class="pm-coche" d="M17 29l8 8 15-17"/>') + '</svg>';
+    if (o.glyphe === "cadenas"){ const g = el("span", "pm-glyphe"); g.innerHTML = SVG_CADENAS; med.appendChild(g); }
+    const textes = el("div", "pm-textes");
+    const tag = el("small", "pm-tag");
+    const ib = el("i", "pm-tag-ico"); ib.innerHTML = SVG_BOUCLIER;
+    tag.append(ib, document.createTextNode(o.tag));
+    textes.append(tag, el("b", "pm-titre", o.titre), el("span", "pm-sous", o.sous));
+    tete.append(med, textes);
+    const x = el("button", "pm-x", "×");
+    x.type = "button";
+    x.setAttribute("aria-label", "Fermer le message");
+    e.append(tete, x);
+    if (o.puces && o.puces.length){
+      const lot = el("div", "pm-puces");
+      o.puces.forEach(t => lot.appendChild(el("span", "pm-puce", t)));
+      e.appendChild(lot);
+    }
+    const barre = el("i", "msg-barre");
+    barre.style.animationDuration = o.duree + "ms";
+    e.appendChild(barre);
+    e.addEventListener("click", () => { z.innerHTML = ""; });
+    z.appendChild(e);
+    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, o.duree);
   }
   function afficherBienvenue(estConnexion){
     if (!user || !profil) return;
     const prenom = String(profil.prenom || "").trim();
-    const z = $("message");
-    clearTimeout(minuteurMessage);
-    z.innerHTML = "";
-    const e = el("div", "msg bienvenue" + (estConnexion ? " connexion" : ""));
-    e.setAttribute("role", "status");
-    const av = el("span", "msg-avatar", (prenom || "B").charAt(0).toUpperCase());
-    const sceau = el("i", "msg-sceau");
-    sceau.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
-    av.appendChild(sceau);
-    const corps = el("div", "msg-corps");
-    corps.appendChild(el("small", "msg-tag", estConnexion ? "Connexion réussie" : "Session sécurisée rétablie"));
-    corps.appendChild(el("b", "", (estConnexion ? "Bienvenue" : "Content de te revoir") + (prenom ? ", " + prenom : "")));
-    corps.appendChild(el("span", "", estConnexion ? "Ton espace est prêt et tes données sont protégées." : "Ta session a été rétablie en toute sécurité."));
-    corps.appendChild(el("span", "msg-resume", resumeBienvenue()));
-    const x = el("button", "msg-x", "×");
-    x.type = "button";
-    x.setAttribute("aria-label", "Fermer le message");
-    const barre = el("i", "msg-barre");
-    barre.style.animationDuration = "7500ms";
-    e.append(av, corps, x, barre);
-    e.addEventListener("click", () => { z.innerHTML = ""; });
-    z.appendChild(e);
-    minuteurMessage = setTimeout(() => { z.innerHTML = ""; }, 7500);
+    const puces = listeBienvenue();
+    afficherCarteSession({
+      type: estConnexion ? "connexion" : "retour",
+      tag: estConnexion ? "Connexion sécurisée" : "Session rétablie",
+      titre: (estConnexion ? "Bienvenue" : "Content de te revoir") + (prenom ? ", " + prenom : ""),
+      sous: estConnexion ? "Ton espace est prêt et tes données sont protégées." : "Ta session a été rétablie en toute sécurité.",
+      puces: puces.length ? puces : ["Les nouvelles opportunités t'attendent"],
+      duree: 8000
+    });
   }
 
   // ---------- Favoris (enregistrés sur cet appareil) ----------
@@ -6075,7 +6160,7 @@
       const err = e => console.error("Prestations :", e);
       const ecoute = (q, f) => onSnapshot(q, s => { f(docsDe(s)); rafraichirPresta(); }, err);
       arretsPresta = [
-        ecoute(query(collection(db, "prestations"), where("valide", "==", true), where("statut", "==", "active"), limit(150)), l => { prestaPublic = l; }),
+        ecoute(query(collection(db, "prestations"), where("valide", "==", true), where("statut", "==", "active"), limit(60)), l => { prestaPublic = l; }),
         ecoute(query(collection(db, "prestations"), where("uid", "==", user.uid)), l => { mesPresta = l; }),
         ecoute(query(collection(db, "devis"), where("clientUid", "==", user.uid)), l => { devisCli = l; }),
         ecoute(query(collection(db, "devis"), where("prestataireUid", "==", user.uid)), l => { devisPro = l; }),
