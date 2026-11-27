@@ -2,6 +2,7 @@
 // Exécuté toutes les 5 minutes par GitHub Actions (voir push.yml).
 import admin from "firebase-admin";
 import nodemailer from "nodemailer";
+import { courrielHtml, courrielTexte, blocsBienvenue, devisPdf, pieceLogo } from "./mailkit.mjs";
 
 const SITE = "https://borisadomou-star.github.io/bohicon-jobs/";
 const AGE_MAX = 3 * 60 * 60 * 1000;   // pas d'alerte pour un événement plus vieux que 3 h
@@ -83,32 +84,6 @@ function domainesDe(u){
   if (GROUPE_BRICOLAGE.some(c => s.has(c))) s.add("bricolage");
   return s;
 }
-const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-function courrielHtml({ prenom, titre, intro, lignes, bouton, lien }){
-  const carte = (lignes || []).length
-    ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 6px;background:#f5faf7;border-left:4px solid #12995a;border-radius:10px"><tr><td style="padding:14px 16px">'
-      + lignes.map(([k, v]) => '<div style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#33463b"><span style="color:#6b7c72">' + esc(k) + ' : </span><strong style="color:#12261b">' + esc(v) + '</strong></div>').join("")
-      + "</td></tr></table>"
-    : "";
-  return '<div style="margin:0;padding:24px 12px;background:#f1f5f2;font-family:Segoe UI,Helvetica,Arial,sans-serif">'
-    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e4ede7;border-radius:20px;overflow:hidden">'
-    + '<tr><td style="padding:22px 24px;background:#0a5a32;background-image:linear-gradient(135deg,#062f1b,#0f7a45)">'
-    + '<table role="presentation" cellpadding="0" cellspacing="0"><tr>'
-    + '<td width="46" height="46" align="center" style="width:46px;height:46px;border-radius:12px;background:#12995a;color:#ffffff;font-size:18px;font-weight:700">BJ</td>'
-    + '<td style="padding-left:12px;color:#ffffff;font-size:18px;font-weight:700;line-height:1.3">Bohicon Jobs<br><span style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fcd116;font-weight:600">Les opportunités à portée de main</span></td>'
-    + "</tr></table></td></tr>"
-    + '<tr><td style="padding:26px 24px 10px">'
-    + '<h1 style="margin:0 0 12px;font-size:20px;line-height:1.3;color:#12261b">' + esc(titre) + "</h1>"
-    + '<p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#33463b">' + (prenom ? "Bonjour " + esc(prenom) + ",<br>" : "") + esc(intro) + "</p>"
-    + carte
-    + '<a href="' + esc(lien) + '" style="display:inline-block;margin:16px 0 8px;padding:13px 26px;background:#0b6b3a;color:#ffffff;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none">' + esc(bouton || "Ouvrir Bohicon Jobs") + "</a>"
-    + "</td></tr>"
-    + '<tr><td style="padding:16px 24px 24px;border-top:1px solid #edf3ef;font-size:12px;line-height:1.6;color:#6b7c72">'
-    + "Tu reçois cet e-mail parce que tu as un compte sur Bohicon Jobs. Pour ne plus en recevoir : Mon espace, Profil, Domaines et formations, puis décoche « Recevoir aussi les alertes par e-mail »."
-    + "</td></tr></table></div>";
-}
-
 async function usersParIds(ids){
   if (tousUsers){
     const index = new Map(tousUsers.map(u => [u.id, u]));
@@ -127,17 +102,22 @@ async function courriel(uids, sujet, corps, lien, extras = {}){
   const ids = [...new Set(uids.filter(Boolean))];
   if (!ids.length) return;
   const profils = await usersParIds(ids);
+  const pourquoi = extras.transactionnel
+    ? "Tu reçois ce message car il concerne une activité en cours sur ton compte (candidature, commande, devis, message ou publication)."
+    : "Tu reçois cet e-mail car les alertes par e-mail sont activées sur ton compte. Pour les désactiver : Mon espace, Profil, Domaines et formations, puis décoche « Recevoir aussi les alertes par e-mail ».";
   for (const u of profils){
     if (courriels >= PLAFOND_RUN || jourCourriels + courriels >= PLAFOND_JOUR) return;
     if (!u.email || u.suspendu || (u.alertesEmail === false && !extras.transactionnel)) continue;
-    const donnees = { prenom: u.prenom, titre: extras.titre || sujet, intro: corps, lignes: extras.lignes, bouton: extras.bouton, lien: lien || SITE };
+    const donnees = { site: SITE, prenom: u.prenom, titre: extras.titre || sujet, intro: corps, lignes: extras.lignes, boutonTexte: extras.bouton, lien: lien || SITE, preheader: extras.preheader, blocs: extras.blocs, pourquoi };
     try {
       await transport.sendMail({
         from: '"Bohicon Jobs" <' + process.env.GMAIL_USER + ">",
+        replyTo: process.env.GMAIL_USER,
         to: u.email,
         subject: extras.sujetMail || (sujet + " · Bohicon Jobs"),
-        text: (u.prenom ? "Bonjour " + u.prenom + ",\n\n" : "") + corps + "\n\n" + (lien || SITE),
-        html: courrielHtml(donnees)
+        text: courrielTexte(donnees),
+        html: courrielHtml(donnees),
+        attachments: [pieceLogo(), ...(extras.pieces || [])]
       });
       courriels++;
     } catch (e){ console.error("E-mail non envoyé :", e.message); }
@@ -278,13 +258,7 @@ for (const d of ms2.docs){
 
 // ---------- Bienvenue : présentation de Bohicon Jobs aux nouveaux inscrits ----------
 const PRESENTATION = {
-  intro: "Bohicon Jobs est la plateforme gratuite qui met en relation les habitants de Bohicon, Abomey, Covè, Zogbodomey et Djidja pour de petits travaux rémunérés. Voici l'essentiel pour bien démarrer.",
-  lignes: [
-    ["Publier", "décris ta mission et fixe ton prix : notre équipe la vérifie avant de la rendre visible"],
-    ["Trouver", "parcours les missions près de chez toi, propose-toi et suis tes candidatures"],
-    ["En confiance", "missions vérifiées, avis des utilisateurs, contact WhatsApp seulement après confirmation"],
-    ["Astuce", "indique tes domaines et ta formation dans ton profil pour recevoir les missions qui te correspondent"]
-  ]
+  intro: "Ton compte est prêt. Bohicon Jobs relie ceux qui ont besoin d'un service à ceux qui savent le rendre, à Bohicon, Abomey, Covè, Zogbodomey et Djidja. Voici tout ce que tu peux faire dès maintenant : missions, prestations, offres d'emploi et espace entreprise, gratuitement et sans commission."
 };
 const inscrits = await db.collection("users").where("createdAt", ">", FENETRE_30J).orderBy("createdAt", "desc").limit(200).get();
 for (const d of inscrits.docs){
@@ -296,7 +270,8 @@ for (const d of inscrits.docs){
     else if (transport){
       const avant = courriels;
       await courriel([u.id], "Bienvenue sur Bohicon Jobs", PRESENTATION.intro, SITE, {
-        titre: "Bienvenue sur Bohicon Jobs", sujetMail: "Bienvenue sur Bohicon Jobs", bouton: "Découvrir les missions", lignes: PRESENTATION.lignes
+        transactionnel: true, titre: "Bienvenue sur Bohicon Jobs", sujetMail: "Bienvenue sur Bohicon Jobs : découvre tout ce que tu peux faire",
+        bouton: "Ouvrir Bohicon Jobs", blocs: blocsBienvenue(SITE), preheader: "Missions, prestations, emplois et espace entreprise : tout ce que tu peux faire dès maintenant."
       });
       if (courriels > avant) maj.mailBienvenue = true;
     }
@@ -400,6 +375,16 @@ for (const d of postulations.docs){
   }
 
   // Demandes de devis
+  async function piecesDevis(q){
+    try {
+      let logoBuf = null, logoType = "jpg";
+      const lg = await db.collection("logos").doc(q.prestataireUid).get();
+      const m = lg.exists && typeof lg.data().data === "string" ? lg.data().data.match(/^data:image\/(jpeg|png);base64,(.+)$/) : null;
+      if (m){ logoBuf = Buffer.from(m[2], "base64"); logoType = m[1] === "png" ? "png" : "jpg"; }
+      const pdf = await devisPdf(q, { logoBuf, logoType, clientNom: q.clientNom });
+      return [{ filename: "Devis-" + String(q.numero || q.id || "bohicon-jobs").replace(/[^A-Za-z0-9_-]/g, "") + ".pdf", content: Buffer.from(pdf), contentType: "application/pdf" }];
+    } catch (e){ console.error("PDF du devis non généré :", e.message); return []; }
+  }
   const devis = await db.collection("devis").where("maj", ">", fenetre).get();
   for (const d of devis.docs){
     const q = d.data();
@@ -409,8 +394,13 @@ for (const d of postulations.docs){
       await notifier([q.prestataireUid], "Nouvelle demande de devis", (q.clientNom || "Un client") + " demande un devis pour « " + q.prestationTitre + " ».", SITE,
         { ...TP, titre: "Nouvelle demande de devis", bouton: "Répondre au client", lignes: base.concat([["Client", q.clientNom || "—"], ["Besoin", court(q.besoin, 160)]], q.budget ? [["Budget", fc(q.budget)]] : [], q.dateSouhaitee ? [["Date souhaitée", q.dateSouhaitee]] : []) });
     } else if (q.statut === "propose"){
-      await notifier([q.clientUid], "Vous avez reçu un devis", (q.prestataireNom || "Le prestataire") + " vous propose " + fc(q.prixPropose) + " pour « " + q.prestationTitre + " ».", SITE,
-        { ...TP, titre: "Devis reçu", bouton: "Voir le devis", lignes: base.concat([["Prix proposé", fc(q.prixPropose)], ["Délai", q.delaiPropose || "À convenir"]], q.messageProposition ? [["Message", court(q.messageProposition, 160)]] : []) });
+      const pieces = await piecesDevis({ ...q, id: d.id });
+      const finDevis = q.dateDevis ? new Date(Number(q.dateDevis) + Number(q.validiteJours || 30) * 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "";
+      const lignesDevis = [["Devis", q.numero || "—"], ["Prestation", q.prestationTitre], ["Montant", fc(q.prixPropose)], ["Délai", q.delaiPropose || "À convenir"]].concat(finDevis ? [["Valable jusqu'au", finDevis]] : []);
+      await notifier([q.clientUid], "Vous avez reçu un devis", (q.emetteur && q.emetteur.nom || q.prestataireNom || "Le prestataire") + " vous propose " + fc(q.prixPropose) + " pour « " + q.prestationTitre + " ». " + (pieces.length ? "Le devis est joint à cet e-mail en PDF et disponible dans votre messagerie." : "Retrouvez-le dans Mes demandes."), SITE,
+        { ...TP, titre: "Vous avez reçu un devis", bouton: "Consulter et accepter le devis", pieces, lignes: lignesDevis, preheader: (q.prestataireNom || "Le prestataire") + " vous propose " + fc(q.prixPropose) + "." });
+      await courriel([q.prestataireUid], "Copie de ton devis " + (q.numero || ""), "Ton devis a bien été envoyé à " + (q.clientNom || "ton client") + (pieces.length ? ". Tu trouveras une copie en pièce jointe (PDF)." : ".") + " Tu seras prévenu(e) dès que le client répond.", SITE,
+        { ...TP, titre: "Ton devis a bien été envoyé", bouton: "Ouvrir mes devis", pieces, lignes: lignesDevis.concat([["Client", q.clientNom || "—"]]) });
     } else if (q.statut === "accepte"){
       await notifier([q.prestataireUid], "Devis accepté", (q.clientNom || "Le client") + " a accepté votre devis pour « " + q.prestationTitre + " ». Confirmez la commande.", SITE,
         { ...TP, titre: "Devis accepté", bouton: "Confirmer la commande", lignes: base.concat([["Montant", fc(q.prixPropose)]]) });
