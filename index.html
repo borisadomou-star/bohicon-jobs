@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b6b3a">
-<meta name="build" content="20261124-2239">
-<meta name="build-notes" content="Logo premium haute définition, fidèle au design d'origine.">
+<meta name="build" content="20261126-1034">
+<meta name="build-notes" content="Devis professionnels imprimables avec envoi par e-mail et messagerie.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1267,6 +1267,77 @@
   .chg-logo,.acces-logo{background:var(--logo-perle) center/cover no-repeat;color:transparent;font-size:0;text-shadow:none;border:1px solid rgba(242,194,48,.65)}
   .chg-logo{box-shadow:0 30px 60px -20px rgba(0,0,0,.6),0 0 0 7px rgba(242,194,48,.14)}
   .acces-logo{box-shadow:0 16px 30px -14px rgba(0,0,0,.7),0 0 0 4px rgba(242,194,48,.14)}
+  /* ===== Devis : éditeur, aperçu et impression ===== */
+  #devis-apercu{position:fixed;top:0;right:0;bottom:0;left:0;z-index:300;display:flex;flex-direction:column;background:#dfe7e2}
+  .devis-barre{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid #e4ede7;background:#fff}
+  .devis-barre .mini{width:auto;margin:0}
+  .devis-defile{flex:1;padding:14px 10px 30px;overflow:auto;-webkit-overflow-scrolling:touch}
+  .dv-feuille{box-sizing:border-box;width:100%;max-width:794px;margin:0 auto;padding:0 clamp(14px,4vw,40px) 18px;overflow:hidden;border-radius:6px;background:#fff;color:#33463b;font-family:"Poppins","Segoe UI",Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;box-shadow:0 20px 50px -20px rgba(8,69,42,.5)}
+  .dv-bandeau{height:8px;margin:0 calc(-1 * clamp(14px,4vw,40px));background:linear-gradient(90deg,#0b6b3a 72%,#f2c230 72%)}
+  .dv-tete{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;padding:20px 0 14px;border-bottom:1px solid #e4ede7}
+  .dv-emet{display:flex;flex:1 1 240px;gap:12px;align-items:flex-start;min-width:0}
+  .dv-logo{flex:none;width:58px;height:58px;border-radius:10px;object-fit:contain}
+  .dv-emet-txt{min-width:0}
+  .dv-nom{display:block;font-size:16px;color:#12261b}
+  .dv-coord{margin-top:2px;font-size:11.5px;line-height:1.5;color:#6b7c72}
+  .dv-titre{text-align:right}
+  .dv-titre h1{margin:0;font-size:30px;line-height:1.1;letter-spacing:.01em;color:#0b6b3a}
+  .dv-titre b{display:block;margin-top:4px;color:#12261b}
+  .dv-titre div{font-size:12px}
+  .dv-boites{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .dv-boite{padding:12px 14px;border:1px solid #e4ede7;border-radius:8px;background:#f6faf8}
+  .dv-boite small{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;color:#0b6b3a}
+  .dv-boite b{display:block;margin:2px 0 4px;font-size:14px;color:#12261b}
+  .dv-boite p{margin:0;font-size:12px;color:#6b7c72}
+  .dv-table{width:100%;margin-top:6px;border-collapse:collapse;font-size:13px}
+  .dv-table th{padding:9px 10px;background:#0b6b3a;color:#fff;font-size:11.5px;text-align:left}
+  .dv-table td{padding:9px 10px;border-bottom:1px solid #eef2f0;vertical-align:top}
+  .dv-table tbody tr:nth-child(odd){background:#f6faf8}
+  .dv-table .dv-n{text-align:right;white-space:nowrap}
+  .dv-fort{font-weight:700;color:#12261b}
+  .dv-totaux{width:min(100%,290px);margin:14px 0 0 auto}
+  .dv-lt{display:flex;justify-content:space-between;gap:10px;padding:4px 10px;font-size:12.5px;color:#6b7c72}
+  .dv-lt.dv-petit{font-size:12px}
+  .dv-ttc{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;padding:11px 12px;border-radius:6px;background:#0b6b3a;color:#fff}
+  .dv-ttc b{font-size:17px}
+  .dv-bloc{margin-top:16px}
+  .dv-bloc h4{margin:0 0 4px;font-size:10.5px;letter-spacing:.1em;color:#0b6b3a}
+  .dv-bloc p{margin:0;white-space:pre-line}
+  .dv-signatures{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  .dv-signatures div{min-height:84px;padding:10px 12px;border:1px solid #dfe9e3;border-radius:6px}
+  .dv-signatures b{display:block;font-size:12px;color:#0b6b3a}
+  .dv-signatures small{font-size:11px;color:#6b7c72}
+  .dv-pied{margin-top:18px;padding-top:10px;border-top:1px solid #e4ede7;text-align:center;font-size:10.5px;color:#8a9a91}
+  @media (max-width:520px){.dv-boites,.dv-signatures{grid-template-columns:1fr}.dv-titre{text-align:left}}
+  @media print{
+    @page{size:A4;margin:10mm}
+    body.imprime-devis{overflow:visible!important;background:#fff!important}
+    body.imprime-devis > *:not(#devis-apercu){display:none!important}
+    body.imprime-devis #devis-apercu{position:static!important;display:block!important;background:#fff!important}
+    body.imprime-devis .devis-barre{display:none!important}
+    body.imprime-devis .devis-defile{overflow:visible!important;padding:0!important}
+    body.imprime-devis .dv-feuille{max-width:none!important;border-radius:0!important;box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .dv-table tr,.dv-signatures,.dv-ttc{break-inside:avoid;page-break-inside:avoid}
+    body.imprime-devis .dv-feuille{padding-bottom:6px;font-size:12px}
+    body.imprime-devis .dv-tete{padding:12px 0 8px}
+    body.imprime-devis .dv-boites{margin:10px 0}
+    body.imprime-devis .dv-bloc{margin-top:10px}
+    body.imprime-devis .dv-signatures{margin-top:14px}
+    body.imprime-devis .dv-signatures div{min-height:60px}
+    body.imprime-devis .dv-pied{margin-top:10px;padding-top:8px}
+  }
+  .dv-ligne{display:grid;grid-template-columns:1fr 64px 96px 34px;gap:6px;margin-bottom:8px;align-items:center}
+  .dv-ligne input{min-width:0;margin:0}
+  @media (max-width:420px){.dv-ligne{grid-template-columns:1fr 1fr 34px}.dv-ligne .dv-d{grid-column:1 / -1}}
+  .dv-x{width:34px;height:34px;margin:0;padding:0;border-radius:50%;background:#fdecea;color:#a12a20;font-size:1.2rem;line-height:1;box-shadow:none}
+  .dv-total{margin:12px 0;padding:14px;border:1px solid #cfe8d9;border-radius:16px;background:linear-gradient(135deg,#f3fbf6,#e8f6ee)}
+  .dv-total-ligne{display:flex;justify-content:space-between;padding:3px 0;font-size:.86rem;color:var(--gris)}
+  .dv-total-ligne.grand{margin-top:4px;padding-top:8px;border-top:1px solid #cfe8d9;font-size:1.05rem;color:var(--vert-fonce)}
+  .ps-bulle.devis{max-width:92%;border:1px solid #cfe8d9;background:#fff;color:var(--encre)}
+  .ps-devis-carte{margin-top:8px;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,#0a5a32,#0b6b3a);color:#fff}
+  .ps-devis-carte small{display:block;font-size:.66rem;letter-spacing:.12em;opacity:.85}
+  .ps-devis-carte b{display:block;margin:2px 0 8px;font-size:1.05rem}
+  .ps-devis-carte .mini{width:auto;margin:0;background:#fff;color:var(--vert);box-shadow:none}
 </style>
 </head>
 <body>
@@ -6157,7 +6228,7 @@
     function rafraichirPresta(){
       try {
         majBadges();
-        const bloque = pv.sous && (pv.sous.type === "form" || pv.sous.type === "thread");
+        const bloque = pv.sous && (pv.sous.type === "form" || pv.sous.type === "thread" || pv.sous.type === "devisform");
         if (ouvertPresta && !modalOuvert && !bloque) rendrePresta();
         if (proOuvert && (proOnglet === "presta" || proOnglet === "messages") && !proSaisie && !modalOuvert && !(pv.sous && pv.sous.type === "thread")) rendrePro();
       } catch (e) { console.error("Prestations :", e); }
@@ -6385,6 +6456,7 @@
         if (s.type === "detail"){ vueDetail(z, s.id); return; }
         if (s.type === "profil"){ vueProfilPublic(z, s.uid); return; }
         if (s.type === "thread"){ vueThread(z, s.id); return; }
+        if (s.type === "devisform"){ vueDevisForm(z, s.id); return; }
         if (s.type === "form"){ vueFormPrestation(z, s.modele); return; }
       }
       if (pv.mode === "client"){
@@ -6731,6 +6803,7 @@
         if (d.statut === "demande") act.appendChild(bouton("Annuler la demande", "sec mini", async () => {
           await updateDoc(doc(db, "devis", d.id), { statut: "annule", ["horodatages.annule"]: Date.now(), maj: serverTimestamp() });
         }));
+        if (["propose", "accepte"].includes(d.statut)) act.appendChild(bouton("Voir / imprimer le devis", "sec mini", async () => ouvrirApercuDevis(d)));
         act.appendChild(bouton("Écrire", "sec mini", async () => ouvrirConversation(d.prestataireUid, d.prestataireNom, d.prestationTitre)));
         c.appendChild(act);
         z.appendChild(c);
@@ -6860,6 +6933,13 @@
         liste.forEach(m => {
           const b = el("div", "ps-bulle " + (m.de === user.uid ? "moi" : "autre"));
           b.appendChild(el("span", "", m.texte));
+          if (m.devisId){
+            b.classList.add("devis");
+            const carte = el("div", "ps-devis-carte");
+            carte.append(el("small", "", "DEVIS " + (m.devisNumero || "")), el("b", "", fcfa(m.devisTotal || 0)));
+            carte.appendChild(bouton("Voir le devis", "mini", async () => ouvrirDevisParId(m.devisId)));
+            b.appendChild(carte);
+          }
           b.appendChild(el("small", "", new Date(m.ms || 0).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })));
           zone.appendChild(b);
         });
@@ -7071,21 +7151,13 @@
         if (d.statut === "propose") c.appendChild(el("div", "info", "Ta proposition : " + fcfa(d.prixPropose) + (d.delaiPropose ? " · " + d.delaiPropose : "")));
         const act = el("div", "rec-pied");
         if (d.statut === "demande"){
-          act.appendChild(bouton("Répondre avec un devis", "mini", async () => {
-            const r = await modalFormulaire({
-              titre: "Ton devis", intro: "Le client reçoit ta proposition et peut l'accepter pour passer commande.",
-              champs: [{ id: "prix", label: "Prix proposé (FCFA)", type: "number", min: 0, valeur: d.budget || "" }, { id: "delai", label: "Délai de réalisation", max: 60, placeholder: "Ex : 5 jours" }, { id: "message", label: "Message au client", type: "textarea", max: 500 }],
-              ok: "Envoyer le devis", valider: v => !(Number(v.prix) > 0) ? "Prix manquant|Indique un prix supérieur à 0." : ""
-            });
-            if (!r) return;
-            await updateDoc(doc(db, "devis", d.id), { statut: "propose", prixPropose: Math.round(Number(r.prix)), delaiPropose: r.delai.slice(0, 60), messageProposition: r.message.slice(0, 500), ["horodatages.propose"]: Date.now(), maj: serverTimestamp() });
-            afficherMessage("Devis envoyé|Le client est prévenu.", "succes");
-          }));
+          act.appendChild(bouton("Répondre avec un devis", "mini", async () => { pv.sous = { type: "devisform", id: d.id }; rerendre(); }));
           act.appendChild(bouton("Décliner", "sec mini", async () => {
             const r = await modalFormulaire({ titre: "Décliner la demande", champs: [{ id: "motif", label: "Motif (communiqué au client)", max: 200 }], ok: "Décliner", valider: v => v.motif.length < 3 ? "Motif requis|Indique un motif." : "" });
             if (r) await updateDoc(doc(db, "devis", d.id), { statut: "refuse", refusePar: "prestataire", motif: r.motif, ["horodatages.refuse"]: Date.now(), maj: serverTimestamp() });
           }));
         }
+        if (["propose", "accepte"].includes(d.statut)) act.appendChild(bouton("Voir le devis", "sec mini", async () => ouvrirApercuDevis(d)));
         act.appendChild(bouton("Écrire au client", "sec mini", async () => ouvrirConversation(d.clientUid, d.clientNom, d.prestationTitre)));
         c.appendChild(act);
         z.appendChild(c);
@@ -7281,6 +7353,234 @@
     $("ps-mode-prest").addEventListener("click", () => { quitterThread(); pv.mode = "prest"; pv.onglet = "mesprestas"; pv.sous = null; rendrePresta(); });
     window.addEventListener("popstate", () => { if (ouvertPresta) fermerPresta(true); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && !modalOuvert) fermerPresta(); });
+
+    // =====================================================================
+    //  DEVIS DÉTAILLÉ : éditeur, aperçu imprimable, envoi par messagerie
+    // =====================================================================
+    const escH = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const fmtN = n => String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
+    function normaliserDevis(d){
+      if (Array.isArray(d.lignes) && d.lignes.length) return d;
+      return Object.assign({}, d, { lignes: [{ d: d.prestationTitre || "Prestation", q: 1, pu: Number(d.prixPropose || 0) }] });
+    }
+    function calculDevis(d0){
+      const d = normaliserDevis(d0);
+      const st = d.lignes.reduce((s, l) => s + Math.round(Number(l.q || 0) * Number(l.pu || 0)), 0);
+      const remise = Math.min(st, Math.max(0, Math.round(Number(d.remise || 0))));
+      const ht = st - remise;
+      const taux = Number(d.tvaTaux || 0);
+      const tva = Math.round(ht * taux / 100);
+      const ttc = ht + tva;
+      const acompte = Math.round(ttc * Number(d.acomptePct || 0) / 100);
+      return { st, remise, ht, taux, tva, ttc, acompte, reste: ttc - acompte };
+    }
+    const dateLongue = ms => new Date(ms).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+    function prochainNumero(){
+      const an = new Date().getFullYear();
+      const n = devisPro.filter(x => x.numero && String(x.numero).indexOf("DEV-" + an + "-") === 0).length + 1;
+      return "DEV-" + an + "-" + String(n).padStart(4, "0");
+    }
+
+    // Feuille de devis (HTML) : affichée à l'écran et imprimée en A4
+    function devisFeuilleHtml(d0, logoSrc){
+      const d = normaliserDevis(d0), t = calculDevis(d), em = d.emetteur || {};
+      const debut = Number(d.dateDevis) || Date.now();
+      const fin = debut + Number(d.validiteJours || 30) * 86400000;
+      const coord = [em.adresse, em.tel ? "Tél. : " + em.tel : "", em.email, em.ifu ? "IFU / RCCM : " + em.ifu : ""].filter(Boolean).map(escH).join("<br>");
+      const lignes = d.lignes.map(l => '<tr><td>' + escH(l.d) + '</td><td class="dv-n">' + escH(String(Number(l.q || 0)).replace(".", ",")) + '</td><td class="dv-n">' + fmtN(l.pu) + '</td><td class="dv-n dv-fort">' + fmtN(Math.round(Number(l.q || 0) * Number(l.pu || 0))) + "</td></tr>").join("");
+      const totaux = ['<div class="dv-lt"><span>Sous-total</span><span>' + fmtN(t.st) + " FCFA</span></div>"]
+        .concat(t.remise ? ['<div class="dv-lt"><span>Remise</span><span>- ' + fmtN(t.remise) + " FCFA</span></div>"] : [])
+        .concat(t.taux ? ['<div class="dv-lt"><span>Total HT</span><span>' + fmtN(t.ht) + ' FCFA</span></div><div class="dv-lt"><span>TVA ' + t.taux + ' %</span><span>' + fmtN(t.tva) + " FCFA</span></div>"] : []).join("");
+      const acompte = Number(d.acomptePct) > 0
+        ? '<div class="dv-lt dv-petit"><span>Acompte à la commande (' + Number(d.acomptePct) + ' %)</span><b>' + fmtN(t.acompte) + ' FCFA</b></div><div class="dv-lt dv-petit"><span>Reste à payer à la livraison</span><span>' + fmtN(t.reste) + " FCFA</span></div>" : "";
+      return '<div class="dv-feuille"><div class="dv-bandeau"></div>'
+        + '<div class="dv-tete"><div class="dv-emet"><img class="dv-logo" src="' + escH(logoSrc) + '" alt=""><div class="dv-emet-txt"><b class="dv-nom">' + escH(em.nom || "Prestataire") + '</b><div class="dv-coord">' + coord + "</div></div></div>"
+        + '<div class="dv-titre"><h1>DEVIS</h1><b>N° ' + escH(d.numero || "") + "</b><div>Date : " + dateLongue(debut) + "</div><div>Valable jusqu'au " + dateLongue(fin) + "</div></div></div>"
+        + '<div class="dv-boites"><div class="dv-boite"><small>DESTINATAIRE</small><b>' + escH(d.clientNom || "Client") + "</b><p>" + escH(d.besoin || "") + "</p></div>"
+        + '<div class="dv-boite"><small>OBJET</small><b>' + escH(d.prestationTitre || "") + "</b>" + (d.delaiPropose ? "<p>Délai de réalisation : " + escH(d.delaiPropose) + "</p>" : "") + "</div></div>"
+        + '<table class="dv-table"><thead><tr><th>Désignation</th><th class="dv-n">Qté</th><th class="dv-n">Prix unitaire</th><th class="dv-n">Total</th></tr></thead><tbody>' + lignes + "</tbody></table>"
+        + '<div class="dv-totaux">' + totaux + '<div class="dv-ttc"><span>' + (t.taux ? "TOTAL TTC" : "TOTAL À PAYER") + "</span><b>" + fmtN(t.ttc) + " FCFA</b></div>" + acompte + "</div>"
+        + (d.messageProposition ? '<div class="dv-bloc"><h4>MESSAGE DU PRESTATAIRE</h4><p>' + escH(d.messageProposition) + "</p></div>" : "")
+        + '<div class="dv-bloc"><h4>CONDITIONS</h4><p>' + escH(d.conditions || "Paiement direct au prestataire. Devis valable pendant la durée indiquée.") + "</p></div>"
+        + '<div class="dv-signatures"><div><b>Le prestataire</b><small>' + escH(em.nom || "") + '</small></div><div><b>Bon pour accord du client</b><small>Date et signature précédées de la mention « Lu et approuvé »</small></div></div>'
+        + '<div class="dv-pied">Devis établi via Bohicon Jobs. Le paiement s\'effectue directement entre le client et le prestataire ; Bohicon Jobs ne perçoit aucune commission.</div></div>';
+    }
+    PRESTA.devisFeuilleHtml = devisFeuilleHtml;
+
+    function ouvrirApercuDevis(d){
+      const ancien = document.getElementById("devis-apercu");
+      if (ancien) ancien.remove();
+      const fond = document.createElement("div");
+      fond.id = "devis-apercu";
+      fond.setAttribute("role", "dialog");
+      fond.setAttribute("aria-modal", "true");
+      const barre = el("div", "devis-barre");
+      const fermer = bouton("← Fermer", "sec mini", async () => { fond.remove(); });
+      const imprimer = bouton("Imprimer / Enregistrer en PDF", "mini", async () => {
+        const fin = () => { document.body.classList.remove("imprime-devis"); window.removeEventListener("afterprint", fin); };
+        window.addEventListener("afterprint", fin);
+        document.body.classList.add("imprime-devis");
+        window.print();
+        setTimeout(fin, 4000);
+      });
+      barre.append(fermer, imprimer);
+      const feuille = document.createElement("div");
+      feuille.className = "devis-defile";
+      const logo = (d.prestataireUid && logoDe(d.prestataireUid)) || "icon-192.png";
+      feuille.innerHTML = devisFeuilleHtml(d, logo);
+      fond.append(barre, feuille);
+      document.body.appendChild(fond);
+    }
+    PRESTA.ouvrirApercuDevis = ouvrirApercuDevis;
+    function ouvrirDevisParId(id){
+      const d = devisPro.concat(devisCli).find(x => x.id === id);
+      if (!d){ afficherMessage("Devis introuvable|Ouvre « Mes demandes » ou « Devis reçus » pour le retrouver."); return; }
+      ouvrirApercuDevis(d);
+    }
+
+    // Conversation : création si nécessaire (sans naviguer), puis message avec carte de devis
+    async function assurerConversation(autreUid, autreNom, contexte){
+      const id = convId(user.uid, autreUid);
+      if (!convs.find(c => c.id === id)){
+        const ref = doc(db, "conversations", id);
+        const existe = await new Promise(r => { let u = null; u = onSnapshot(ref, s => { if (u) u(); r(s.exists()); }, () => r(false)); });
+        if (!existe){
+          await setDoc(ref, {
+            participants: [user.uid, autreUid].sort(), noms: { [user.uid]: nomUtilisateur(), [autreUid]: autreNom || "Utilisateur" },
+            contexte: contexte || "", dernierTexte: "", dernierMs: 0, dernierDe: "", lus: {}, maj: serverTimestamp()
+          });
+        }
+      }
+      return id;
+    }
+    async function envoyerMessageDevis(d, total){
+      const id = await assurerConversation(d.clientUid, d.clientNom, d.prestationTitre);
+      const texte = "Devis " + d.numero + " : " + fcfa(total) + ". Consulte-le, imprime-le ou accepte-le depuis cette carte.";
+      const lot = writeBatch(db);
+      lot.set(doc(collection(db, "conversations", id, "messages")), { de: user.uid, texte, ms: Date.now(), createdAt: serverTimestamp(), devisId: d.id, devisNumero: d.numero, devisTotal: total });
+      lot.update(doc(db, "conversations", id), { dernierTexte: "Devis " + d.numero + " · " + fcfa(total), dernierMs: Date.now(), dernierDe: user.uid, ["lus." + user.uid]: Date.now(), maj: serverTimestamp() });
+      await lot.commit();
+    }
+
+    // ---------- éditeur de devis ----------
+    function vueDevisForm(z, id){
+      proSaisie = true;
+      z.appendChild(retourBtn(() => { pv.sous = null; proSaisie = false; rerendre(); }));
+      const d0 = devisPro.find(x => x.id === id);
+      if (!d0 || d0.statut !== "demande"){ z.appendChild(videEl("Cette demande n'est plus à traiter.")); return; }
+      const p = mesPresta.find(x => x.id === d0.prestationId) || {};
+      let memo = {};
+      try { memo = JSON.parse(localStorage.getItem("bj_devis_emetteur") || "{}"); } catch (e) { memo = {}; }
+      const em = {
+        nom: memo.nom || p.entrepriseNom || nomUtilisateur(), tel: memo.tel || (profil && profil.tel) || "",
+        email: memo.email || (user && user.email) || "", adresse: memo.adresse || (profil && profil.ville) || "", ifu: memo.ifu || ""
+      };
+      const etat = { lignes: [{ d: p.titre || d0.prestationTitre || "", q: 1, pu: Math.round(Number(p.prix || d0.budget || 0)) || "" }] };
+      const f = el("div", "rec-form");
+      f.insertAdjacentHTML("beforeend",
+        '<div class="rec-note">Le client reçoit ce devis dans la messagerie et par e-mail (PDF joint). Il peut l\'imprimer et l\'accepter en un geste. Paiement direct, sans commission.</div>'
+        + '<div class="rec-avertissement"><b>' + escH(d0.clientNom || "Client") + '</b> demande : ' + escH(d0.besoin) + '</div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">1</span>Tes coordonnées sur le devis</div>'
+        + '<label class="champ"><span>Nom ou entreprise</span><input id="dv-nom" maxlength="80"></label>'
+        + '<label class="champ"><span>Téléphone</span><input id="dv-tel" maxlength="30" inputmode="tel"></label>'
+        + '<label class="champ"><span>E-mail</span><input id="dv-email" maxlength="80" inputmode="email"></label>'
+        + '<label class="champ"><span>Adresse ou ville</span><input id="dv-adresse" maxlength="100"></label>'
+        + '<label class="champ"><span>IFU ou RCCM <small>facultatif</small></span><input id="dv-ifu" maxlength="30"></label></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">2</span>Détail des prestations</div><div id="dv-lignes"></div>'
+        + '<button id="dv-ajout" class="sec mini" type="button">+ Ajouter une ligne</button></div>'
+        + '<div class="sect"><div class="sect-titre"><span class="sect-num">3</span>Conditions</div>'
+        + '<label class="champ"><span>Remise (FCFA) <small>facultatif</small></span><input id="dv-remise" type="number" min="0" inputmode="numeric" placeholder="0"></label>'
+        + '<label class="champ"><span>TVA</span><select id="dv-tva"></select></label>'
+        + '<label class="champ"><span>Acompte à la commande</span><select id="dv-acompte"></select></label>'
+        + '<label class="champ"><span>Validité du devis</span><select id="dv-validite"></select></label>'
+        + '<label class="champ"><span>Délai de réalisation</span><input id="dv-delai" maxlength="60" placeholder="Ex : 5 jours ouvrés"></label>'
+        + '<label class="champ"><span>Conditions</span><textarea id="dv-cond" rows="3" maxlength="500"></textarea></label>'
+        + '<label class="champ"><span>Message au client <small>facultatif</small></span><textarea id="dv-msg" rows="3" maxlength="500" placeholder="Un mot pour accompagner ton devis"></textarea></label></div>'
+        + '<div class="dv-total" id="dv-total"></div>');
+      const q = s => f.querySelector(s);
+      q("#dv-nom").value = em.nom; q("#dv-tel").value = em.tel; q("#dv-email").value = em.email; q("#dv-adresse").value = em.adresse; q("#dv-ifu").value = em.ifu;
+      [["0", "Aucune TVA"], ["18", "TVA 18 %"]].forEach(([v, l]) => { const o = el("option", "", l); o.value = v; q("#dv-tva").appendChild(o); });
+      [["0", "Aucun acompte"], ["30", "30 %"], ["50", "50 %"]].forEach(([v, l]) => { const o = el("option", "", l); o.value = v; q("#dv-acompte").appendChild(o); });
+      [["15", "15 jours"], ["30", "30 jours"], ["60", "60 jours"]].forEach(([v, l]) => { const o = el("option", "", l); o.value = v; q("#dv-validite").appendChild(o); });
+      q("#dv-tva").value = "0"; q("#dv-acompte").value = "0"; q("#dv-validite").value = "30";
+      q("#dv-delai").value = p.delai || "";
+      q("#dv-cond").value = "Acompte à la commande, solde à la livraison. Paiement direct entre le client et le prestataire (espèces, Mobile Money…). Devis valable pendant la durée indiquée.";
+
+      const lire = () => ({
+        id: d0.id, prestataireUid: user.uid, clientUid: d0.clientUid, clientNom: d0.clientNom, besoin: d0.besoin, prestationTitre: d0.prestationTitre,
+        lignes: etat.lignes.map(l => ({ d: String(l.d || "").trim().slice(0, 80), q: Math.round(Number(l.q || 0) * 100) / 100, pu: Math.round(Number(l.pu || 0)) })),
+        remise: Math.max(0, Math.round(Number(q("#dv-remise").value) || 0)), tvaTaux: Number(q("#dv-tva").value) || 0, acomptePct: Number(q("#dv-acompte").value) || 0,
+        validiteJours: Number(q("#dv-validite").value) || 30, delaiPropose: q("#dv-delai").value.trim().slice(0, 60), conditions: q("#dv-cond").value.trim().slice(0, 500),
+        messageProposition: q("#dv-msg").value.trim().slice(0, 500), numero: prochainNumero(), dateDevis: Date.now(),
+        emetteur: { nom: q("#dv-nom").value.trim().slice(0, 80), tel: q("#dv-tel").value.trim().slice(0, 30), email: q("#dv-email").value.trim().slice(0, 80), adresse: q("#dv-adresse").value.trim().slice(0, 100), ifu: q("#dv-ifu").value.trim().slice(0, 30) }
+      });
+      const majTotal = () => {
+        const d = lire(), t = calculDevis(d);
+        const zt = q("#dv-total");
+        zt.innerHTML = "";
+        const ligne = (k, v, cls) => { const l = el("div", "dv-total-ligne" + (cls ? " " + cls : "")); l.append(el("span", "", k), el("b", "", v)); zt.appendChild(l); };
+        ligne("Sous-total", fcfa(t.st));
+        if (t.remise) ligne("Remise", "- " + fcfa(t.remise));
+        if (t.taux){ ligne("Total HT", fcfa(t.ht)); ligne("TVA " + t.taux + " %", fcfa(t.tva)); }
+        ligne(t.taux ? "Total TTC" : "Total à payer", fcfa(t.ttc), "grand");
+        if (d.acomptePct) ligne("Acompte (" + d.acomptePct + " %)", fcfa(t.acompte));
+      };
+      const dessinerLignes = () => {
+        const zone = q("#dv-lignes");
+        zone.innerHTML = "";
+        etat.lignes.forEach((l, i) => {
+          const r = el("div", "dv-ligne");
+          const d = document.createElement("input"); d.className = "dv-d"; d.maxLength = 80; d.placeholder = "Désignation (ex : Logo, 3 propositions)"; d.value = l.d || "";
+          d.addEventListener("input", () => { l.d = d.value; });
+          const qt = document.createElement("input"); qt.className = "dv-q"; qt.type = "number"; qt.min = "0"; qt.step = "any"; qt.inputMode = "decimal"; qt.placeholder = "Qté"; qt.value = String(l.q == null ? "" : l.q);
+          qt.addEventListener("input", () => { l.q = qt.value; majTotal(); });
+          const pu = document.createElement("input"); pu.className = "dv-pu"; pu.type = "number"; pu.min = "0"; pu.inputMode = "numeric"; pu.placeholder = "Prix unitaire"; pu.value = String(l.pu == null ? "" : l.pu);
+          pu.addEventListener("input", () => { l.pu = pu.value; majTotal(); });
+          const x = el("button", "dv-x", "×"); x.type = "button"; x.setAttribute("aria-label", "Supprimer la ligne");
+          x.addEventListener("click", () => { if (etat.lignes.length > 1){ etat.lignes.splice(i, 1); dessinerLignes(); majTotal(); } });
+          r.append(d, qt, pu, x);
+          zone.appendChild(r);
+        });
+      };
+      dessinerLignes();
+      q("#dv-ajout").addEventListener("click", () => {
+        if (etat.lignes.length >= 15){ afficherMessage("Limite atteinte|Un devis peut contenir 15 lignes au maximum."); return; }
+        etat.lignes.push({ d: "", q: 1, pu: "" }); dessinerLignes(); majTotal();
+      });
+      ["#dv-remise", "#dv-tva", "#dv-acompte"].forEach(s => { q(s).addEventListener("input", majTotal); q(s).addEventListener("change", majTotal); });
+      majTotal();
+
+      const valider = d => {
+        if (!d.emetteur.nom) return "Nom manquant|Indique ton nom ou celui de ton entreprise.";
+        if (!d.emetteur.tel) return "Téléphone manquant|Le client doit pouvoir te joindre : indique ton numéro.";
+        if (d.lignes.some(l => !l.d || !(l.q > 0) || !(l.pu > 0))) return "Lignes incomplètes|Chaque ligne doit avoir une désignation, une quantité et un prix.";
+        if (!(calculDevis(d).ttc > 0)) return "Montant nul|Le total du devis doit être supérieur à 0.";
+        return "";
+      };
+      f.appendChild(bouton("Aperçu du devis", "sec", async () => {
+        const d = lire(), e = valider(d);
+        if (e){ afficherMessage(e); return; }
+        ouvrirApercuDevis(d);
+      }));
+      f.appendChild(bouton("Envoyer le devis au client", "", async () => {
+        const d = lire(), e = valider(d);
+        if (e){ afficherMessage(e); return; }
+        const t = calculDevis(d);
+        try {
+          await updateDoc(doc(db, "devis", d0.id), {
+            statut: "propose", prixPropose: t.ttc, delaiPropose: d.delaiPropose, messageProposition: d.messageProposition, numero: d.numero, dateDevis: d.dateDevis,
+            validiteJours: d.validiteJours, lignes: d.lignes, remise: d.remise, tvaTaux: d.tvaTaux, acomptePct: d.acomptePct, conditions: d.conditions, emetteur: d.emetteur,
+            ["horodatages.propose"]: Date.now(), maj: serverTimestamp()
+          });
+        } catch (err){ console.error(err); afficherMessage("Devis non envoyé|Vérifie ta connexion puis réessaie."); return; }
+        try { localStorage.setItem("bj_devis_emetteur", JSON.stringify(d.emetteur)); } catch (err) { /* ignoré */ }
+        try { await envoyerMessageDevis(d, t.ttc); } catch (err) { console.error("Message du devis :", err); }
+        afficherMessage("Devis envoyé|Le client le reçoit dans la messagerie et par e-mail (PDF joint).", "succes");
+        pv.sous = null; proSaisie = false; rerendre();
+      }));
+      z.appendChild(f);
+    }
+
     // Raccourcis depuis les tableaux de bord : ouvre directement la bonne vue
     PRESTA.aller = (vue, filtre) => {
       if (filtre) filtreCmdPro = filtre;
