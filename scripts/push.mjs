@@ -2,9 +2,9 @@
 // Exécuté toutes les 5 minutes par GitHub Actions (voir push.yml).
 import admin from "firebase-admin";
 import nodemailer from "nodemailer";
-import { courrielHtml, courrielTexte, blocsBienvenue, devisPdf, pieceLogo } from "./mailkit.mjs";
+import { courrielHtml, courrielTexte, blocsBienvenue, devisPdf, pieceLogo, MAIL_ASSISTANCE } from "./mailkit.mjs";
 
-const SITE = "https://borisadomou-star.github.io/bohicon-jobs/";
+const SITE = "https://www.bohiconjobs.online/";
 const AGE_MAX = 3 * 60 * 60 * 1000;   // pas d'alerte pour un événement plus vieux que 3 h
 
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
@@ -111,8 +111,8 @@ async function courriel(uids, sujet, corps, lien, extras = {}){
     const donnees = { site: SITE, prenom: u.prenom, titre: extras.titre || sujet, intro: corps, lignes: extras.lignes, boutonTexte: extras.bouton, lien: lien || SITE, preheader: extras.preheader, blocs: extras.blocs, pourquoi };
     try {
       await transport.sendMail({
-        from: '"Bohicon Jobs" <' + process.env.GMAIL_USER + ">",
-        replyTo: process.env.GMAIL_USER,
+        from: '"Bohicon Jobs" <' + (process.env.MAIL_FROM || process.env.GMAIL_USER) + ">",
+        replyTo: process.env.MAIL_REPLY || MAIL_ASSISTANCE,
         to: u.email,
         subject: extras.sujetMail || (sujet + " · Bohicon Jobs"),
         text: courrielTexte(donnees),
