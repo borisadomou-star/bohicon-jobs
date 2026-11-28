@@ -84,7 +84,7 @@
   <div class="hero-in">
     <div class="tuile" aria-hidden="true">🔒</div>
     <h1>Confidentialité et conditions d'utilisation</h1>
-    <span class="maj">Dernière mise à jour : 27 novembre 2026</span>
+    <span class="maj">Dernière mise à jour : 28 novembre 2026</span>
   </div>
 </div>
 
@@ -207,7 +207,7 @@
   <section>
     <h2><span class="num">7</span>Tes droits</h2>
     <p>Tu peux demander à consulter, corriger ou supprimer les informations que nous avons sur toi, conformément à la réglementation béninoise sur la protection des données personnelles. Pour cela, contacte-nous :</p>
-    <p id="contact">Contact : à renseigner.</p>
+    <p id="contact">Contact : <a href="mailto:contact@bohiconjobs.online">contact@bohiconjobs.online</a> · Assistance : <a href="mailto:assistance@bohiconjobs.online">assistance@bohiconjobs.online</a></p>
   </section>
 
   <section>
@@ -287,7 +287,8 @@
 <script>
   // Tes coordonnées se règlent dans le fichier config.js
   const WHATSAPP = (window.CONFIG && window.CONFIG.NUMERO_WA) || "";
-  const EMAIL = (window.CONFIG && window.CONFIG.EMAIL) || "";
+  const EMAIL = (window.CONFIG && window.CONFIG.EMAIL) || "contact@bohiconjobs.online";
+  const ASSISTANCE = (window.CONFIG && window.CONFIG.ASSISTANCE) || "assistance@bohiconjobs.online";
 
   (function(){
     const zone = document.getElementById("contact");
@@ -304,6 +305,15 @@
       a.href = "mailto:" + EMAIL;
       a.textContent = EMAIL;
       morceaux.push(a);
+    }
+    if (ASSISTANCE){
+      const s = document.createElement("span");
+      s.appendChild(document.createTextNode("Assistance : "));
+      const a = document.createElement("a");
+      a.href = "mailto:" + ASSISTANCE;
+      a.textContent = ASSISTANCE;
+      s.appendChild(a);
+      morceaux.push(s);
     }
     if (morceaux.length){
       zone.textContent = "Contact : ";

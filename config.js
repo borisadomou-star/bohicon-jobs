@@ -1,8 +1,8 @@
-// Réglages de Bohicon Jobs : modifie seulement ce fichier pour ton contact.
-// NUMERO_WA : ton numéro WhatsApp au format 229 + 10 chiffres, par exemple "2290155000000".
-// EMAIL : ton adresse e-mail de contact, par exemple "contact@exemple.com".
-// Laisse "" pour ne rien afficher.
+// Réglages de Bohicon Jobs : modifie seulement ce fichier pour tes contacts.
+// NUMERO_WA : ton numéro WhatsApp au format 229 + 10 chiffres, par exemple "2290155000000". Laisse "" pour ne rien afficher.
+// EMAIL : adresse de contact général. ASSISTANCE : adresse du support aux utilisateurs.
 window.CONFIG = {
-  NUMERO_WA: "2290167079595",
-  EMAIL: "borisadomou@gmail.com"
+  NUMERO_WA: "",
+  EMAIL: "contact@bohiconjobs.online",
+  ASSISTANCE: "assistance@bohiconjobs.online"
 };
